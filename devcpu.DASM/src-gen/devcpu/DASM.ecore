@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="dASM" nsURI="http://herobrinesarmy.com/" nsPrefix="dASM">
+  <eClassifiers xsi:type="ecore:EClass" name="Model"/>
+  <eClassifiers xsi:type="ecore:EClass" name="LineDefinition" eSuperTypes="#//Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="labels" upperBound="-1"
+        eType="#//Label" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="content" eType="#//LineContent"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="comment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LineContent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Directive" eSuperTypes="#//LineContent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OriginDirective" eSuperTypes="#//Directive">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IncludeDirective" eSuperTypes="#//Directive">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataLine" eSuperTypes="#//LineContent">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dataElements" unique="false"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LiteralExpression" eSuperTypes="#//Value #//AddressExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//NonGroupOperand"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NonGroupOperand">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="labelName" eType="#//Label"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StackValue" eSuperTypes="#//NonGroupOperand"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PickValue" eSuperTypes="#//StackValue">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pickValue" eType="#//LiteralExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Label">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Instruction" eSuperTypes="#//LineContent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="a" eType="#//Value" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BasicInstruction" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opcode" eType="#//BasicOpcode"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="b" eType="#//Value" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpecialInstruction" eSuperTypes="#//Instruction">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opcode" eType="#//SpecialOpcode"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Value"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Literal" eSuperTypes="#//NonGroupOperand">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="number" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Register" eSuperTypes="#//NonGroupOperand">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="standardRegister" eType="#//StandardRegister"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="specialRegister" eType="#//SpecialRegister"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LiteralAddress">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="number" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="labelName" eType="#//Label"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AddressExpression" eSuperTypes="#//Value"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="BasicOpcode">
+    <eLiterals name="SET" literal="SET"/>
+    <eLiterals name="ADD" value="1" literal="ADD"/>
+    <eLiterals name="SUB" value="2" literal="SUB"/>
+    <eLiterals name="MUL" value="3" literal="MUL"/>
+    <eLiterals name="MLI" value="4" literal="MLI"/>
+    <eLiterals name="DIV" value="5" literal="DIV"/>
+    <eLiterals name="DVI" value="6" literal="DVI"/>
+    <eLiterals name="MOD" value="7" literal="MOD"/>
+    <eLiterals name="MDI" value="8" literal="MDI"/>
+    <eLiterals name="AND" value="9" literal="AND"/>
+    <eLiterals name="BOR" value="10" literal="BOR"/>
+    <eLiterals name="XOR" value="11" literal="XOR"/>
+    <eLiterals name="SHR" value="12" literal="SHR"/>
+    <eLiterals name="ASR" value="13" literal="ASR"/>
+    <eLiterals name="SHL" value="14" literal="SHL"/>
+    <eLiterals name="IFB" value="15" literal="IFB"/>
+    <eLiterals name="IFC" value="16" literal="IFC"/>
+    <eLiterals name="IFE" value="17" literal="IFE"/>
+    <eLiterals name="IFN" value="18" literal="IFN"/>
+    <eLiterals name="IFG" value="19" literal="IFG"/>
+    <eLiterals name="IFA" value="20" literal="IFA"/>
+    <eLiterals name="IFL" value="21" literal="IFL"/>
+    <eLiterals name="IFU" value="22" literal="IFU"/>
+    <eLiterals name="ADX" value="23" literal="ADX"/>
+    <eLiterals name="SBX" value="24" literal="SBX"/>
+    <eLiterals name="STI" value="25" literal="STI"/>
+    <eLiterals name="STD" value="26" literal="STD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SpecialOpcode">
+    <eLiterals name="JSR" literal="JSR"/>
+    <eLiterals name="INT" value="1" literal="INT"/>
+    <eLiterals name="IAG" value="2" literal="IAG"/>
+    <eLiterals name="IAS" value="3" literal="IAS"/>
+    <eLiterals name="RFI" value="4" literal="RFI"/>
+    <eLiterals name="IAQ" value="5" literal="IAQ"/>
+    <eLiterals name="HWN" value="6" literal="HWN"/>
+    <eLiterals name="HWQ" value="7" literal="HWQ"/>
+    <eLiterals name="HWI" value="8" literal="HWI"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="StandardRegister">
+    <eLiterals name="A" literal="A"/>
+    <eLiterals name="B" value="1" literal="B"/>
+    <eLiterals name="C" value="2" literal="C"/>
+    <eLiterals name="X" value="3" literal="X"/>
+    <eLiterals name="Y" value="4" literal="Y"/>
+    <eLiterals name="Z" value="5" literal="Z"/>
+    <eLiterals name="I" value="6" literal="I"/>
+    <eLiterals name="J" value="7" literal="J"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SpecialRegister">
+    <eLiterals name="SP" literal="SP"/>
+    <eLiterals name="PC" value="1" literal="PC"/>
+    <eLiterals name="EX" value="2" literal="EX"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Operator">
+    <eLiterals name="ADD" literal="+"/>
+    <eLiterals name="SUBTRACT" value="1" literal="-"/>
+    <eLiterals name="MULTIPLY" value="2" literal="*"/>
+    <eLiterals name="DIVIDE" value="3" literal="/"/>
+    <eLiterals name="MODULUS" value="4" literal="%"/>
+    <eLiterals name="LEFT_SHIFT" value="5" literal="&lt;&lt;"/>
+    <eLiterals name="ARITHMETIC_RIGHT_SHIFT" value="6" literal=">>"/>
+    <eLiterals name="LOGICAL_RIGHT_SHIFT" value="7" literal=">>>"/>
+    <eLiterals name="BITWISE_AND" value="8" literal="&amp;"/>
+    <eLiterals name="BITWISE_OR" value="9" literal="|"/>
+    <eLiterals name="BITWISE_XOR" value="10" literal="^"/>
+    <eLiterals name="BITWISE_NOT" value="11" literal="~"/>
+    <eLiterals name="LOGICAL_NOT" value="12" literal="!"/>
+    <eLiterals name="EQUAL" value="13" literal="=="/>
+    <eLiterals name="NOT_EQUAL" value="14" literal="!="/>
+    <eLiterals name="GREATER" value="15" literal=">"/>
+    <eLiterals name="GREATER_OR_EQUAL" value="16" literal=">="/>
+    <eLiterals name="LESS" value="17" literal="&lt;"/>
+    <eLiterals name="LESS_OR_EQUAL" value="18" literal="&lt;="/>
+    <eLiterals name="LOGICAL_AND" value="19" literal="&amp;&amp;"/>
+    <eLiterals name="LOGICAL_OR" value="20" literal="||"/>
+    <eLiterals name="CONDITIONAL_TRUE" value="21" literal="?"/>
+    <eLiterals name="CONDITIONAL_FALSE" value="22" literal=":"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Operation" eSuperTypes="#//Model #//LiteralExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="#//Operator"/>
+  </eClassifiers>
+</ecore:EPackage>

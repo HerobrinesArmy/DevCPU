@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lzma.jar"/>
+	<classpathentry exported="true" kind="lib" path="lwjgl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lwjgl_util.jar"/>
+	<classpathentry exported="true" kind="lib" path="lwjgl-debug.jar"/>
+	<classpathentry exported="true" kind="lib" path="lwjgl_util_applet.jar"/>
+	<classpathentry exported="true" kind="lib" path="lwjgl_test.jar"/>
+	<classpathentry exported="true" kind="lib" path="jinput.jar"/>
+	<classpathentry exported="true" kind="lib" path="asm-debug-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="AppleJavaExtensions.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
