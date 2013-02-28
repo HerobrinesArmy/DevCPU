@@ -177,12 +177,12 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="AssembleToFloppyHandler"
+            defaultHandler="devcpu.NavigatorCommandHandler"
             id="AssembleToFloppy"
             name="Assemble to floppy...">
       </command>
       <command
-            defaultHandler="AssembleToFloppyHandler"
+            defaultHandler="devcpu.NavigatorCommandHandler"
             id="AssembleToDCPU"
             name="Assemble to DCPU...">
       </command>

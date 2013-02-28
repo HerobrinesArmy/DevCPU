@@ -1,3 +1,4 @@
+package devcpu;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -17,14 +18,13 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import devcpu.Activator;
 import devcpu.emulation.Assembler;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerContentProvider;
 import devcpu.views.DeviceManagerLabelProvider;
 
-public class AssembleToFloppyHandler implements IHandler {
+public class NavigatorCommandHandler implements IHandler {
 	private static final String ASSEMBLE_TO_FLOPPY = "AssembleToFloppy";
 	private static final String ASSEMBLE_TO_DCPU = "AssembleToDCPU";
 

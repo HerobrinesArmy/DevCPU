@@ -21,6 +21,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
@@ -232,25 +235,23 @@ public class DeviceManagerView extends ViewPart {
 	        		};
 						});
 	    		}
-        	MenuManager attachMenu = new MenuManager("Connect Hardware");
-      	  attachMenu.addMenuListener(new IMenuListener() {
-      	    @Override
-      	    public void menuAboutToShow(IMenuManager manager) {
-      	    	for (final DCPUHardware hw : Activator.getDefault().getShip().getHardwareManager().getDevices())
-      	    	{
-      	    		if (!hw.isConnected()) {
-	      	    		manager.add(new Action(hw.getID()) {
-	        	    		public void run() {
-	        	    			hw.connectTo(dcpu);
-	        	    			contentProvider.update();
-	        	    		};
-	        	    	});
-      	    		}
-      	    	}
-      	    }
-      	  });
-      	  attachMenu.setRemoveAllWhenShown(true);
-      	  menuMgr.add(attachMenu);
+	    		
+	    		manager.add(new Action("Connect hardware...") {
+        		public void run() {
+        			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getDefault().getShip().getHardwareManager(), new DeviceManagerContentProvider(), new DeviceManagerLabelProvider(), "Choose hardware to connect to "+dcpu.getID()+".");
+							listDialog.setTitle("Connect Hardware");
+							int open = listDialog.open();
+							if (open == ListSelectionDialog.OK) {
+								Object[] res = listDialog.getResult();
+								for (Object o : res) {
+									if (o instanceof DCPUHardware) {
+										((DCPUHardware) o).connectTo(dcpu);
+									}
+								}
+							}
+							contentProvider.update();
+        		}
+	    		});
         } else if (o instanceof VirtualFloppyDrive) {
         	final VirtualFloppyDrive vfd = (VirtualFloppyDrive) o;
         	if (vfd.getDisk() == null) {
