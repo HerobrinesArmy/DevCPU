@@ -1,0 +1,158 @@
+grammar devcpu.DASM hidden(WS)
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate dASM "http://herobrinesarmy.com/"
+
+Model:
+	LineDefinition ({Operation.left=current} NL right=Model)?
+;
+
+LineDefinition:
+	(labels += Label)* (content=LineContent)? (comment=SL_COMMENT)? 
+;
+
+LineContent:
+	Instruction | Directive | DataLine
+;
+
+Directive:
+	IncludeDirective | OriginDirective
+;
+
+OriginDirective:
+	(".origin"|"#origin"|".align"|"#align") value=Number
+;
+
+IncludeDirective:
+	(".include"|"#include"|".import"|"#import") name=STRING
+;
+
+DataLine:
+	("DAT"|".dat") (','* dataElements+=DataElement ','*)+
+;
+
+DataElement:
+	STRING | Number
+;
+
+LiteralExpression :
+  TerminalExpression ({Operation.left=current} op=Operator right=LiteralExpression)?
+;
+ 
+TerminalExpression returns LiteralExpression:
+  '(' LiteralExpression ')' | value=NonGroupOperand
+;
+
+NonGroupOperand:
+	Register | Literal | labelName=[Label] | StackValue
+;
+
+StackValue:
+	"POP"|"PUSH"|PickValue
+;
+
+PickValue:
+	"PICK" pickValue=LiteralExpression
+;
+
+Label:
+	':'name=ID
+;
+
+Instruction:
+	BasicInstruction | SpecialInstruction	
+;
+
+BasicInstruction:
+	opcode=BasicOpcode b=Value ","? a=Value
+;
+
+SpecialInstruction:
+	opcode=SpecialOpcode a=Value
+;
+
+Value:
+ LiteralExpression | AddressExpression
+;
+
+Literal:
+	number=Number
+;
+
+Register:
+	(standardRegister=StandardRegister) | (specialRegister=SpecialRegister)
+;
+
+LiteralAddress:
+	'[' (number=Number|labelName=[Label]) ']'
+;
+
+AddressExpression:
+	'[' LiteralExpression ']'
+;
+
+Number:
+	HEXNUMBER | DECNUMBER | BINNUMBER
+;
+
+enum BasicOpcode:
+	SET|ADD|SUB|MUL|MLI|DIV|DVI|MOD|MDI|AND|BOR|XOR|SHR|ASR|SHL|IFB|IFC|IFE|IFN|IFG|IFA|IFL|IFU|ADX|SBX|STI|STD
+;
+
+enum SpecialOpcode:
+	JSR|INT|IAG|IAS|RFI|IAQ|HWN|HWQ|HWI
+;
+
+enum StandardRegister:
+	A|B|C|X|Y|Z|I|J
+;
+
+enum SpecialRegister:
+	SP|PC|EX
+;
+
+enum Operator:
+	ADD='+'|
+	SUBTRACT='-'|
+	MULTIPLY='*'|
+	DIVIDE='/'|
+	MODULUS='%'|
+	LEFT_SHIFT='<<'|
+	ARITHMETIC_RIGHT_SHIFT='>>'|
+	LOGICAL_RIGHT_SHIFT='>>>'|
+	BITWISE_AND='&'|
+	BITWISE_OR='|'|
+	BITWISE_XOR='^'|
+	BITWISE_NOT='~'|
+	LOGICAL_NOT='!'|
+	EQUAL='=='|
+	NOT_EQUAL='!='|
+	GREATER='>'|
+	GREATER_OR_EQUAL='>='|
+	LESS='<'|
+	LESS_OR_EQUAL='<='|
+	LOGICAL_AND='&&'|
+	LOGICAL_OR='||'|
+	CONDITIONAL_TRUE='?'|
+	CONDITIONAL_FALSE=':'
+;
+
+terminal ID : '^'?('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*; 
+
+terminal HEXNUMBER:	'0x'('0'..'9'|'a'..'f'|'A'..'F')+;
+
+terminal DECNUMBER: ('-')?('0'..'9')+;
+
+terminal BINNUMBER:	'0b'('0'|'1')+;
+
+terminal SL_COMMENT: ";" !('\n'|'\r')*;
+
+terminal STRING	: 
+	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|'"') )* '"' |
+	"'" ( '\\' ('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|"'") )* "'"
+; 
+		
+terminal WS : (' '|'\t')+;
+
+terminal NL : (' '|'\t')* ('\r'? '\n');

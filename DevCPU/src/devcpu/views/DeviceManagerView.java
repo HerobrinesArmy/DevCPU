@@ -216,8 +216,22 @@ public class DeviceManagerView extends ViewPart {
 	  	    			contentProvider.update();
 	  	    		};
 	  	    	});
+		    		manager.add(new Action("Load from binary...") {
+	        		public void run() {
+	        			FileDialog fd = new FileDialog(container.getShell(), SWT.OPEN);
+	              fd.setText("Load binary file (big endian)");
+	              String selected = fd.open();
+	              if (selected != null) {
+										try {
+											dcpu.load(new File(selected));
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+	              }
+	        			contentProvider.update();
+	        		};
+						});
 	    		}
- 	    		
         	MenuManager attachMenu = new MenuManager("Connect Hardware");
       	  attachMenu.addMenuListener(new IMenuListener() {
       	    @Override

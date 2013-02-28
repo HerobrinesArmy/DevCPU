@@ -1,5 +1,11 @@
 package devcpu.emulation;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import devcpu.DCPUManager;
 
 public class DefaultControllableDCPU extends DCPU implements Identifiable {
@@ -123,6 +129,19 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable {
 		return keepAlive;
 	}
 
+	public void load(File file) throws IOException {
+		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+		try {
+			for (int i = 0;; i++) {
+				ram[i] = dis.readChar();
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			//TODO handle file too large for disk
+		} catch (IOException e) {
+			dis.close();
+		}	
+	}
+	
 //	public void addTickListener(DCPUTickListener listener) {
 //		tickListeners.add(listener);
 //	}

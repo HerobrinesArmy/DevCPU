@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/devcpu.DASM/src-gen" editDirectory="/devcpu.DASM.edit/src"
+    editorDirectory="/devcpu.DASM.editor/src" modelPluginID="devcpu.DASM" forceOverwrite="true"
+    modelName="DASM" updateClasspath="false" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    complianceLevel="5.0" copyrightFields="false" editPluginID="devcpu.DASM.edit"
+    editorPluginID="devcpu.DASM.editor" runtimeVersion="2.9">
+  <genPackages prefix="DASM" basePackage="devcpu" disposableProviderFactory="true"
+      fileExtensions="dasm,dasm16" ecorePackage="DASM.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DASM.ecore#//BasicOpcode">
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/SET"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/ADD"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/SUB"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/MUL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/MLI"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/DIV"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/DVI"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/MOD"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/MDI"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/AND"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/BOR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/XOR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/SHR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/ASR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/SHL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFB"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFC"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFE"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFN"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFG"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFA"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/IFU"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/ADX"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/SBX"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/STI"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//BasicOpcode/STD"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DASM.ecore#//SpecialOpcode">
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/JSR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/INT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/IAG"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/IAS"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/RFI"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/IAQ"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/HWN"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/HWQ"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialOpcode/HWI"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DASM.ecore#//StandardRegister">
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/A"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/B"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/C"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/X"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/Y"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/Z"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/I"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//StandardRegister/J"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DASM.ecore#//SpecialRegister">
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialRegister/SP"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialRegister/PC"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//SpecialRegister/EX"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DASM.ecore#//Operator">
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/ADD"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/SUBTRACT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/MULTIPLY"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/DIVIDE"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/MODULUS"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LEFT_SHIFT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/ARITHMETIC_RIGHT_SHIFT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LOGICAL_RIGHT_SHIFT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/BITWISE_AND"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/BITWISE_OR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/BITWISE_XOR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/BITWISE_NOT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LOGICAL_NOT"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/EQUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/NOT_EQUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/GREATER"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/GREATER_OR_EQUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LESS"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LESS_OR_EQUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LOGICAL_AND"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/LOGICAL_OR"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/CONDITIONAL_TRUE"/>
+      <genEnumLiterals ecoreEnumLiteral="DASM.ecore#//Operator/CONDITIONAL_FALSE"/>
+    </genEnums>
+    <genClasses ecoreClass="DASM.ecore#//Model"/>
+    <genClasses ecoreClass="DASM.ecore#//LineDefinition">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//LineDefinition/labels"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//LineDefinition/content"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//LineDefinition/comment"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//LineContent"/>
+    <genClasses ecoreClass="DASM.ecore#//Directive"/>
+    <genClasses ecoreClass="DASM.ecore#//OriginDirective">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//OriginDirective/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//IncludeDirective">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//IncludeDirective/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//DataLine">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//DataLine/dataElements"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//LiteralExpression">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//LiteralExpression/value"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//NonGroupOperand">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DASM.ecore#//NonGroupOperand/labelName"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//StackValue"/>
+    <genClasses ecoreClass="DASM.ecore#//PickValue">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//PickValue/pickValue"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//Label">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//Label/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//Instruction">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//Instruction/a"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//BasicInstruction">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//BasicInstruction/opcode"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//BasicInstruction/b"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//SpecialInstruction">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//SpecialInstruction/opcode"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//Value"/>
+    <genClasses ecoreClass="DASM.ecore#//Literal">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//Literal/number"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//Register">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//Register/standardRegister"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//Register/specialRegister"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//LiteralAddress">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//LiteralAddress/number"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DASM.ecore#//LiteralAddress/labelName"/>
+    </genClasses>
+    <genClasses ecoreClass="DASM.ecore#//AddressExpression"/>
+    <genClasses ecoreClass="DASM.ecore#//Operation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//Operation/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DASM.ecore#//Operation/right"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DASM.ecore#//Operation/op"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
