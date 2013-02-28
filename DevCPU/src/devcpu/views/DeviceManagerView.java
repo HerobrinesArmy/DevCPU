@@ -21,9 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
@@ -89,17 +87,17 @@ public class DeviceManagerView extends ViewPart {
 	        	menuMgr.add(new Separator());
 	        }
 	        
-//	        if (o instanceof DCPUHardware) {
-//	        	final DCPUHardware hardware = (DCPUHardware) o;
-//	        	if ()
-//	        	manager.add(new Action("Reset") {
-//	        		public void run() {
-//	        			FloppyDisk disk = hardware.createFloppyDisk();
-//	        			treeViewer.expandToLevel(disk, 0);
-//	        			contentProvider.update();
-//	        		};
-//						});
-//	        }
+	        if (o instanceof DCPUHardware) {
+	        	final DCPUHardware hardware = (DCPUHardware) o;
+	        	if (hardware.isConnected()) {
+		        	manager.add(new Action("Disconnect") {
+		        		public void run() {
+		        			hardware.disconnect();
+		        			contentProvider.update();
+		        		};
+							});
+	        	}
+	        }
 	        
 	        if (o instanceof DCPUManager) {
 	        	final DCPUManager dcpuManager = (DCPUManager) o;

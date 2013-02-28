@@ -133,119 +133,123 @@ public class VirtualMonitor extends DCPUHardware
   }
 
   public void render() {
-  	synchronized (this) {
-  		if (pixels != null) {
-		    if ((screenMemMap == 0) || (startDelay > 0)) {
-		      int reds = 0;
-		      int greens = 0;
-		      int blues = 0;
-		
-		      if ((startDelay > 0) && (startDelay < 10)) {
-		        for (int y = 0; y < 96; y++)
-		          for (int x = 0; x < 128; x++) {
-		            int col = palette[0];
-		            pixels[(x + y * 128)] = col;
-		            reds += (col & 0xFF0000);
-		            greens += (col & 0xFF00);
-		            blues += (col & 0xFF);
-		          }
-		      }
-		      else {
-		        for (int y = 0; y < 96; y++) {
-		          for (int x = 0; x < 128; x++) {
-		            int cc = loadImage[(x + y * 128)] & 0xFF;
-		            int col = palette[1];
-		            pixels[(x + y * 128)] = col;
-		            reds += (col & 0xFF0000);
-		            greens += (col & 0xFF00);
-		            blues += (col & 0xFF);
-		          }
-		        }
-		      }
-		
-		      int bgColor = 1;
-		      if (startDelay < 26) {
-		        bgColor = startDelay - 10;
-		      }
-		      if (bgColor < 0) bgColor = 0;
-		      int color = palette[bgColor];
-		      for (int y = 96; y < 128; y++) {
-		        for (int x = 0; x < 128; x++) {
-		          pixels[(x + y * 128)] = color;
-		        }
-		      }
-		
-		      int borderPixels = 100;
-		      reds += (color & 0xFF0000) * borderPixels;
-		      greens += (color & 0xFF00) * borderPixels;
-		      blues += (color & 0xFF) * borderPixels;
-		
-		      reds = reds / (0x3000 + borderPixels) & 0xFF0000;
-		      greens = greens / (0x3000 + borderPixels) & 0xFF00;
-		      blues = blues / (0x3000 + borderPixels) & 0xFF;
-		      lightColor = (reds | greens | blues);
-		    } else {
-		      long time = System.currentTimeMillis() / 16L;
-		      boolean blink = time / 20L % 2L == 0L;
-		      long reds = 0L;
-		      long greens = 0L;
-		      long blues = 0L;
-		
-		      char[] fontRam = font;
-		      int charOffset = 0;
-		      if (fontMemMap > 0) {
-		        fontRam = dcpu.ram;
-		        charOffset = fontMemMap;
-		      }
-		      if (paletteMemMap == 0)
-		        resetPalette();
-		      else {
-		        loadPalette(dcpu.ram, paletteMemMap);
-		      }
-		
-		      for (int y = 0; y < 12; y++) {
-		        for (int x = 0; x < 32; x++) {
-		          char dat = dcpu.ram[(screenMemMap + x + y * 32)];
-		          int ch = dat & 0x7F;
-		          int colorIndex = dat >> '\b' & 0xFF;
-		          int co = charOffset + ch * 2;
-		
-		          int color = palette[(colorIndex & 0xF)];
-		          int colorAdd = palette[(colorIndex >> 4 & 0xF)] - color;
-		          if ((blink) && ((dat & 0x80) > 0)) colorAdd = 0;
-		          int pixelOffs = x * 4 + y * 8 * 128;
-		
-		          for (int xx = 0; xx < 4; xx++) {
-		            int bits = fontRam[(co + (xx >> 1))] >> (xx + 1 & 0x1) * 8 & 0xFF;
-		            for (int yy = 0; yy < 8; yy++) {
-		              int col = color + colorAdd * (bits >> yy & 0x1);
-		              pixels[(pixelOffs + xx + yy * 128)] = col;
-		              reds += (col & 0xFF0000);
-		              greens += (col & 0xFF00);
-		              blues += (col & 0xFF);
-		            }
-		          }
-		        }
-		      }
-		
-		      int color = palette[borderColor];
-		      for (int y = 96; y < 128; y++) {
-		        for (int x = 0; x < 128; x++) {
-		          pixels[(x + y * 128)] = color;
-		        }
-		      }
-		
-		      int borderPixels = 100;
-		      reds += (color & 0xFF0000) * borderPixels;
-		      greens += (color & 0xFF00) * borderPixels;
-		      blues += (color & 0xFF) * borderPixels;
-		
-		      reds = reds / (0x3000 + borderPixels) & 0xFF0000;
-		      greens = greens / (0x3000 + borderPixels) & 0xFF00;
-		      blues = blues / (0x3000 + borderPixels) & 0xFF;
-		      lightColor = (int)(reds | greens | blues);
-		    }
-  		}
+  	try {
+	  	synchronized (this) {
+	  		if (pixels != null) {
+			    if ((screenMemMap == 0) || (startDelay > 0)) {
+			      int reds = 0;
+			      int greens = 0;
+			      int blues = 0;
+			
+			      if ((startDelay > 0) && (startDelay < 10)) {
+			        for (int y = 0; y < 96; y++)
+			          for (int x = 0; x < 128; x++) {
+			            int col = palette[0];
+			            pixels[(x + y * 128)] = col;
+			            reds += (col & 0xFF0000);
+			            greens += (col & 0xFF00);
+			            blues += (col & 0xFF);
+			          }
+			      }
+			      else {
+			        for (int y = 0; y < 96; y++) {
+			          for (int x = 0; x < 128; x++) {
+			            int cc = loadImage[(x + y * 128)] & 0xFF;
+			            int col = palette[1];
+			            pixels[(x + y * 128)] = col;
+			            reds += (col & 0xFF0000);
+			            greens += (col & 0xFF00);
+			            blues += (col & 0xFF);
+			          }
+			        }
+			      }
+			
+			      int bgColor = 1;
+			      if (startDelay < 26) {
+			        bgColor = startDelay - 10;
+			      }
+			      if (bgColor < 0) bgColor = 0;
+			      int color = palette[bgColor];
+			      for (int y = 96; y < 128; y++) {
+			        for (int x = 0; x < 128; x++) {
+			          pixels[(x + y * 128)] = color;
+			        }
+			      }
+			
+			      int borderPixels = 100;
+			      reds += (color & 0xFF0000) * borderPixels;
+			      greens += (color & 0xFF00) * borderPixels;
+			      blues += (color & 0xFF) * borderPixels;
+			
+			      reds = reds / (0x3000 + borderPixels) & 0xFF0000;
+			      greens = greens / (0x3000 + borderPixels) & 0xFF00;
+			      blues = blues / (0x3000 + borderPixels) & 0xFF;
+			      lightColor = (reds | greens | blues);
+			    } else {
+			      long time = System.currentTimeMillis() / 16L;
+			      boolean blink = time / 20L % 2L == 0L;
+			      long reds = 0L;
+			      long greens = 0L;
+			      long blues = 0L;
+			
+			      char[] fontRam = font;
+			      int charOffset = 0;
+			      if (fontMemMap > 0) {
+			        fontRam = dcpu.ram;
+			        charOffset = fontMemMap;
+			      }
+			      if (paletteMemMap == 0)
+			        resetPalette();
+			      else {
+			        loadPalette(dcpu.ram, paletteMemMap);
+			      }
+			
+			      for (int y = 0; y < 12; y++) {
+			        for (int x = 0; x < 32; x++) {
+			          char dat = dcpu.ram[(screenMemMap + x + y * 32)];
+			          int ch = dat & 0x7F;
+			          int colorIndex = dat >> '\b' & 0xFF;
+			          int co = charOffset + ch * 2;
+			
+			          int color = palette[(colorIndex & 0xF)];
+			          int colorAdd = palette[(colorIndex >> 4 & 0xF)] - color;
+			          if ((blink) && ((dat & 0x80) > 0)) colorAdd = 0;
+			          int pixelOffs = x * 4 + y * 8 * 128;
+			
+			          for (int xx = 0; xx < 4; xx++) {
+			            int bits = fontRam[(co + (xx >> 1))] >> (xx + 1 & 0x1) * 8 & 0xFF;
+			            for (int yy = 0; yy < 8; yy++) {
+			              int col = color + colorAdd * (bits >> yy & 0x1);
+			              pixels[(pixelOffs + xx + yy * 128)] = col;
+			              reds += (col & 0xFF0000);
+			              greens += (col & 0xFF00);
+			              blues += (col & 0xFF);
+			            }
+			          }
+			        }
+			      }
+			
+			      int color = palette[borderColor];
+			      for (int y = 96; y < 128; y++) {
+			        for (int x = 0; x < 128; x++) {
+			          pixels[(x + y * 128)] = color;
+			        }
+			      }
+			
+			      int borderPixels = 100;
+			      reds += (color & 0xFF0000) * borderPixels;
+			      greens += (color & 0xFF00) * borderPixels;
+			      blues += (color & 0xFF) * borderPixels;
+			
+			      reds = reds / (0x3000 + borderPixels) & 0xFF0000;
+			      greens = greens / (0x3000 + borderPixels) & 0xFF00;
+			      blues = blues / (0x3000 + borderPixels) & 0xFF;
+			      lightColor = (int)(reds | greens | blues);
+			    }
+	  		}
+	  	}
+  	} catch (Exception e) {
+  		e.printStackTrace();
   	}
   }
 
