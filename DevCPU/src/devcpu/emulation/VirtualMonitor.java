@@ -33,11 +33,19 @@ public class VirtualMonitor extends DCPUHardware
     this.manager = manager;
     this.id = id;
     resetPalette();
+    resetFont();
+    
+    try {
+			ImageIO.read(VirtualMonitor.class.getResource("/dcpu/hardware/lem/boot.png")).getRGB(0, 0, 128, 96, loadImage, 0, 128);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+  }
 
-    int[] pixels = new int[4096];
+  private void resetFont() {
+  	int[] pixels = new int[4096];
     try {
       ImageIO.read(VirtualMonitor.class.getResource("/dcpu/hardware/lem/font.png")).getRGB(0, 0, 128, 32, pixels, 0, 128);
-      ImageIO.read(VirtualMonitor.class.getResource("/dcpu/hardware/lem/boot.png")).getRGB(0, 0, 128, 96, loadImage, 0, 128);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -54,9 +62,9 @@ public class VirtualMonitor extends DCPUHardware
         font[ro + xx / 2] = (char)(font[ro + xx / 2] | bb << (xx + 1 & 0x1) * 8);
       }
     }
-  }
+	}
 
-  public VirtualMonitor() {
+	public VirtualMonitor() {
   	this("LEM1802", null);
 	}
 
@@ -266,5 +274,17 @@ public class VirtualMonitor extends DCPUHardware
 
 	public HardwareManager getManager() {
 		return manager;
+	}
+	
+	@Override
+	public void powerOff() {
+    resetPalette();
+    resetFont();
+    lightColor = 0;
+    screenMemMap = 0;
+    fontMemMap = 0;
+    paletteMemMap = 0;
+    borderColor = 0;
+    startDelay = 0;   
 	}
 }

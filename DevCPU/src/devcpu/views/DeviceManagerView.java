@@ -89,6 +89,18 @@ public class DeviceManagerView extends ViewPart {
 	        	menuMgr.add(new Separator());
 	        }
 	        
+//	        if (o instanceof DCPUHardware) {
+//	        	final DCPUHardware hardware = (DCPUHardware) o;
+//	        	if ()
+//	        	manager.add(new Action("Reset") {
+//	        		public void run() {
+//	        			FloppyDisk disk = hardware.createFloppyDisk();
+//	        			treeViewer.expandToLevel(disk, 0);
+//	        			contentProvider.update();
+//	        		};
+//						});
+//	        }
+	        
 	        if (o instanceof DCPUManager) {
 	        	final DCPUManager dcpuManager = (DCPUManager) o;
 	        	manager.add(new Action("Add DCPU") {

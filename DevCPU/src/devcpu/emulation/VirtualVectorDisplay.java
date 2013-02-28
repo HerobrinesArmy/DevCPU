@@ -143,4 +143,14 @@ public class VirtualVectorDisplay extends DCPUHardware
 	public HardwareManager getManager() {
 		return manager;
 	}
+	
+	@Override
+	public void powerOff() {
+//		this.angle = 0;
+//		this.broken = false; //TODO watch out for this one
+		this.mapLength = 0;
+		this.mapStart = 0;
+		this.targetDelta = 0;
+		this.vertices.clear();
+	}
 }

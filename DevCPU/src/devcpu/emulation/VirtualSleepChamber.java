@@ -158,4 +158,10 @@ public class VirtualSleepChamber extends DCPUHardware
 	public HardwareManager getManager() {
 		return manager;
 	}
+	
+	@Override
+	public void powerOff() {
+		this.numberOfUnitsToSkip = 0;
+		this.unitToSkip = 0;
+	}
 }

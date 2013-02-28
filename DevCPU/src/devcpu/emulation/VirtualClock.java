@@ -8,6 +8,7 @@ public class VirtualClock extends DCPUHardware
   private int intCount;
   private char ticks;
   private char interruptMessage;
+  
 	private String id;
 	private HardwareManager manager;
 
@@ -52,5 +53,13 @@ public class VirtualClock extends DCPUHardware
 
 	public HardwareManager getManager() {
 		return manager;
+	}
+	
+	@Override
+	public void powerOff() {
+		this.intCount = 0;
+		this.interruptMessage = 0;
+		this.interval = 0;
+		this.ticks = 0;
 	}
 }

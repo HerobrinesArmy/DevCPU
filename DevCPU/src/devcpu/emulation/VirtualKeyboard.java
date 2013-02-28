@@ -21,6 +21,7 @@ public class VirtualKeyboard extends DCPUHardware
   private boolean[] isDown = new boolean[256];
   private char interruptMessage;
   private boolean doInterrupt;
+  
   private String id = "Generic Keyboard";
 	private HardwareManager manager;
 
@@ -104,5 +105,15 @@ public class VirtualKeyboard extends DCPUHardware
 
 	public HardwareManager getManager() {
 		return manager;
+	}
+	
+	@Override
+	public void powerOff() {
+		this.keyBuffer = new char[64];
+	  this.krp = 0;
+	  this.kwp = 0;
+	  this.isDown = new boolean[256];
+	  this.interruptMessage = 0;
+	  this.doInterrupt = false;
 	}
 }

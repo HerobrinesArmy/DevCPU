@@ -220,4 +220,14 @@ public class VirtualFloppyDrive extends DCPUHardware
 	public HardwareManager getManager() {
 		return manager;
 	}
+	
+	@Override
+	public void powerOff() {
+		this.state = floppy == null ? STATE_NO_MEDIA : floppy.isWriteProtected() ? STATE_READY_WP : STATE_READY;
+		this.error = ERROR_NONE;
+		this.interruptsEnabled = false;
+		this.message = 0;
+		this.track = 0;
+		this.operation = new FloppyOperation(FloppyOperation.NONE, 0, 0, Integer.MAX_VALUE);
+	}
 }
