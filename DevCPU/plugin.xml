@@ -325,7 +325,7 @@
          point="org.eclipse.ui.contexts">
       <context
             description="DCPU Adapter"
-            id="devcpu.memoryview.debugging"
+            id="devcpu.debugging"
             name="DCPU Adapter"
             parentId="org.eclipse.debug.ui.debugging">
       </context>
@@ -333,7 +333,7 @@
    <extension
          point="org.eclipse.debug.ui.debugModelContextBindings">
       <modelContextBinding
-            contextId="devcpu.memoryview.debugging"
+            contextId="devcpu.debugging"
             debugModelId="devcpu.memoryview">
       </modelContextBinding>
    </extension>
@@ -341,9 +341,17 @@
          point="org.eclipse.debug.ui.contextViewBindings">
       <contextViewBinding
             autoOpen="true"
-            contextId="devcpu.memoryview.debugging"
+            contextId="devcpu.debugging"
             viewId="org.eclipse.debug.ui.MemoryView">
       </contextViewBinding>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="devcpu.dcpulaunch"
+            icon="icons/dcpu.png"
+            id="devcpu.launchimage">
+      </launchConfigurationTypeImage>
    </extension>
 
 </plugin>
