@@ -415,9 +415,8 @@ public class DCPU
         if (a == 0) {
           b = ex = 0;
         } else {
-          long val = (b << 16) / a;
-          b = (char)(int)(val >> 16);
-          ex = (char)(int)val;
+          b /= a;
+          ex = (char)((b << 16) / a);
         }
         break;
       }case 7:{ //DVI
@@ -425,9 +424,8 @@ public class DCPU
         if (a == 0) {
           b = ex = 0;
         } else {
-          long val = ((short)b << 16) / (short)a;
-          b = (char)(int)(val >> 16);
-          ex = (char)(int)val;
+          b = (char)((short)b / (short)a);
+          ex = (char)(((short)b << 16) / (short)a);
         }
         break;
       }case 8: //MOD
@@ -460,8 +458,8 @@ public class DCPU
         b = (char)(b >>> a);
         break;
       case 14: //ASR
-        ex = (char)(b << 16 >>> a);
-        b = (char)(b >> a);
+        ex = (char)((short)b << 16 >>> a);
+        b = (char)((short)b >> a);
         break;
       case 15: //SHL
         ex = (char)(b << a >> 16);
@@ -505,11 +503,12 @@ public class DCPU
         b = (char)val;
         ex = (char)(val >> 16);
         break;
-      }case 27:{ //SBX TODO: Ensure returns 0x0001 if there's an overflow
+      }case 27:{ //SBX
         cycles += 1;
         int val = b - a + ex;
         b = (char)val;
         ex = (char)(val >> 16);
+        break;
       }case 30: //STI
         b = a;
         registers[6]++;
@@ -551,10 +550,10 @@ public class DCPU
           return str;
         }
       } else {
-        int atype = opcode >> 10 & 0x3F;
-        int btype = opcode >> 5 & 0x1F;
-        str = OpCodes.basic.getName(cmd) + " " + getStr(btype, false) + ", " + getStr(atype, true);
-        return str;
+      	String atype = getStr(opcode >> 10 & 0x3F, true);
+      	String btype = getStr(opcode >> 5 & 0x1F, false);
+      	str = OpCodes.basic.getName(cmd) + " " + btype + ", " + atype;
+      	return str;
       }
       return "!?!?!?";
     } finally {

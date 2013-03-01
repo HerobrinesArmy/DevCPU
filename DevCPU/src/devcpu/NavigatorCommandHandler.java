@@ -1,19 +1,14 @@
 package devcpu;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -21,7 +16,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import devcpu.emulation.Assembler;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
-import devcpu.views.DeviceManagerContentProvider;
 import devcpu.views.DeviceManagerLabelProvider;
 
 public class NavigatorCommandHandler implements IHandler {
@@ -70,7 +64,7 @@ public class NavigatorCommandHandler implements IHandler {
 								try {
 									a.assemble(file.getContents(true));
 								} catch (Exception e) {
-									// TODO Error message
+									// TODO Error message; get rid of any catches in Assembler.
 									e.printStackTrace();
 								}
 							}
