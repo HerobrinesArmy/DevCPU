@@ -4,6 +4,8 @@ public class AWTKeyMapping extends KeyMapping
 {
   public AWTKeyMapping()
   {
+  	map(32, 32);
+  	
     map(38, 128);
     map(40, 129);
     map(37, 130);

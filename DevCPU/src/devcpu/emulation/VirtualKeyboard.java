@@ -1,5 +1,6 @@
 package devcpu.emulation;
 
+import devcpu.Activator;
 import devcpu.HardwareManager;
 
 public class VirtualKeyboard extends DCPUHardware
@@ -73,8 +74,10 @@ public class VirtualKeyboard extends DCPUHardware
       krp = 0;
       kwp = 0;
     } else if (a == 1) {
-      if ((dcpu.registers[2] = keyBuffer[(krp & 0x3F)]) != 0)
+      if ((dcpu.registers[2] = keyBuffer[(krp & 0x3F)]) != 0) {
+//      	Activator.getConsole().newMessageStream().println("Keyboard recieved interrupt: a=" + a + " and returned " + (int)dcpu.registers[2] + " in C.");
         keyBuffer[(krp++ & 0x3F)] = 0;
+      }
     }
     else if (a == 2) {
       int key = dcpu.registers[1];

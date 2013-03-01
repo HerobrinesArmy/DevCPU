@@ -66,14 +66,14 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (vk != null) {
-					vk.keyTyped(e.getKeyCode());
+					vk.keyReleased(e.getKeyCode());
 				}				
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (vk != null) {
-					vk.keyTyped(e.getKeyCode());
+					vk.keyPressed(e.getKeyCode());
 				}
 			}
 		});

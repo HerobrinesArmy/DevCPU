@@ -102,7 +102,12 @@ public class Assembler
 	        return 0x1a;
         }
         else if ((tokens[0].length() == 1) && (this.registers.indexOf(tokens[0].toUpperCase()) >= 0)) {
-          this.ram[this.pc++] = (char)parseNumber(tokens[1]);
+        	if (Character.isDigit(tokens[1].charAt(0)) || "-1".equals(tokens[1])) {
+        		this.ram[this.pc++] = (char)parseNumber(tokens[1]);
+        	} else {
+        		this.labelUsages.put(new Position(this.currentScope, this.pc), tokens[1]);
+  	        this.ram[this.pc++] = 0xBEEF;
+        	}
           if (this.registers.indexOf(tokens[0].toUpperCase()) < 0) throw new IllegalArgumentException("Must be a register!");
           return 0x10 + this.registers.indexOf(tokens[0].toUpperCase());
         } else {
@@ -213,7 +218,7 @@ public class Assembler
         this.ram[this.pc++] = string.charAt(i);
     } else {
       this.labelUsages.put(new Position(this.currentScope, this.pc), string);
-      this.ram[this.pc++] = 48879;
+      this.ram[this.pc++] = 0xBEEF;
     }
   }
 
