@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.xtext.common.types.ui,
  org.eclipse.xtext.ui.codetemplates.ui,
  org.eclipse.compare,
- devcpu.DASM.ui;bundle-version="1.0.0"
+ devcpu.DASM.ui;bundle-version="1.0.0",
+ org.eclipse.ui.console;bundle-version="3.5.200"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: AppleJavaExtensions.jar,

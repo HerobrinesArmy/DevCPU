@@ -1,17 +1,13 @@
 package devcpu;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import devcpu.emulation.AWTKeyMapping;
-import devcpu.emulation.Assembler;
-import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.Ship;
-import devcpu.emulation.VirtualClock;
-import devcpu.emulation.VirtualKeyboard;
-import devcpu.emulation.VirtualMonitor;
-import devcpu.emulation.VirtualVectorDisplay;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -22,6 +18,11 @@ public class Activator extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "DevCPU"; //$NON-NLS-1$
 
 	private static Ship ship = new Ship();
+	
+	private static MessageConsole console = new MessageConsole("Default Console", null);
+	{
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {console});  
+	}
 	
 	// The shared instance
 	private static Activator plugin;
@@ -36,6 +37,10 @@ public class Activator extends AbstractUIPlugin {
 		return ship;
 	}
 
+	public static MessageConsole getConsole() {
+		return console;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -43,15 +48,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-//		DefaultControllableDCPU cpu = ship.getDCPUManager().createDCPU();
-//		cpu.setID("Main Computer");
-//		ship.getDeviceManager().createVirtualVectorDisplay("SPED-3").connectTo(cpu);
-//		ship.getDeviceManager().createVirtualMonitor("Primary Monitor").connectTo(cpu);
-//		ship.getDeviceManager().createVirtualClock("Clock").connectTo(cpu);
-//		ship.getDeviceManager().createVirtualKeyboard("Keyboard").connectTo(cpu);
-//		
-//		new Assembler(cpu.ram).assemble("creepertest.txt");
-//		cpu.run();
 	}
 
 	/*

@@ -82,22 +82,36 @@
             id="developmentnavigator"
             name="Development Navigator">
       </view>
+      <view
+            class="org.eclipse.ui.internal.console.ConsoleView"
+            id="devcpu.console"
+            name="Console"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="*">
          <view
+               id="developmentnavigator"
                minimized="false"
-               relative="org.eclipse.ui.editorss"
+               ratio="0.5"
                relationship="left"
-               id="developmentnavigator">
+               relative="org.eclipse.ui.editorss">
          </view>
          <view
                id="devcpu.views.DeviceManagerView"
                minimized="false"
+               ratio="0.6"
                relationship="bottom"
                relative="developmentnavigator">
+         </view>
+         <view
+               id="devcpu.console"
+               minimized="false"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>
    </extension>
