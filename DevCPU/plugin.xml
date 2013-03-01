@@ -286,11 +286,64 @@
       </activityPatternBinding>
    </extension>
    <extension
-         point="org.eclipse.ui.splashHandlers">
-      <splashHandler
-            class="devcpu.splashHandlers.InteractiveSplashHandler"
-            id="devcpu.splashHandlers.interactive">
-      </splashHandler>
+         point="org.eclipse.debug.ui.memoryRenderings">
+      <renderingBindings
+            defaultIds="org.eclipse.debug.ui.rendering.hexint,org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.signedint"
+            primaryId="org.eclipse.debug.ui.rendering.hexint"
+            renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint,org.eclipse.debug.ui.rendering.hexint">
+         <enablement>
+            <instanceof
+                  value="devcpu.launch.DCPUMemoryBlock">
+            </instanceof>
+         </enablement>
+      </renderingBindings>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="devcpu.launch.DCPULaunchDelegate"
+            id="devcpu.dcpulaunch"
+            name="DCPU Launch Configuration">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="devcpu.launch.DCPULaunchTabGroup"
+            id="devcpu.launchtabgroup"
+            type="devcpu.dcpulaunch">
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="devcpu.launch.DCPUModelPresentation"
+            id="devcpu.memoryview">
+      </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="DCPU Adapter"
+            id="devcpu.memoryview.debugging"
+            name="DCPU Adapter"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelContextBindings">
+      <modelContextBinding
+            contextId="devcpu.memoryview.debugging"
+            debugModelId="devcpu.memoryview">
+      </modelContextBinding>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.contextViewBindings">
+      <contextViewBinding
+            autoOpen="true"
+            contextId="devcpu.memoryview.debugging"
+            viewId="org.eclipse.debug.ui.MemoryView">
+      </contextViewBinding>
    </extension>
 
 </plugin>

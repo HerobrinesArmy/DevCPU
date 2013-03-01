@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.eclipse.ui.part.IShowInSource;
+import org.eclipse.ui.part.ShowInContext;
+
 import devcpu.DCPUManager;
 
 public class DefaultControllableDCPU extends DCPU implements Identifiable {
@@ -141,7 +144,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable {
 			dis.close();
 		}	
 	}
-	
+
 //	public void addTickListener(DCPUTickListener listener) {
 //		tickListeners.add(listener);
 //	}

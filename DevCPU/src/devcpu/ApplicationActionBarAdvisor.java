@@ -1,5 +1,19 @@
 package devcpu;
 
+import java.math.BigInteger;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IMemoryBlock;
+import org.eclipse.debug.core.model.MemoryByte;
+import org.eclipse.debug.internal.ui.memory.MemoryRenderingManager;
+import org.eclipse.debug.internal.ui.views.memory.MemoryView;
+import org.eclipse.debug.internal.ui.views.memory.renderings.CreateRendering;
+import org.eclipse.debug.ui.memory.AbstractMemoryRendering;
+import org.eclipse.debug.ui.memory.IMemoryRendering;
+import org.eclipse.debug.ui.memory.MemoryRenderingElement;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -13,8 +27,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
@@ -22,6 +40,7 @@ import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
@@ -44,7 +63,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		private OpenViewAction sped3Action;
 //    private OpenViewAction openViewAction;
 //    private Action messagePopupAction;
-		private OpenViewAction keyboardAction;
+		private Action keyboardAction;
 private MenuManager showViewMenuMgr;
 private IContributionItem showViewItem;
     
@@ -71,9 +90,85 @@ private IContributionItem showViewItem;
         sped3Action.setAccelerator(0);
         register(sped3Action);
         
-        keyboardAction = new OpenViewAction(window, "Generic Keyboard", KeyboardView.ID);
-        keyboardAction.setAccelerator(0);
-        register(keyboardAction);
+        keyboardAction = new Action("SHOOP") {
+        	@Override
+        	public void run() {
+        		try {
+        			MemoryView view = (MemoryView) window.getActivePage().showView("org.eclipse.debug.ui.MemoryView", "blah", IWorkbenchPage.VIEW_ACTIVATE);
+        			System.out.println(view.getMemoryRenderingContainers().length);
+        			MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
+        			IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
+        			rendering.init(view.getMemoryRenderingContainers()[0], new IMemoryBlock() {
+								
+								@Override
+								public Object getAdapter(Class adapter) {
+									// TODO Auto-generated method stub
+									return null;
+								}
+								
+								@Override
+								public String getModelIdentifier() {
+									// TODO Auto-generated method stub
+									return "DCPU";
+								}
+								
+								@Override
+								public ILaunch getLaunch() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+								
+								@Override
+								public IDebugTarget getDebugTarget() {
+									// TODO Auto-generated method stub
+									return null;
+								}
+								
+								@Override
+								public boolean supportsValueModification() {
+									// TODO Auto-generated method stub
+									return false;
+								}
+								
+								@Override
+								public void setValue(long offset, byte[] bytes) throws DebugException {
+									// TODO Auto-generated method stub
+									
+								}
+								
+								@Override
+								public long getStartAddress() {
+									// TODO Auto-generated method stub
+									return 0;
+								}
+								
+								@Override
+								public long getLength() {
+									// TODO Auto-generated method stub
+									return 4;
+								}
+								
+								@Override
+								public byte[] getBytes() throws DebugException {
+									// TODO Auto-generated method stub
+									return new byte[]{10,2,0,100};
+								}
+							});
+        			BigInteger address = new BigInteger("0");
+        			MemoryByte[] bytes = new DCPUMemoryByte[65536];
+        			MemoryRenderingElement a = new org.eclipse.debug.ui.memory.MemoryRenderingElement(rendering, address, bytes);
+        			view.getMemoryRenderingContainers()[0].addMemoryRendering(rendering);
+//        			view.getMemoryRenderingContainers()[0].addMemoryRendering(new CreateRendering(view.getMemoryRenderingContainers()[0]).);
+        		} catch (PartInitException e) {
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+        		} catch (CoreException e) {
+							e.printStackTrace();
+						}
+        	}
+				}; //OpenViewAction(window, "Generic Keyboard", KeyboardView.ID);
+//        keyboardAction.setAccelerator(0);
+//        register(keyboardAction);
         
         showViewMenuMgr = new MenuManager("Show View", "showView"); 
         showViewItem = 
