@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Ship;
+import devcpu.emulation.VirtualFloppyDrive;
 
 public class FloppyManager {
 	private int id;
@@ -36,5 +37,16 @@ public class FloppyManager {
 		FloppyDisk fd = new FloppyDisk("Floppy " + id++, this);
 		disks.add(fd);
 		return fd;
+	}
+
+	public void destroyDisk(FloppyDisk disk) {
+		VirtualFloppyDrive drive = disk.getDriveUsing();
+		if (drive != null) {
+			drive.eject();
+		}
+		for (MappedView<FloppyDisk> view : ViewMapper.getAllViews(disk)) {
+			view.mapTo(null);
+		}
+		disks.remove(disk);
 	}
 }

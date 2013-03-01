@@ -230,4 +230,11 @@ public class VirtualFloppyDrive extends DCPUHardware
 		this.track = 0;
 		this.operation = new FloppyOperation(FloppyOperation.NONE, 0, 0, Integer.MAX_VALUE);
 	}
+	
+	@Override
+	public void onDestroy() {
+		if (floppy != null) {
+			eject();
+		}
+	}
 }

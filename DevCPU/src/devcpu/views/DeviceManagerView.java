@@ -84,6 +84,34 @@ public class DeviceManagerView extends ViewPart {
 								}
 	        		}
 	        	});
+	        	
+      			//TODO: Add confirm dialog for all of these destroys? Or keep it this way for quick destruction? Maybe use preference.
+	        	if (o instanceof DefaultControllableDCPU) {
+	          	final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+	          	manager.add(new Action("Destroy") {
+	          		public void run() {
+	          			Activator.getShip().getDCPUManager().destroyDCPU(dcpu);
+	          			contentProvider.update();
+	          		};
+	  					});
+	        	} else if (o instanceof DCPUHardware) {
+		        	final DCPUHardware hardware = (DCPUHardware) o;
+		        	manager.add(new Action("Destroy") {
+		        		public void run() {
+		        			Activator.getShip().getHardwareManager().destroyDevice(hardware);
+		        			contentProvider.update();
+		        		};
+							});
+	        	} else if (o instanceof FloppyDisk) {
+		        	final FloppyDisk disk = (FloppyDisk) o;
+		        	manager.add(new Action("Destroy") {
+		        		public void run() {
+		        			Activator.getShip().getFloppyManager().destroyDisk(disk);
+		        			contentProvider.update();
+		        		};
+							});
+	        	}
+	        	
 	        	menuMgr.add(new Separator());
 	        }
 	        

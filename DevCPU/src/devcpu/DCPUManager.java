@@ -2,6 +2,7 @@ package devcpu;
 
 import java.util.ArrayList;
 
+import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.Ship;
 
@@ -26,5 +27,16 @@ public class DCPUManager {
 
 	public Ship getShip() {
 		return ship;
+	}
+
+	public void destroyDCPU(DefaultControllableDCPU dcpu) {
+		dcpu.stop();
+		for (DCPUHardware hardware : new ArrayList<DCPUHardware>(dcpu.hardware)){
+			hardware.disconnect();
+		}
+		for (MappedView<DefaultControllableDCPU> view : ViewMapper.getAllViews(dcpu)) {
+			view.mapTo(null);
+		}
+		dcpus.remove(dcpu);
 	}
 }

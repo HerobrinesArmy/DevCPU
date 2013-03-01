@@ -66,4 +66,7 @@ public abstract class DCPUHardware implements Identifiable
 	public boolean isConnected() {
 		return dcpu != null;
 	}
+
+	public void onDestroy() {
+	}
 }

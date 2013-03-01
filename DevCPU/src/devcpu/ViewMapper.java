@@ -65,4 +65,15 @@ public class ViewMapper {
 		viewMap.get(o).add(view);
 		objectMap.put(view, o);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> ArrayList<MappedView<T>> getAllViews(T o) {
+		ArrayList<MappedView<T>> list = new ArrayList<MappedView<T>>();
+		if (viewMap.containsKey(o)) {
+			for (MappedView<?> view : viewMap.get(o)) {
+				list.add((MappedView<T>) view);
+			}
+		}
+		return list;
+	}
 }

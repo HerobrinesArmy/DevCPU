@@ -108,4 +108,15 @@ public class HardwareManager {
 		}
 		return ret;
 	}
+
+	public void destroyDevice(DCPUHardware hardware) {
+		hardware.onDestroy();
+		if (hardware.isConnected()) {
+			hardware.disconnect();
+		}
+		for (MappedView<DCPUHardware> view : ViewMapper.getAllViews(hardware)) {
+			view.mapTo(null);
+		}
+		devices.remove(hardware);
+	}
 }

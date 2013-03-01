@@ -33,7 +33,7 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 	}
 	
-	public Ship getShip() {
+	public static Ship getShip() {
 		return ship;
 	}
 
