@@ -1,4 +1,5 @@
 package devcpu;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
@@ -21,6 +22,8 @@ import devcpu.views.DeviceManagerLabelProvider;
 public class NavigatorCommandHandler implements IHandler {
 	private static final String ASSEMBLE_TO_FLOPPY = "AssembleToFloppy";
 	private static final String ASSEMBLE_TO_DCPU = "AssembleToDCPU";
+	private static final String WRITE_TO_FLOPPY = "WriteToFloppy";
+	private static final String WRITE_TO_DCPU = "WriteToDCPU";
 
 	LinkedHashSet<IHandlerListener> listeners = new LinkedHashSet<IHandlerListener>();
 
@@ -42,7 +45,7 @@ public class NavigatorCommandHandler implements IHandler {
 				Object firstElement = structuredSelection.getFirstElement();
 				if (firstElement instanceof IFile) {
 					IFile file = (IFile) firstElement;
-					ArrayList<FloppyDisk> disks = Activator.getDefault().getShip().getFloppyManager().getAvailableDisks();
+					ArrayList<FloppyDisk> disks = Activator.getShip().getFloppyManager().getAvailableDisks();
 					for (FloppyDisk disk : new ArrayList<FloppyDisk>(disks)) {
 						if (disk.isWriteProtected()) {
 							disks.remove(disk);
@@ -79,7 +82,7 @@ public class NavigatorCommandHandler implements IHandler {
 				Object firstElement = structuredSelection.getFirstElement();
 				if (firstElement instanceof IFile) {
 					IFile file = (IFile) firstElement;
-					ArrayList<DefaultControllableDCPU> dcpus = Activator.getDefault().getShip().getDCPUManager().getDCPUs();
+					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
 					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
 					listDialog.setElements(dcpus.toArray());
 					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
@@ -104,7 +107,72 @@ public class NavigatorCommandHandler implements IHandler {
 					}
 				}
 			}
-		} 
+		} else if (event.getCommand().getId().equals(WRITE_TO_FLOPPY)) {
+			ISelection selection = HandlerUtil.getCurrentSelection(event);
+			if (selection instanceof IStructuredSelection) {
+				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+				Object firstElement = structuredSelection.getFirstElement();
+				if (firstElement instanceof IFile) {
+					IFile file = (IFile) firstElement;
+					ArrayList<FloppyDisk> disks = Activator.getShip().getFloppyManager().getAvailableDisks();
+					for (FloppyDisk disk : new ArrayList<FloppyDisk>(disks)) {
+						if (disk.isWriteProtected()) {
+							disks.remove(disk);
+						}
+					}
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					listDialog.setElements(disks.toArray());
+					listDialog.setEmptyListMessage("There aren't any unprotected floppies available that aren't currently inserted in a floppy drive.");
+					listDialog.setEmptySelectionMessage("Select a floppy disk");
+					listDialog.setMessage("Choose the floppy disk on which to write the file.\nExisting disk contents will be zeroed prior to writing.");
+					// listDialog.setMultipleSelection(false); //TODO consider allowing multiple selection. Why the hell not?
+					listDialog.setTitle("Write to Floppy");
+					int open = listDialog.open();
+					if (open == ListSelectionDialog.OK) {
+						Object[] res = listDialog.getResult();
+						for (Object o : res) {
+							if (o instanceof FloppyDisk) {
+								try {
+									((FloppyDisk) o).load(file.getRawLocation().makeAbsolute().toFile());
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if (event.getCommand().getId().equals(WRITE_TO_DCPU)) {
+			ISelection selection = HandlerUtil.getCurrentSelection(event);
+			if (selection instanceof IStructuredSelection) {
+				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+				Object firstElement = structuredSelection.getFirstElement();
+				if (firstElement instanceof IFile) {
+					IFile file = (IFile) firstElement;
+					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					listDialog.setElements(dcpus.toArray());
+					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
+					listDialog.setEmptySelectionMessage("Select a DCPU");
+					listDialog.setMessage("Choose the DCPU on which to write the file.\nExisting memory contents will be zeroed prior to writing.");
+					// listDialog.setMultipleSelection(false); //TODO consider allowing multiple selection. Why the hell not?
+					listDialog.setTitle("Write to DCPU");
+					int open = listDialog.open();
+					if (open == ListSelectionDialog.OK) {
+						Object[] res = listDialog.getResult();
+						for (Object o : res) {
+							if (o instanceof DefaultControllableDCPU) {
+								try {
+									((DefaultControllableDCPU) o).load(file.getRawLocation().makeAbsolute().toFile());
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		return null;
 	}
 

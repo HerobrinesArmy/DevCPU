@@ -156,7 +156,7 @@ public class DeviceManagerView extends ViewPart {
 			        		};
 								});
 		        	} else {
-		        		manager.add(new Action("Load from binary...") {
+		        		manager.add(new Action("Write from file...") {
 			        		public void run() {
 			        			FileDialog fd = new FileDialog(container.getShell(), SWT.OPEN);
 			              fd.setText("Load binary file (big endian)");

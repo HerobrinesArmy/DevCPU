@@ -120,6 +120,35 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:developmentnavigator?after=additions">
+         <separator
+               name="separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="AssembleToDCPU"
+               style="push">
+            <visibleWhen>
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <or>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.dasm16">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.dasm">
+                           </test>
+                        </or>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
          <command
                commandId="AssembleToFloppy"
                style="push">
@@ -146,7 +175,7 @@
             </visibleWhen>
          </command>
          <command
-               commandId="AssembleToDCPU"
+               commandId="WriteToDCPU"
                style="push">
             <visibleWhen>
                <with
@@ -154,17 +183,22 @@
                   <iterate
                         ifEmpty="false">
                      <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <or>
-                           <test
-                                 property="org.eclipse.core.resources.name"
-                                 value="*.dasm16">
-                           </test>
-                           <test
-                                 property="org.eclipse.core.resources.name"
-                                 value="*.dasm">
-                           </test>
-                        </or>
+                           type="org.eclipse.core.resources.IFile">
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="WriteToFloppy"
+               style="push">
+            <visibleWhen>
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IFile">
                      </adapt>
                   </iterate>
                </with>
@@ -192,13 +226,23 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="devcpu.NavigatorCommandHandler"
+            id="AssembleToDCPU"
+            name="Assemble to DCPU...">
+      </command>
+      <command
+            defaultHandler="devcpu.NavigatorCommandHandler"
             id="AssembleToFloppy"
             name="Assemble to floppy...">
       </command>
       <command
             defaultHandler="devcpu.NavigatorCommandHandler"
-            id="AssembleToDCPU"
-            name="Assemble to DCPU...">
+            id="WriteToFloppy"
+            name="Write to floppy...">
+      </command>
+      <command
+            defaultHandler="devcpu.NavigatorCommandHandler"
+            id="WriteToDCPU"
+            name="Write to DCPU...">
       </command>
    </extension>
    <extension
