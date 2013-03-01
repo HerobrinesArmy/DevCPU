@@ -238,7 +238,7 @@
       </activity>
       <activityPatternBinding
             activityId="DevCPU.hiddenviews"
-            pattern=".*(?&lt;!devcpu.{0,999})(View|jdt\.ui\.|ierarchy).*">
+            pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy).*">
       </activityPatternBinding>
    </extension>
    <extension
