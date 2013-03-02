@@ -8,6 +8,9 @@ import java.util.Random;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.MemoryByte;
 
+import devcpu.Activator;
+import devcpu.emulation.DefaultControllableDCPU;
+
 public class DCPUEngine {
 	Random fRandom = new Random();
 	byte[] fMemory;
@@ -27,16 +30,18 @@ public class DCPUEngine {
 	 */
 	synchronized public MemoryByte[] getBytesFromAddress( BigInteger address, long length)
 	throws RuntimeException {
-		
+		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUs().get(0);
 		if (memoryBlockTable == null)
-		{	
+		{		
 			// create new memoryBlock table
 			memoryBlockTable = new Hashtable();
 			byte[] bytes = new byte[(int)length*getAddressableSize()];
+			for(int i=0;i<length;i++) {
+			   bytes[i*2] = (byte) (dcpu.ram[address.intValue()+i] >> 8);
+			   bytes[i*2+1] = (byte) dcpu.ram[address.intValue()+i];
+			}
 			BigInteger addressKey = address;
-			
-			random.nextBytes(bytes);
-			
+						
 			for (int i=0; i<bytes.length; i=i+getAddressableSize())
 			{
 				addressKey = addressKey.add(BigInteger.valueOf(1));
@@ -67,7 +72,8 @@ public class DCPUEngine {
 			if (temp == null)
 			{
 				byte[] x = new byte[getAddressableSize()];
-				random.nextBytes(x);
+				x[i*2] = (byte) (dcpu.ram[address.intValue()+i] >> 8);
+			  x[i*2+1] = (byte) dcpu.ram[address.intValue()+i];
 				byte flag = 0;
 				flag |= MemoryByte.READABLE;
 				flag |= MemoryByte.ENDIANESS_KNOWN;
@@ -235,7 +241,7 @@ public class DCPUEngine {
 	 */
 	public int getAddressableSize()
 	{
-		return 1;
+		return 2;
 	}
 	
 	/**
@@ -305,26 +311,26 @@ public class DCPUEngine {
 	 * @param thread
 	 * @return
 	 */
-	public DCPUStackFrame[] getStackframes(DCPUThread thread)
-	{
-		Object stackframes = stackframeTable.get(thread);
-		if (stackframes == null)
-		{
-			stackframes = createStackframes(thread);
-			stackframeTable.put(thread, stackframes);
-		}
-		return (DCPUStackFrame[])stackframes;
-	}
+//	public DCPUStackFrame[] getStackframes(DCPUThread thread)
+//	{
+//		Object stackframes = stackframeTable.get(thread);
+//		if (stackframes == null)
+//		{
+////			stackframes = createStackframes(thread);
+//			stackframeTable.put(thread, stackframes);
+//		}
+//		return (DCPUStackFrame[])stackframes;
+//	}
 	
 	/**
 	 * 
 	 */
-	private DCPUStackFrame[] createStackframes(DCPUThread thread) {
-		DCPUStackFrame[] stackframes = new DCPUStackFrame[2];
-		stackframes[0] = new DCPUStackFrame(thread, "Frame1");
-		stackframes[1] = new DCPUStackFrame(thread, "Frame2");
-		return stackframes;
-	}
+//	private DCPUStackFrame[] createStackframes(DCPUThread thread) {
+//		DCPUStackFrame[] stackframes = new DCPUStackFrame[2];
+//		stackframes[0] = new DCPUStackFrame(thread, "Frame1");
+//		stackframes[1] = new DCPUStackFrame(thread, "Frame2");
+//		return stackframes;
+//	}
 	
 	/**
 	 * @param mb
@@ -360,7 +366,7 @@ public class DCPUEngine {
 	 */
 	public int getAddressSize() throws CoreException
 	{
-		return 4;
+		return 2;
 	}
 }
 

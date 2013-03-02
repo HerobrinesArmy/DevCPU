@@ -33,7 +33,8 @@ public class DCPUThread extends DebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
 	 */
 	public IStackFrame[] getStackFrames() throws DebugException {
-		return ((DCPUDebugTarget)getDebugTarget()).getEngine().getStackframes(this);
+		return null;
+//		return ((DCPUDebugTarget)getDebugTarget()).getEngine().getStackframes(this);
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +57,8 @@ public class DCPUThread extends DebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
 	 */
 	public IStackFrame getTopStackFrame() throws DebugException {
-		return ((DCPUDebugTarget)getDebugTarget()).getEngine().getStackframes(this)[0];
+		return null;
+//		return ((DCPUDebugTarget)getDebugTarget()).getEngine().getStackframes(this)[0];
 	}
 
 

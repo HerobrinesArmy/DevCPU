@@ -64,10 +64,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
-		ILaunchConfiguration[] configurations = manager.getLaunchConfigurations(type);
-		ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "Example Launch");
 	}
 
 	/*

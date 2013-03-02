@@ -82,12 +82,12 @@
             id="developmentnavigator"
             name="Development Navigator">
       </view>
-      <view
+<!--      <view
             class="org.eclipse.ui.internal.console.ConsoleView"
             id="devcpu.console"
             name="Console"
             restorable="true">
-      </view>
+      </view> -->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -107,12 +107,12 @@
                relationship="bottom"
                relative="developmentnavigator">
          </view>
-         <view
+ <!--        <view
                id="devcpu.console"
                minimized="false"
                relationship="bottom"
                relative="org.eclipse.ui.editorss">
-         </view>
+         </view> -->
       </perspectiveExtension>
    </extension>
    <extension
@@ -286,7 +286,7 @@
       </activity>
       <activityPatternBinding
             activityId="DevCPU.hiddenviews"
-            pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy).*">
+            pattern="sdaf.*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy).*">
       </activityPatternBinding>
    </extension>
    <extension
@@ -307,6 +307,7 @@
       <launchConfigurationType
             delegate="devcpu.launch.DCPULaunchDelegate"
             id="devcpu.dcpulaunch"
+            modes="run,debug"
             name="DCPU Launch Configuration">
       </launchConfigurationType>
    </extension>

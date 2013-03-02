@@ -50,7 +50,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
 	 */
 	public boolean hasThreads() throws DebugException {
-		return true;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +58,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 */
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
 		
-		return false;
+		return false; //TODO
 	}
 
 	/* (non-Javadoc)
@@ -139,25 +139,28 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
 	 */
 	public void breakpointAdded(IBreakpoint breakpoint) {
+		//TODO
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+		//TODO
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+		//TODO
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
 	 */
 	public boolean canDisconnect() {
-		
+		//TODO
 		return false;
 	}
 
@@ -205,7 +208,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long, long)
 	 */
 	public IMemoryBlock getMemoryBlock(long startAddress, long length) throws DebugException {
-		 
+		 System.out.println("ERMAHGERD, ERM NERT ERMPLERMERNTERD!");
 		return null;
 	}
 
@@ -218,10 +221,10 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public IThread[] getThreads() throws DebugException {
-		if (isTerminated())
+//		if (isTerminated())
 			return new IThread[0];
 		
-		return getEngine().getThreads(this);
+//		return getEngine().getThreads(this);
 	}
 
 	public String getName() throws DebugException {
@@ -238,7 +241,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	public IMemoryBlockExtension getExtendedMemoryBlock(String expression, Object context) throws DebugException {
 		
 		// ask debug engine for an address
-		BigInteger address = getEngine().evaluateExpression(expression, context);
+		BigInteger address = new BigInteger(expression);// getEngine().evaluateExpression(expression, context);
 		
 		// if address can be evaluated to an address, create memory block
 		if (address != null)

@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.eclipse.ui.part.IShowInSource;
-import org.eclipse.ui.part.ShowInContext;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 
 import devcpu.DCPUManager;
 
@@ -20,6 +22,18 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable {
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
 		this.id = id;
+		doInitDebugEnvironment();
+	}
+
+	private void doInitDebugEnvironment() {
+		try { //TODO
+			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
+			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
+			workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
