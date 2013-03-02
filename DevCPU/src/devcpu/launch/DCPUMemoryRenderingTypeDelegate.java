@@ -1,19 +1,16 @@
-package devcpu;
+package devcpu.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.memory.IMemoryRendering;
 import org.eclipse.debug.ui.memory.IMemoryRenderingTypeDelegate;
 
-public class DCPUMemoryRenderingType implements IMemoryRenderingTypeDelegate {
+public class DCPUMemoryRenderingTypeDelegate implements IMemoryRenderingTypeDelegate {
 
-	public DCPUMemoryRenderingType() {
-		// TODO Auto-generated constructor stub
+	public DCPUMemoryRenderingTypeDelegate() {
 	}
 
 	@Override
 	public IMemoryRendering createRendering(String id) throws CoreException {
-		// TODO Auto-generated method stub
-		return null;
+		return new DCPUHexadecimalMemoryRendering(id);
 	}
-
 }
