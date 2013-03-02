@@ -1,9 +1,12 @@
 package devcpu.emulation;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import devcpu.FloppyManager;
@@ -27,17 +30,32 @@ public class FloppyDisk implements Identifiable {
 	
 	public void load(File file) throws IOException {
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+		int i = 0;
 		try {
-			for (int i = 0;; i++) {
+			for (; i<data.length; i++) {
 				data[i] = dis.readChar();
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			//TODO handle file too large for disk
+			e.printStackTrace();
 		} catch (IOException e) {
+			for (; i<data.length; i++) {
+				data[i] = 0;
+			}
 			dis.close();
 		}	
 	}
 
+	public void save(File file) throws IOException {
+		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+		try {
+			for (int i = 0; i < data.length; i++) {
+				dos.writeChar(data[i]);
+			}
+		} catch (IOException e) {
+			dos.close();
+		}
+	}
+	
 	public boolean isWriteProtected() {
 		return writeProtected;
 	}

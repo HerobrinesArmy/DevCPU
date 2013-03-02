@@ -149,6 +149,21 @@ public class DeviceManagerView extends ViewPart implements IShowInSource {
 						});
 	        } else if (o instanceof FloppyDisk) {
 	        	final FloppyDisk disk = (FloppyDisk) o;
+	        	manager.add(new Action("Dump to file...") {
+	        		public void run() {
+	        			FileDialog fd = new FileDialog(container.getShell(), SWT.SAVE);
+	              fd.setText("Save binary file (big endian)");
+	              String selected = fd.open();
+	              if (selected != null) {
+	              	try {
+										disk.save(new File(selected));
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+	              }
+	        			contentProvider.update();
+	        		};
+						});
 	        	if (disk.getDriveUsing() == null) {
 		        	if (disk.isWriteProtected()) {
 		        		manager.add(new Action("Unprotect") {
@@ -180,12 +195,17 @@ public class DeviceManagerView extends ViewPart implements IShowInSource {
 			        		};
 								});
 		        	}
+	        	} else {
+	        		manager.add(new Action("Eject") {
+		        		public void run() {
+		        			disk.getDriveUsing().eject();
+		        			contentProvider.update();
+		        		};
+							});
 	        	}
 	        } else if (o instanceof HardwareManager) {
-//        	manager.add(new Action("Placeholder") {});
         	final HardwareManager hardwareManager = (HardwareManager) o;
         	MenuManager hardwareMenu = new MenuManager("Add Hardware");
-//      	  Menu menu = hardwareMenu.createContextMenu(treeViewer.getControl())
       	  hardwareMenu.addMenuListener(new IMenuListener() {
       	    @Override
       	    public void menuAboutToShow(IMenuManager manager) {
@@ -275,6 +295,21 @@ public class DeviceManagerView extends ViewPart implements IShowInSource {
 	        		};
 						});
 	    		}
+	    		manager.add(new Action("Dump RAM to file...") {
+        		public void run() {
+        			FileDialog fd = new FileDialog(container.getShell(), SWT.SAVE);
+              fd.setText("Save binary file (big endian)");
+              String selected = fd.open();
+              if (selected != null) {
+              	try {
+									dcpu.save(new File(selected));
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+              }
+        			contentProvider.update();
+        		};
+					});
 	    		
 	    		manager.add(new Action("Connect hardware...") {
         		public void run() {

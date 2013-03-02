@@ -1,9 +1,12 @@
 package devcpu.emulation;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.eclipse.debug.core.DebugPlugin;
@@ -148,17 +151,31 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable {
 
 	public void load(File file) throws IOException {
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+		int i = 0;
 		try {
-			for (int i = 0;; i++) {
+			for (; i<ram.length; i++) {
 				ram[i] = dis.readChar();
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			//TODO handle file too large for disk
+			e.printStackTrace();
 		} catch (IOException e) {
+			for (; i<ram.length; i++) {
+				ram[i] = 0;
+			}
 			dis.close();
 		}	
 	}
 
+	public void save(File file) throws IOException {
+		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+		try {
+			for (int i = 0; i<ram.length; i++) {
+				dos.writeChar(ram[i]);
+			}
+		} catch (IOException e) {
+			dos.close();
+		}
+	}
 //	public void addTickListener(DCPUTickListener listener) {
 //		tickListeners.add(listener);
 //	}

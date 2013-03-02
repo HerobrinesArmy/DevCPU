@@ -348,13 +348,14 @@ public class DCPU
           break;
         case 17: //HWQ
           cycles += 3;
-          if ((a < 0) || (a >= hardware.size())) break;
-          ((DCPUHardware)hardware.get(a)).query();
+          if ((a >= 0) && (a < hardware.size()))
+          	((DCPUHardware)hardware.get(a)).query();
           break;
         case 18: //HWI
           cycles += 3;
-          if ((a < 0) || (a >= hardware.size())) break;
-          ((DCPUHardware)hardware.get(a)).interrupt();
+          if ((a >= 0) && (a < hardware.size()))
+          	((DCPUHardware)hardware.get(a)).interrupt();
+          break;
         case 2:
         case 3:
         case 4:
