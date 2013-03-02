@@ -511,18 +511,19 @@ public class DCPU
         break;
       }case 30: //STI
         b = a;
+        set(baddr, b);
         registers[6]++;
         registers[7]++;
-        break;
+        return;
       case 31: //STD
       	b = a;
+      	set(baddr, b);
         registers[6]--;
         registers[7]--;
-        break;
+        return;
       case 24:
       case 25:
       }
-
       set(baddr, b);
     }
   }

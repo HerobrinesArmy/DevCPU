@@ -10,6 +10,5 @@ package devcpu;
 public interface ICommandIds {
 
     public static final String CMD_OPEN = "devcpu.open";
-    public static final String CMD_OPEN_MESSAGE = "devcpu.openMessage";
     
 }

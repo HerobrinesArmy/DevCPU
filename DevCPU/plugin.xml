@@ -244,6 +244,10 @@
             id="WriteToDCPU"
             name="Write to DCPU...">
       </command>
+      <command
+            id="devcpu.open"
+            name="Open View">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
