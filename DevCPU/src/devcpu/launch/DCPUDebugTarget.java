@@ -18,6 +18,8 @@ import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
+import devcpu.Activator;
+
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrievalExtension {
 	boolean fTerminate = false;
 	boolean fSuspend = true;
@@ -246,7 +248,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		// if address can be evaluated to an address, create memory block
 		if (address != null)
 		{
-			IMemoryBlockExtension memoryBlock =  new DCPUMemoryBlock(this, expression, address);
+			IMemoryBlockExtension memoryBlock =  new DCPUMemoryBlock(Activator.getShip().getDCPUManager().getDCPUs().get(0));//TODO
 			fMemoryBlocks.add(memoryBlock);
 			
 			return memoryBlock;

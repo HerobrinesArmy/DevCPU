@@ -50,9 +50,9 @@ public class DCPUEngine {
 				for (int j=0; j<getAddressableSize(); j++)
 				{
 					MemoryByte oneByte = new MemoryByte(bytes[i+j]);
-					oneByte.setBigEndian(isBigEndian(addressKey));
-					oneByte.setWritable(isWritable(addressKey));
-					oneByte.setReadable(isReadable(addressKey));
+					oneByte.setBigEndian(true);
+					oneByte.setWritable(true);
+					oneByte.setReadable(true);
 					byteUnit[j] = oneByte;
 				}
 				DCPUMemoryUnit unit = new DCPUMemoryUnit(byteUnit);

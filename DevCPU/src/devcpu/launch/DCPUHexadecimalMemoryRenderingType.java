@@ -17,6 +17,6 @@ public class DCPUHexadecimalMemoryRenderingType implements IMemoryRenderingType 
 
 	@Override
 	public IMemoryRendering createRendering() throws CoreException {
-		return new DCPUHexadecimalMemoryRendering("rendering");
+		return new DCPUHexadecimalMemoryRendering("org.eclipse.debug.ui.rendering.hexint");
 	}
 }

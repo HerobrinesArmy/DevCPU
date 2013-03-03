@@ -301,14 +301,6 @@
             </instanceof>
          </enablement>
       </renderingBindings>
-      <renderingBindings
-            class="devcpu.launch.DCPUMemoryRenderingBinding">
-         <enablement>
-            <instanceof
-                  value="devcpu.launch.DCPUMemoryBlock">
-            </instanceof>
-         </enablement>
-      </renderingBindings>
    </extension>
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
