@@ -7,7 +7,7 @@ public class DCPUMemoryUnit {
 	MemoryByte[] fBytes;
 	
 	public DCPUMemoryUnit(MemoryByte[] bytes)
-	{
+	{System.out.println("DCPUMemoryUnit construct");
 		fBytes = bytes;
 	}
 	

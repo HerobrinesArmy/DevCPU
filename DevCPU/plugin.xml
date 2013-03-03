@@ -14,7 +14,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="Perspective"
+            name="DevCPU"
             class="devcpu.Perspective"
             id="DevCPU.perspective">
       </perspective>
@@ -72,6 +72,7 @@
       <view
             category="devcpu.Emulation"
             class="devcpu.views.DeviceManagerView"
+            icon="icons/devnav.png"
             id="devcpu.views.DeviceManagerView"
             name="Device Manager"
             restorable="true">
@@ -79,6 +80,7 @@
       <view
             category="devcpu.Development"
             class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="icons/dasm.png"
             id="developmentnavigator"
             name="Development Navigator">
       </view>
@@ -107,12 +109,21 @@
                relationship="bottom"
                relative="developmentnavigator">
          </view>
+         <newWizardShortcut
+               id="devcpu.dasmfilewizard">
+         </newWizardShortcut>
  <!--        <view
                id="devcpu.console"
                minimized="false"
                relationship="bottom"
                relative="org.eclipse.ui.editorss">
          </view> -->
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="DevCPU.perspective">
+         <newWizardShortcut
+               id="devcpu.dasmfilewizard">
+         </newWizardShortcut>
       </perspectiveExtension>
    </extension>
    <extension
@@ -286,7 +297,7 @@
       </activity>
       <activityPatternBinding
             activityId="DevCPU.hiddenviews"
-            pattern="sdaf.*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy).*">
+            pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy).*">
       </activityPatternBinding>
    </extension>
    <extension
@@ -357,6 +368,31 @@
             icon="icons/dcpu.png"
             id="devcpu.launchimage">
       </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <primaryWizard
+            id="devcpu.dasmfilewizard">
+      </primaryWizard>
+      <wizard
+            category="DCPU"
+            class="devcpu.wizards.DASMFileWizard"
+            icon="icons/dasm.png"
+            id="devcpu.dasmfilewizard"
+            name="DCPU-16 Assembly File">
+      </wizard>
+      <category
+            id="DCPU"
+            name="DCPU">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonWizard
+            type="new"
+            wizardId="devcpu.dasmfilewizard">
+         <enablement></enablement>
+      </commonWizard>
    </extension>
 
 </plugin>

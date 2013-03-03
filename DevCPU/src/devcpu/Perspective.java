@@ -5,5 +5,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class Perspective implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
+		layout.addNewWizardShortcut("devcpu.dasmfilewizard");
+		System.out.println("Sadfsdfasd");
 	}
 }

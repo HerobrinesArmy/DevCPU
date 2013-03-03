@@ -20,6 +20,9 @@ public class DCPUEngine {
 	Hashtable stackframeTable = new Hashtable();
 	
 	Random random = new Random();
+	public DCPUEngine() {
+		System.out.println("DCPUEngine");
+	}
 	
 	/**
 	 * Allow debug adapters to get memory from an address

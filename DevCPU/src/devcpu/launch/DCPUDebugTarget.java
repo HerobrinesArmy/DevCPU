@@ -39,6 +39,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		super(null);
 		fLaunch = launch;
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+		System.out.println("DCPUDebugTarget");
 	}
 	
 	/* (non-Javadoc)

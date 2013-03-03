@@ -8,16 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Hashtable;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfigurationType;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
@@ -26,7 +22,8 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.MemoryByte;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
-import org.eclipse.debug.internal.ui.views.memory.MemoryView;
+import org.eclipse.debug.internal.ui.memory.MemoryRenderingManager;
+import org.eclipse.debug.internal.ui.viewers.provisional.IAsynchronousContentAdapter;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.memory.IMemoryRendering;
 import org.eclipse.debug.ui.memory.IMemoryRenderingContainer;
@@ -37,8 +34,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import devcpu.DCPUManager;
-import devcpu.launch.DCPUDebugTarget;
-import devcpu.launch.DCPUHexadecimalMemoryRenderingType;
 import devcpu.launch.DCPUMemoryBlock;
 import devcpu.launch.DCPUMemoryUnit;
 
@@ -52,15 +47,15 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
 		this.id = id;
-		doInitDebugEnvironment();
+//		doInitDebugEnvironment();
 	}
 
 	private void doInitDebugEnvironment() {
 		try { //TODO
-			ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
-			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
-			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
-			ILaunch launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
+//			ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
+//			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
+//			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
+//			ILaunch launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
 			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
 		  if (page != null)
@@ -81,7 +76,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 		        IMemoryRenderingType renderingType = 
 		DebugUITools.getMemoryRenderingManager(). 
 
-		getRenderingType("org.eclipse.debug.ui.rendering.raw_memory"); 
+		getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
 		        IMemoryRendering rendering = renderingType.createRendering(); 
 
 		        IMemoryRenderingContainer container = memoryView.getContainer( 
@@ -102,8 +97,8 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 			
 //		System.out.println(view.getMemoryRenderingContainers().length);
 //		view.getMemoryRenderingContainers()[0].
-//		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
-//		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
+		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
+		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -256,11 +251,13 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 	@Override
 	public String getModelIdentifier() {
+		System.out.println("hit DCPU getMI");
 		return "devcpu.memoryview";
 	}
 
 	@Override
 	public IDebugTarget getDebugTarget() {
+		System.out.println("hit DCPU getDT");
 		return this;
 	}
 
@@ -272,96 +269,112 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 	@Override
 	public Object getAdapter(Class adapter) {
+//		if (adapter.equals(org.eclipse.core.resources.IResource.class)) {
+//			return Platform.getLocation();
+//		}
 		System.out.println("DefaultControllableDCPU adapt to " + adapter.getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public boolean canTerminate() {
-		return true;
+		System.out.println("hit DCPU canTerm");
+		return false;
 	}
 
 	@Override
 	public boolean isTerminated() {
 		//TODO
+		System.out.println("hit DCPU isTerm");
 		return false;
 	}
 
 	@Override
 	public void terminate() throws DebugException {
 		// TODO Auto-generated method stub
-		
+		System.out.println("hit DCPU term");
+			
 	}
 
 	@Override
 	public boolean canResume() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU canRes");
 		return false;
 	}
 
 	@Override
 	public boolean canSuspend() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU canSUs");
 		return false;
 	}
 
 	@Override
 	public boolean isSuspended() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPUisSus");
 		return false;
 	}
 
 	@Override
 	public void resume() throws DebugException {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU res");
 		
 	}
 
 	@Override
 	public void suspend() throws DebugException {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU sus");
 		
 	}
 
 	@Override
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("hit DCPU bpA");
 	}
 
 	@Override
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU bpR");
 		
 	}
 
 	@Override
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("hit DCPU bpC");
 	}
 
 	@Override
 	public boolean canDisconnect() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU canDis");
 		return false;
 	}
 
 	@Override
 	public void disconnect() throws DebugException {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU dis");
 		
 	}
 
 	@Override
 	public boolean isDisconnected() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU isDis");
 		return false;
 	}
 
 	@Override
 	public boolean supportsStorageRetrieval() {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU supportsSR");
 		return true;
 	}
 
@@ -387,21 +400,25 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 	@Override
 	public boolean hasThreads() throws DebugException {
+		System.out.println("hit DCPU hasThreads");
 		return false;
 	}
 
 	@Override
 	public String getName() throws DebugException {
+		System.out.println("hit DCPU getName");
 		return id;
 	}
 
 	@Override
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
 		// TODO Auto-generated method stub
+		System.out.println("hit DCPU supports Break");
 		return false;
 	}
 
 	public MemoryByte[] getBytesFromAddress(int address, int length) {
+		System.out.println("hit DCPU getBytesfromaddress " + address +", " + length);
 		if (memoryBlockTable == null)
 		{		
 			// create new memoryBlock table
@@ -467,7 +484,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 			else
 			{
 				MemoryByte[] bytes = temp.getBytes();
-				
+				IAsynchronousContentAdapter a;
 				for (int j=0; j<bytes.length; j++)
 				{
 					MemoryByte oneByte = new MemoryByte(bytes[j].getValue(), bytes[j].getFlags());

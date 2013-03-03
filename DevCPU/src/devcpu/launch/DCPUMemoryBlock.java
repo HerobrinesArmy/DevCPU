@@ -8,16 +8,16 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlockExtension;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
-import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.MemoryByte;
-import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.debug.internal.ui.elements.adapters.MemoryBlockContentAdapter;
+import org.eclipse.debug.internal.ui.viewers.provisional.IAsynchronousContentAdapter;
 
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugElement implements IMemoryBlockExtension {
 
 	private String fExpression;
-	private DefaultControllableDCPU fDebugTarget;
+	private DefaultControllableDCPU dcpu;
 
 	private boolean isEnabled = true;
 	private BigInteger fBaseAddress;
@@ -25,7 +25,8 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	private ArrayList fConnections = new ArrayList();
 		
 	public DCPUMemoryBlock(DefaultControllableDCPU dcpu) {
-		this.fDebugTarget = dcpu;
+		System.out.println("DCPUMemoryBlock construct");
+		this.dcpu = dcpu;
 	}
 
 
@@ -33,14 +34,16 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getBigBaseAddress()
 	 */
 	public BigInteger getBigBaseAddress() throws DebugException {
+		System.out.println("DCPUMemoryBlock getBigBaseAddress");
 //		fBaseAddress = fDebugTarget.getEngine().evaluateExpression(fExpression, null);
-		return new BigInteger("0");
+		return BigInteger.valueOf(0);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#supportBaseAddressModification()
 	 */
-	public boolean supportBaseAddressModification() throws DebugException {			
+	public boolean supportBaseAddressModification() throws DebugException {
+		System.out.println("DCPUMemoryBlock supportBAM");
 		return false;//fDebugTarget.getEngine().suppostsBaseAddressModification(this);
 	}
 
@@ -53,7 +56,8 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 //		} catch (CoreException e) {
 //			throw new DebugException(e.getStatus());
 //		}			
-	}
+		System.out.println("DCPUMemoryBlock SetBAM");
+		}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getBytesFromOffset(long, long)
@@ -61,6 +65,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	synchronized public MemoryByte[] getBytesFromOffset(BigInteger offset, long length)
 		throws DebugException {
 //		BigInteger address = fBaseAddress.subtract(offset);
+		System.out.println("DCPUMemoryBlock getBytesFromOffset");
 		return getBytesFromAddress(offset, length);
 	}
 
@@ -70,6 +75,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 */
 	public MemoryByte[] getBytesFromAddress(BigInteger address, long length)
 		throws DebugException {
+		System.out.println("DCPUMemoryBlock getBytesFromAddress");
 		
 		try {
 			MemoryByte[] bytes = new MemoryByte[(int)length * 2];
@@ -78,7 +84,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 			int i=0;
 			
 			// asks engine to get bytes from address
-			MemoryByte[] engineBytes =  fDebugTarget.getBytesFromAddress(address.intValue(), lengthCnt);
+			MemoryByte[] engineBytes =  dcpu.getBytesFromAddress(address.intValue(), lengthCnt);
 			System.arraycopy(engineBytes, 0, bytes, i, engineBytes.length);
 			
 			// if engine did not return enough memory, pad with dummy memory
@@ -101,6 +107,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#connect(java.lang.Object)
 	 */
 	public void connect(Object object) {
+		System.out.println("DCPUMemoryBlock connect");
 		
 		if (!fConnections.contains(object))
 			fConnections.add(object);
@@ -121,7 +128,8 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#disconnect(java.lang.Object)
 	 */
 	public void disconnect(Object object) {
-			
+		System.out.println("DCPUMemoryBlock disconnect from " + object + " (" + object.getClass().getCanonicalName()+ ")");
+		
 		if (fConnections.contains(object))
 			fConnections.remove(object);
 		
@@ -133,8 +141,9 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getConnected()
 	 */
-	public Object[] getConnections() {				
-		return fConnections.toArray();		
+	public Object[] getConnections() {
+		System.out.println("DCPUMemoryBlock getConnections");
+		return fConnections.toArray();
 	}
 	
 	/**
@@ -151,6 +160,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 */
 	public long getStartAddress() {
 		// no need to implement this method as it belongs to IMemoryBlock
+		System.out.println("DCPUMemoryBlock getStartAddress");
 		return 0;
 	}
 
@@ -160,6 +170,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 */
 	public long getLength() {
 		// no need to implement this method as it belongs to IMemoryBlock
+		System.out.println("DCPUMemoryBlock getLength");
 		return 0;
 	}
 
@@ -168,6 +179,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 */
 	public byte[] getBytes() throws DebugException {
 		// no need to implement this method as it belongs to IMemoryBlock
+		System.out.println("DCPUMemoryBlock getBytes");
 		return new byte[0];
 	}
 
@@ -175,13 +187,15 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlock#supportsValueModification()
 	 */
 	public boolean supportsValueModification() {
-		return true;//fDebugTarget.getEngine().supportsValueModification(this);
+		System.out.println("DCPUMemoryBlock supportsVM");
+		return false;//fDebugTarget.getEngine().supportsValueModification(this);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlock#setValue(long, byte[])
 	 */
 	public void setValue(BigInteger offset, byte[] bytes) throws DebugException {
+		System.out.println("DCPUMemoryBlock setValue");
 		//TODO
 	}
 
@@ -189,6 +203,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
 	 */
 	public String getModelIdentifier() {
+		System.out.println("DCPUMemoryBlock getMI");
 		return getDebugTarget().getModelIdentifier();
 	}
 
@@ -196,14 +211,16 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
 	 */
 	public IDebugTarget getDebugTarget() {
-		return fDebugTarget;
+		System.out.println("DCPUMemoryBlock getDT");
+		return dcpu;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
 	 */
 	public ILaunch getLaunch() {
-		return fDebugTarget.getLaunch();
+		System.out.println("DCPUMemoryBlock getLaunch");
+		return dcpu.getLaunch();
 	}
 
 
@@ -211,14 +228,17 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
 	public Object getAdapter(Class adapter) {
-		
-		if (adapter.equals(IMemoryBlockRetrievalExtension.class))
-			return getDebugTarget();	
-
-		if (adapter == IColorProvider.class)
-		{
-			return DCPUModelPresentation.getDCPUModelPresentation();
+		System.out.println("DCPUMemoryBlock getAdapter " + adapter.getCanonicalName());
+		if (adapter.equals(IAsynchronousContentAdapter.class)) {
+			return new MemoryBlockContentAdapter();
 		}
+//		if (adapter.equals(IMemoryBlockRetrievalExtension.class))
+//			return getDebugTarget();	
+//
+//		if (adapter == IColorProvider.class)
+//		{
+//			return DCPUModelPresentation.getDCPUModelPresentation();
+//		}
 
 		return null;//super.getAdapter(adapter);
 	}
@@ -228,6 +248,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getExpression()
 	 */
 	public String getExpression() {
+		System.out.println("DCPUMemoryBlock getExpression");
 		return  fExpression;
 	}
 
@@ -238,12 +259,14 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	public void dispose() throws DebugException {		
 		// remove this memory block from debug target
 //		fDebugTarget.removeMemoryBlock(this);
+		System.out.println("DCPUMemoryBlock dispose");
 	}
 
 	/**
 	 * @return is enabled
 	 */
 	public boolean isEnabled() {
+		System.out.println("DCPUMemoryBlock isEnabled");
 		return isEnabled;
 	}
 
@@ -251,6 +274,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see com.ibm.debug.extended.ui.IMemoryBlockExtension#getMemoryBlockRetrieval()
 	 */
 	public IMemoryBlockRetrieval getMemoryBlockRetrieval() {
+		System.out.println("DCPUMemoryBlock getMemoryBlockRetrieval");
 		return getDebugTarget();
 	}
 
@@ -267,13 +291,15 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see com.ibm.debug.extended.ui.IMemoryBlockExtension#isMemoryChangesManaged()
 	 */
 	public boolean supportsChangeManagement() {
-		return false;
+		System.out.println("DCPUMemoryBlock supportsCM");
+		return true;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getAddressableSize()
 	 */
 	public int getAddressableSize() throws DebugException {
+		System.out.println("DCPUMemoryBlock getAddressableSize");
 		return 2;
 	}
 
@@ -282,6 +308,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlockExtension#getAddressSize()
 	 */
 	public int getAddressSize() throws DebugException {
+		System.out.println("DCPUMemoryBlock getAddressSize");
 		return 2;
 	}
 
@@ -296,6 +323,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 		// Return null by default.  
 		// Null is acceptable if default start address is to be used.
 		// Default is 0.
+		System.out.println("DCPUMemoryBlock getMBSA");
 		return BigInteger.valueOf(0);
 	}
 
@@ -310,6 +338,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 		// Return null by default.
 		// Null is accpetable if default end address is to be used.
 		// Default end address is calculated based on address size.
+		System.out.println("DCPUMemoryBlock getMBEA");
 		return BigInteger.valueOf(65535);//TODO or 128?
 	}
 
@@ -318,6 +347,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 * @see org.eclipse.debug.core.model.IMemoryBlock#setValue(long, byte[])
 	 */
 	public void setValue(long offset, byte[] bytes) throws DebugException {
+		System.out.println("DCPUMemoryBlock setValue");
 		// do not need to implement for IMemoryBlockExtension
 	}
 
@@ -327,6 +357,7 @@ public class DCPUMemoryBlock implements IMemoryBlockExtension {//extends DebugEl
 	 */
 	public BigInteger getBigLength() throws DebugException{
 		// return -1 by default and default length is calculated
-		return BigInteger.valueOf(-1);
+		System.out.println("DCPUMemoryBlock getBigLength");
+		return BigInteger.valueOf(65536);
 	}
 }

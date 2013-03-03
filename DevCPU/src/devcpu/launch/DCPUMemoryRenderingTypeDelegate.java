@@ -7,6 +7,7 @@ import org.eclipse.debug.ui.memory.IMemoryRenderingTypeDelegate;
 public class DCPUMemoryRenderingTypeDelegate implements IMemoryRenderingTypeDelegate {
 
 	public DCPUMemoryRenderingTypeDelegate() {
+		System.out.println("MRTD construct");
 	}
 
 	@Override

@@ -24,6 +24,9 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IColorPro
 	private static DCPUModelPresentation fPresentation;
 	private static Color blue;
 
+	public DCPUModelPresentation() {
+		System.out.println("DCPUModelPresentation");// TODO Auto-generated constructor stub
+	}
 	public static DCPUModelPresentation getDCPUModelPresentation()
 	{
 		if (fPresentation == null)

@@ -6,5 +6,6 @@ import org.eclipse.debug.internal.ui.views.memory.renderings.HexIntegerRendering
 public class DCPUHexadecimalMemoryRendering extends HexIntegerRendering {
 	public DCPUHexadecimalMemoryRendering(String renderingId) {
 		super(renderingId);
+		System.out.println("HMR construct");
 	}
 }
