@@ -22,7 +22,7 @@ public class LiteralMatcher implements LexerTokenMatcher {
 		return followTokenMatchers;
 	}
 
-	@Override
+	@Override //TODO make this work
 	public MatcherResult match(String text, int offset, int lineOffset) {
 		String s = text.substring(offset);
 		for (Pattern pattern : patterns) {
