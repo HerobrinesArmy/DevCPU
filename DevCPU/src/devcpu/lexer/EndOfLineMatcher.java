@@ -19,7 +19,7 @@ public class EndOfLineMatcher implements LexerTokenMatcher {
 		StandardResult result = null;
 		Matcher m = pattern.matcher(text.substring(offset));
 		if (m.find() && m.start() == 0) {
-			LexerToken token = new EndOfLineToken(m.group(), lineOffset + m.start(), lineOffset + offset + m.end());
+			LexerToken token = new EndOfLineToken(m.group(), lineOffset + offset, lineOffset + offset + m.end());
 			result = new StandardResult(true, new LexerToken[]{token}, offset + m.end(), this);
 		} else {
 			result = new StandardResult(false, null, offset, this);

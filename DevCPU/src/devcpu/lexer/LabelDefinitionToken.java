@@ -1,6 +1,13 @@
 package devcpu.lexer;
 
+import org.eclipse.debug.internal.ui.ColorManager;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+
 public class LabelDefinitionToken extends TrimmedLexerToken{
+	public static final Color FOREGROUND = ColorManager.getDefault().getColor(new RGB(0, 0, 127));
+	public static final Color BACKGROUND = ColorManager.getDefault().getColor(new RGB(255, 255, 255));
+
 	public LabelDefinitionToken(String text, int start, int end) {
 		super(text, start, end);
 	}

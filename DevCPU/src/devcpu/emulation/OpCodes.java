@@ -2,6 +2,7 @@ package devcpu.emulation;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Set;
 
 import util.IntHashMap;
 
@@ -26,9 +27,12 @@ public class OpCodes
       }
   }
 
-  public boolean contains(String name)
-  {
+  public boolean contains(String name) {
     return this.codes.containsKey(name.toUpperCase());
+  }
+  
+  public Set<String> getNames() {
+  	return codes.keySet();
   }
 
   public int getId(String name) {

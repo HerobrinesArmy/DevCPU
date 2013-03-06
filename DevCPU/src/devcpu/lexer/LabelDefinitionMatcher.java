@@ -15,7 +15,7 @@ public class LabelDefinitionMatcher implements LexerTokenMatcher {
 		followTokenMatchers.add(LabelDefinitionMatcher.get());
 		followTokenMatchers.add(CommentMatcher.get());
 		followTokenMatchers.add(EndOfLineMatcher.get());
-		followTokenMatchers.add(InstructionMatcher.get());
+		followTokenMatchers.add(SpecialOpCodeMatcher.get());
 		followTokenMatchers.add(DataLineMatcher.get());
 		return followTokenMatchers;
 	}
@@ -27,7 +27,7 @@ public class LabelDefinitionMatcher implements LexerTokenMatcher {
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
 			String match = m.group(); //TODO check for label name group
-			LabelDefinitionToken token = new LabelDefinitionToken(match, lineOffset + m.start(), lineOffset + offset + m.end());
+			LabelDefinitionToken token = new LabelDefinitionToken(match, lineOffset + offset, lineOffset + offset + m.end());
 			result = new StandardResult(true, new LexerToken[]{token}, offset + m.end(), this);
 		} else {
 			result = new StandardResult(false, null, offset, this);

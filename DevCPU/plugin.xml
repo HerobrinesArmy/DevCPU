@@ -410,5 +410,40 @@
             extensions="dasm,dasm16">
       </participant>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="devcpu.DASM"
+            class="devcpu.lexer.SyntaxColoringPreferencePage"
+            id="devcpu.dasm.coloring"
+            name="Syntax Coloring">
+         <keywordReference
+               id="devcpu.keyword_dasm">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="devcpu.DASMPreferencesPage"
+            id="devcpu.DASM"
+            name="DASM">
+         <keywordReference
+               id="devcpu.keyword_dasm">
+         </keywordReference>
+         <enabledWhen>
+            <adapt
+                  type="org.eclipse.core.resources.IProject">
+            </adapt>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="devcpu.keyword_dasm"
+            label="DASM">
+      </keyword>
+   </extension>
 
 </plugin>

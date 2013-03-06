@@ -17,7 +17,8 @@ public class Lexer {
 		initialTokenMatchers.add(CommentMatcher.get());
 		initialTokenMatchers.add(EndOfLineMatcher.get());
 		initialTokenMatchers.add(DirectiveMatcher.get());
-		initialTokenMatchers.add(InstructionMatcher.get());
+		initialTokenMatchers.add(SpecialOpCodeMatcher.get());
+		initialTokenMatchers.add(BasicOpCodeMatcher.get());
 		initialTokenMatchers.add(DataLineMatcher.get());
 	}
 	
@@ -72,7 +73,8 @@ public class Lexer {
 	public String[] getLegalContentTypes() {
 		LinkedHashSet<String> types = new LinkedHashSet<String>();
 		//TODO
-		return new String[]{"DASM_NOTHING", "DASM_ERROR", "DASM_COMMENT", "DASM_EOL", "DASM_LABEL_DEFINITION"};
+		return new String[]{"DASM_NOTHING", "DASM_ERROR", "DASM_COMMENT", "DASM_EOL", "DASM_LABEL_DEFINITION",
+				"DASM_SPECIAL_OPCODE", "DASM_BASIC_OPCODE", "DASM_LITERAL"};
 	}
 	
 	

@@ -1,21 +1,20 @@
 package devcpu.lexer;
 
 import org.eclipse.debug.internal.ui.ColorManager;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
-public class CommentToken extends TrimmedLexerToken {
-	public static final Color FOREGROUND = ColorManager.getDefault().getColor(new RGB(63, 127, 95));
+public class LiteralToken extends StandardLexerToken{
+	public static final Color FOREGROUND = ColorManager.getDefault().getColor(new RGB(64, 64, 64));
 	public static final Color BACKGROUND = ColorManager.getDefault().getColor(new RGB(255, 255, 255));
 
-	public CommentToken(String text, int start, int end) {
+	public LiteralToken(String text, int start, int end) {
 		super(text, start, end);
 	}
 
 	@Override
 	public String getType() {
-		return "DASM_COMMENT";
+		return "DASM_LITERAL";
 	}
 
 	@Override
@@ -40,7 +39,6 @@ public class CommentToken extends TrimmedLexerToken {
 
 	@Override
 	public Object getData() {
-		//TODO get these from preferences
-		return new TextAttribute(FOREGROUND, BACKGROUND, 0);
+		return null;
 	}
 }
