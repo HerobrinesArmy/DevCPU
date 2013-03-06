@@ -307,9 +307,6 @@
             primaryId="org.eclipse.debug.ui.rendering.hexint"
             renderingIds="org.eclipse.debug.ui.rendering.raw_memory,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint,org.eclipse.debug.ui.rendering.hexint">
          <enablement>
-            <instanceof
-                  value="devcpu.launch.DCPUMemoryBlock">
-            </instanceof>
          </enablement>
       </renderingBindings>
    </extension>
@@ -393,6 +390,25 @@
             wizardId="devcpu.dasmfilewizard">
          <enablement></enablement>
       </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="devcpu.editors.dasm.DASMEditor"
+            default="false"
+            extensions="dasm,dasm16"
+            icon="icons/dasm.png"
+            id="devcpu.dasmeditor"
+            name="New DASM Editor">
+      </editor>
+   </extension>
+   <extension
+         id="DASM"
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="devcpu.editors.dasm.DASMDocumentSetupParticipant"
+            extensions="dasm,dasm16">
+      </participant>
    </extension>
 
 </plugin>

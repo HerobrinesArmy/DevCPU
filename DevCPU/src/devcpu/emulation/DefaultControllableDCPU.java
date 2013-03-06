@@ -47,7 +47,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
 		this.id = id;
-//		doInitDebugEnvironment();
+		doInitDebugEnvironment();
 	}
 
 	private void doInitDebugEnvironment() {
@@ -70,25 +70,17 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 		        IMemoryRenderingSite memoryView = (IMemoryRenderingSite) view; 
 		        IMemoryBlockExtension mbe = new DCPUMemoryBlock(this); 
-		        DebugPlugin.getDefault().getMemoryBlockManager(). 
-		                    addMemoryBlocks(new IMemoryBlock[] {mbe}); 
+		        DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {mbe}); 
 
-		        IMemoryRenderingType renderingType = 
-		DebugUITools.getMemoryRenderingManager(). 
-
-		getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
+		        IMemoryRenderingType renderingType = DebugUITools.getMemoryRenderingManager().getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
 		        IMemoryRendering rendering = renderingType.createRendering(); 
 
-		        IMemoryRenderingContainer container = memoryView.getContainer( 
-		                   DebugUIPlugin.getUniqueIdentifier() + 
-		".MemoryView.RenderingViewPane.1"); 
+		        IMemoryRenderingContainer container = memoryView.getContainer(DebugUIPlugin.getUniqueIdentifier() + ".MemoryView.RenderingViewPane.1"); 
 
-		        rendering.init(container, mbe); 
+		        rendering.init(container, mbe);
 		        
 		        container.addMemoryRendering(rendering);	
-
 		       }
-
 		       catch (Exception e) {e.printStackTrace();}
 		  }
 
@@ -97,8 +89,8 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 			
 //		System.out.println(view.getMemoryRenderingContainers().length);
 //		view.getMemoryRenderingContainers()[0].
-		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
-		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
+//		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
+//		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
