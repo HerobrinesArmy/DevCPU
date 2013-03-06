@@ -24,7 +24,7 @@ public class FloppyManager {
 	}
 
 	public ArrayList<FloppyDisk> getAvailableDisks() {
-		ArrayList<FloppyDisk> avail = new ArrayList<>();
+		ArrayList<FloppyDisk> avail = new ArrayList<FloppyDisk>();
 		for (FloppyDisk fd : disks) {
 			if (fd.getDriveUsing() == null) {
 				avail.add(fd);
