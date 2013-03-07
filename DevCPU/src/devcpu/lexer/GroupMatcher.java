@@ -7,8 +7,7 @@ import java.util.regex.Pattern;
 
 public class GroupMatcher implements LexerTokenMatcher {
 	private static GroupMatcher matcher = new GroupMatcher();
-	private Pattern pattern = Pattern.compile("\\s*(\\()\\s*([^;]*)(\\))"); //TODO Not so sure about that *
-	//TODO FIXME XXX this pattern is flawed. There is a chance to incorrectly span from value b to value a 
+	private Pattern pattern = Pattern.compile("\\s*(\\()\\s*([^;,]*)(\\))");
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
@@ -24,26 +23,47 @@ public class GroupMatcher implements LexerTokenMatcher {
 		String s = text.substring(offset);
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
-			int resultOffset = offset + m.end();
-			String inner = m.group(2);
-			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
-			tokens.add(new GroupStartToken(m.group(1), lineOffset + offset + m.start(1), lineOffset + offset + m.end(1)));
-			GroupEndToken endToken = new GroupEndToken(m.group(3), lineOffset + offset + m.start(3), lineOffset + offset + m.end(3));
-			//I heard comments help you remember how your code works, so here's a comment.
-//			for (BoundableLexerTokenMatcher matcher : innerMatchers) {
-				MatcherResult result = ExpressionMatcher.get().match(text, offset+m.start(2), offset+m.end(2), lineOffset);
-				if (result.matched()) {
-					for (LexerToken token : result.getTokens()) {
-						tokens.add(token);
+			int mend = getRealGroupEnd(s);
+			if (mend > 1) {
+				int resultOffset = offset + mend;
+				ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
+				tokens.add(new GroupStartToken(m.group(1), lineOffset + offset + m.start(1), lineOffset + offset + m.end(1)));
+//				GroupEndToken endToken = new GroupEndToken(m.group(3), lineOffset + offset + mend - 1, lineOffset + offset + mend);
+				//I heard comments help you remember how your code works, so here's a comment.
+	//			for (BoundableLexerTokenMatcher matcher : innerMatchers) {
+					MatcherResult result = ExpressionMatcher.get().match(text, offset + m.start(2), offset + mend - 1, lineOffset);
+					if (result.matched()) {
+						for (LexerToken token : result.getTokens()) {
+							tokens.add(token);
+						}
+						s = text.substring(result.getEndOffset());
+						m = Pattern.compile("\\s*\\)").matcher(s);
+						if (m.find() && m.start() == 0) {
+//						if (text.substring(result.getEndOffset(), mend-1).trim().length() == 0) {
+							GroupEndToken endToken = new GroupEndToken(m.group(), lineOffset + result.getEndOffset(), lineOffset + result.getEndOffset() + m.end());
+							tokens.add(endToken);
+							return new StandardResult(true, tokens.toArray(new LexerToken[0]), resultOffset, this);
+						}
 					}
-					//TODO check for anything between the end of the last token and the ']'
-					//Fail if non-whitespace found
-					tokens.add(endToken);
-					return new StandardResult(true, tokens.toArray(new LexerToken[0]), resultOffset, this);
-				}
-//			}
+	//			}
+			}
 		}
 		return new StandardResult(false, null, offset, this);
+	}
+
+	private int getRealGroupEnd(String s) {
+		char[] chars = s.toCharArray();
+		int j = 0;
+		for (int i = 0; i < chars.length; i++) {
+			if (chars[i] == '(') {
+				j++;
+			} else if (chars[i] ==')') {
+				if (--j == 0) {
+					return i+1;
+				}
+			}
+		}
+		return -1;
 	}
 
 	public static GroupMatcher get() {

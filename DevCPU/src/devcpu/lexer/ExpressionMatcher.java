@@ -101,6 +101,7 @@ public class ExpressionMatcher implements BoundableLexerTokenMatcher {
 		String text = originalText.substring(startOffset, endOffset);
 		int offset = 0;
 		boolean started = false;
+		MatcherResult finalResult = null;
 		MatcherResult result = matchUnaryOperator(text, offset, lineOffset);
 		if (result != null) {
 			for (LexerToken token : result.getTokens()) {
@@ -111,6 +112,7 @@ public class ExpressionMatcher implements BoundableLexerTokenMatcher {
 		for (LexerTokenMatcher matcher : operandMatchers) {
 			result = matcher.match(text, offset, lineOffset);
 			if (result.matched()) {
+				finalResult = result;
 				for (LexerToken token : result.getTokens()) {
 					tokens.add(token);
 				}
@@ -140,6 +142,7 @@ public class ExpressionMatcher implements BoundableLexerTokenMatcher {
 				if (result == null) {
 					return new StandardResult(false, null, offset, this);
 				}
+				finalResult = result;
 				for (LexerToken token : result.getTokens()) {
 					tokens.add(token);
 				}
@@ -148,7 +151,7 @@ public class ExpressionMatcher implements BoundableLexerTokenMatcher {
 			//TODO check that there isn't leftover content in the group/address
 			//On second thought, do this one level up
 			//TODO consider using the endOffset of the last result instead
-			return new StandardResult(true, tokens.toArray(new LexerToken[0]), startOffset + endOffset, this);
+			return new StandardResult(true, tokens.toArray(new LexerToken[0]), startOffset + finalResult.getEndOffset(), this);
 		}
 		return new StandardResult(false, null, offset, this);
 	}

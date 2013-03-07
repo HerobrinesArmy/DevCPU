@@ -16,29 +16,31 @@ public class Lexer {
 		initialTokenMatchers.add(LabelDefinitionMatcher.get());
 		initialTokenMatchers.add(CommentMatcher.get());
 		initialTokenMatchers.add(EndOfLineMatcher.get());
-		initialTokenMatchers.add(DirectiveMatcher.get());
+		initialTokenMatchers.add(DirectiveMatcher.get()); //TODO
 		initialTokenMatchers.add(SpecialOpCodeMatcher.get());
 		initialTokenMatchers.add(BasicOpCodeMatcher.get());
-		initialTokenMatchers.add(DataLineMatcher.get());
+		initialTokenMatchers.add(DataLineMatcher.get()); //TODO
 	}
 	
 	public LexerToken[] generateTokens(String text) {
+		return generateTokens(text, false);
+	}
+	
+	public LexerToken[] generateTokens(String text, boolean includeZeroLength) {
 		ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
 		String[] lines = text.split("\\n");
 		int lineOffset = 0;
 		for (String line : lines) {
-			//TODO Just in case you turn stupid, don't forget that these offsets are currently reset per line
 			ArrayList<LexerToken> lineTokens = getTokens(line, 0, lineOffset, initialTokenMatchers);
 			if (lineTokens == null) {
 				tokens.add(new ErrorToken(line, lineOffset, lineOffset + line.length()));
 			} else {
 				for (LexerToken token : lineTokens) {
-					System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
-					if (!(token instanceof TrueToken || token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken)) {
+//					System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
+					if (includeZeroLength || !(token instanceof TrueToken || token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken)) {
 						tokens.add(token);
 					}
 				}
-//				tokens.addAll(lineTokens);
 			}
 			lineOffset += line.length() + 1;
 		}
