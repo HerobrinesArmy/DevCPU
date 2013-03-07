@@ -32,7 +32,12 @@ public class Lexer {
 			if (lineTokens == null) {
 				tokens.add(new ErrorToken(line, lineOffset, lineOffset + line.length()));
 			} else {
-				tokens.addAll(lineTokens);
+				for (LexerToken token : lineTokens) {
+					if (!(token instanceof TrueToken)) {
+						tokens.add(token);
+					}
+				}
+//				tokens.addAll(lineTokens);
 			}
 			lineOffset += line.length() + 1;
 		}
@@ -73,15 +78,28 @@ public class Lexer {
 	public String[] getLegalContentTypes() {
 //		LinkedHashSet<String> types = new LinkedHashSet<String>();
 		//TODO
-		return new String[]{"DASM_NOTHING", "DASM_ERROR", "DASM_COMMENT", "DASM_EOL", "DASM_LABEL_DEFINITION",
-				"DASM_SPECIAL_OPCODE", "DASM_BASIC_OPCODE", "DASM_LITERAL", "DASM_REGISTER"};
+		return new String[]{
+			"DASM_NOTHING",
+			"DASM_ERROR",
+			"DASM_COMMENT",
+			"DASM_EOL",
+			"DASM_LABEL_DEFINITION",
+			"DASM_SPECIAL_OPCODE",
+			"DASM_BASIC_OPCODE",
+			"DASM_LITERAL",
+			"DASM_REGISTER",
+			"DASM_ADDRESS_END",
+			"DASM_ADDRESS_END",
+			"DASM_GROUP_START",
+			"DASM_GROUP_END",
+			"DASM_LABEL",
+			"DASM_OPERATOR"
+		};
 	}
-	
-	
 	
 	public static void main(String[] args) {
 		Lexer l = Lexer.get();
-		LexerToken[] tokens = l.generateTokens(";My comment that starts the file\r\n\n :the_label  ;it has a comment too\nset x,0xF10d;MOAR COMMENTS");
+		LexerToken[] tokens = l.generateTokens("HWI 23\n;My comment that starts the file\r\n\n :the_label  ;it has a comment too\nset x,0xF10d;MOAR COMMENTS");
 		for (LexerToken token : tokens) {
 			System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
 		}

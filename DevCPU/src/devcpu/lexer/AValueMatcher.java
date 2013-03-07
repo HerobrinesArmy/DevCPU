@@ -10,8 +10,17 @@ public class AValueMatcher implements LexerTokenMatcher {
 	private Pattern ignoredSeparators = Pattern.compile("[\\s\\,]*");
 	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
-		matchers.add(LiteralMatcher.get());
-		matchers.add(RegisterMatcher.get());
+//		matchers.add(LiteralMatcher.get());
+//		matchers.add(RegisterMatcher.get());
+		matchers.add(AddressMatcher.get());
+		matchers.add(ExpressionMatcher.get());
+		/*
+		//push
+		pop
+		peek
+		pick literal
+		*/
+//		matchers.add(LabelMatcher.get());
 	}
 	
 	@Override
