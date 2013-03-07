@@ -16,6 +16,7 @@ public class LabelDefinitionMatcher implements LexerTokenMatcher {
 		followTokenMatchers.add(CommentMatcher.get());
 		followTokenMatchers.add(EndOfLineMatcher.get());
 		followTokenMatchers.add(SpecialOpCodeMatcher.get());
+		followTokenMatchers.add(BasicOpCodeMatcher.get());
 		followTokenMatchers.add(DataLineMatcher.get());
 		return followTokenMatchers;
 	}
