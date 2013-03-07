@@ -12,6 +12,7 @@ public class LiteralMatcher implements LexerTokenMatcher {
 		patterns.add(Pattern.compile("\\s*"+Lexer.REGEX_HEXADECIMAL_VALUE));
 		patterns.add(Pattern.compile("\\s*"+Lexer.REGEX_DECIMAL_VALUE));
 		patterns.add(Pattern.compile("\\s*"+Lexer.REGEX_BINARY_VALUE));
+		patterns.add(Pattern.compile("\\s*"+Lexer.REGEX_CHARACTER_VALUE));
 	}
 	
 	@Override
