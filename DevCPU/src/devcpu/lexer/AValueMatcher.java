@@ -44,6 +44,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 			return new StandardResult(false, null, offset, this);
 		} else {
 			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
+			tokens.add(new AValueStartToken("", offset, offset));
 			int endOffset = offset;
 			for (MatcherResult r : results) {
 				endOffset = r.getEndOffset();
@@ -51,6 +52,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 					tokens.add(token);
 				}
 			}
+			tokens.add(new AValueEndToken("", endOffset, endOffset));
 			return new StandardResult(true, tokens.toArray(new LexerToken[0]), endOffset, this);
 		}
 	}

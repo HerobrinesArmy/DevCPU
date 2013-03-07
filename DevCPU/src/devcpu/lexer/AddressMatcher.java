@@ -26,14 +26,14 @@ public class AddressMatcher implements LexerTokenMatcher {
 		String s = text.substring(offset);
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
-			int resultOffset = m.end();
+			int resultOffset = offset + m.end();
 			String inner = m.group(2);
 			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
 			tokens.add(new AddressStartToken(m.group(1), lineOffset + offset + m.start(1), lineOffset + offset + m.end(1)));
 			AddressEndToken endToken = new AddressEndToken(m.group(3), lineOffset + offset + m.start(3), lineOffset + offset + m.end(3));
 			//I heard comments help you remember how your code works, so here's a comment.
 			for (BoundableLexerTokenMatcher matcher : innerMatchers) {
-				MatcherResult result = matcher.match(inner, m.start(2), m.end(2), lineOffset);
+				MatcherResult result = matcher.match(text, offset+m.start(2), offset+m.end(2), lineOffset);
 				if (result.matched()) {
 					for (LexerToken token : result.getTokens()) {
 						tokens.add(token);

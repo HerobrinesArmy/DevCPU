@@ -33,7 +33,8 @@ public class Lexer {
 				tokens.add(new ErrorToken(line, lineOffset, lineOffset + line.length()));
 			} else {
 				for (LexerToken token : lineTokens) {
-					if (!(token instanceof TrueToken)) {
+					System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
+					if (!(token instanceof TrueToken || token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken)) {
 						tokens.add(token);
 					}
 				}
@@ -99,7 +100,7 @@ public class Lexer {
 	
 	public static void main(String[] args) {
 		Lexer l = Lexer.get();
-		LexerToken[] tokens = l.generateTokens("HWI 23\n;My comment that starts the file\r\n\n :the_label  ;it has a comment too\nset x,0xF10d;MOAR COMMENTS");
+		LexerToken[] tokens = l.generateTokens("sub [(a)], 0b1010\nHWI 23\n;My comment that starts the file\r\n\n :the_label  ;it has a comment too\nset x,0xF10d;MOAR COMMENTS");
 		for (LexerToken token : tokens) {
 			System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
 		}
