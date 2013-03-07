@@ -22,8 +22,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eclipse.ui.part.IShowInSource;
-import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
@@ -43,7 +41,7 @@ import devcpu.emulation.VirtualMonitor;
 import devcpu.emulation.VirtualSleepChamber;
 import devcpu.emulation.VirtualVectorDisplay;
 
-public class DeviceManagerView extends ViewPart implements IShowInSource {
+public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
 	private TreeViewer treeViewer;
 	private DeviceManagerContentProvider contentProvider;
@@ -434,8 +432,8 @@ public class DeviceManagerView extends ViewPart implements IShowInSource {
 	public void setFocus() {
 	}
 	
-	@Override
-	public ShowInContext getShowInContext() {
-		return new ShowInContext(((IStructuredSelection)treeViewer.getSelection()).getFirstElement(), treeViewer.getSelection());
-	}
+//	@Override
+//	public ShowInContext getShowInContext() {
+//		return new ShowInContext(((IStructuredSelection)treeViewer.getSelection()).getFirstElement(), treeViewer.getSelection());
+//	}
 }

@@ -35,7 +35,7 @@ public class LexerDamagerRepairer implements IPresentationRepairer, IPresentatio
 	@Override
 	public void createPresentation(TextPresentation presentation, ITypedRegion damage) {
 		Lexer lexer = new Lexer();
-		//TODO
+		//TODO read from preferences store
 		LexerToken[] tokens = lexer.generateTokens(document.get());
 		for (LexerToken token : tokens) {
 			if ("DASM_COMMENT".equals(token.getType())) {
@@ -48,6 +48,8 @@ public class LexerDamagerRepairer implements IPresentationRepairer, IPresentatio
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), BasicOpCodeToken.FOREGROUND, BasicOpCodeToken.BACKGROUND, SWT.BOLD));
 			} else if ("DASM_LITERAL".equals(token.getType())) {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), LiteralToken.FOREGROUND, LiteralToken.BACKGROUND, SWT.NORMAL));
+			} else if ("DASM_REGISTER".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), RegisterToken.FOREGROUND, RegisterToken.BACKGROUND, SWT.BOLD));
 			} else {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DEFAULT_FOREGROUND, DEFAULT_BACKGROUND, SWT.NORMAL));
 			}

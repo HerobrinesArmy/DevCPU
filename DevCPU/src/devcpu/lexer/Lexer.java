@@ -8,7 +8,7 @@ public class Lexer {
 	public static final String REGEX_IDENTIFIER = "\\b[a-zA-Z_][a-zA-Z_0-9]*\\b";
 	public static final String REGEX_HEXADECIMAL_VALUE = "\\b0x[0-9A-Fa-f]{1,4}\\b";
 	public static final String REGEX_BINARY_VALUE = "\\b0b[01]{1,16}\\b";
-	public static final String REGEX_DECIMAL_VALUE = "\\b\\-?[0-9]{1,5}\\b";
+	public static final String REGEX_DECIMAL_VALUE = "\\-?[0-9]{1,5}\\b";
 	
 	private static Lexer lexer = new Lexer();
 	private ArrayList<LexerTokenMatcher> initialTokenMatchers = new ArrayList<LexerTokenMatcher>();
@@ -71,10 +71,10 @@ public class Lexer {
 	}
 	
 	public String[] getLegalContentTypes() {
-		LinkedHashSet<String> types = new LinkedHashSet<String>();
+//		LinkedHashSet<String> types = new LinkedHashSet<String>();
 		//TODO
 		return new String[]{"DASM_NOTHING", "DASM_ERROR", "DASM_COMMENT", "DASM_EOL", "DASM_LABEL_DEFINITION",
-				"DASM_SPECIAL_OPCODE", "DASM_BASIC_OPCODE", "DASM_LITERAL"};
+				"DASM_SPECIAL_OPCODE", "DASM_BASIC_OPCODE", "DASM_LITERAL", "DASM_REGISTER"};
 	}
 	
 	

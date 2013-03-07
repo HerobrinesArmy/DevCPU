@@ -14,9 +14,7 @@ public class BasicOpCodeMatcher implements LexerTokenMatcher {
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO
-		followTokenMatchers.add(CommentMatcher.get());
-		followTokenMatchers.add(EndOfLineMatcher.get());
+		followTokenMatchers.add(BValueMatcher.get());
 		return followTokenMatchers;
 	}
 

@@ -14,10 +14,7 @@ public class SpecialOpCodeMatcher implements LexerTokenMatcher {
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO
-		followTokenMatchers.add(LiteralMatcher.get());
-		followTokenMatchers.add(CommentMatcher.get());
-		followTokenMatchers.add(EndOfLineMatcher.get());
+		followTokenMatchers.add(AValueMatcher.get());
 		return followTokenMatchers;
 	}
 

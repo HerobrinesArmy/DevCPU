@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AValueMatcher implements LexerTokenMatcher {
-	private static AValueMatcher matcher = new AValueMatcher();
+public class BValueMatcher implements LexerTokenMatcher {
+	private static BValueMatcher matcher = new BValueMatcher();
 	private Pattern ignoredSeparators = Pattern.compile("[\\s\\,]*");
 	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
@@ -17,9 +17,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO
-		followTokenMatchers.add(CommentMatcher.get());
-		followTokenMatchers.add(EndOfLineMatcher.get());
+		followTokenMatchers.add(AValueMatcher.get());
 		return followTokenMatchers;
 	}
 
@@ -70,7 +68,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 		}
 		return null;
 	}
-	public static AValueMatcher get() {
+	public static BValueMatcher get() {
 		return matcher ;
 	}
 }
