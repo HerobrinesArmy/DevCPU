@@ -96,7 +96,7 @@
       <perspectiveExtension
             targetID="*">
          <view
-               id="developmentnavigator"
+               id="org.eclipse.ui.navigator.ProjectExplorer"
                minimized="false"
                ratio="0.5"
                relationship="left"
@@ -130,13 +130,14 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="popup:developmentnavigator?after=additions">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <separator
                name="separator1"
                visible="true">
          </separator>
          <command
                commandId="AssembleToDCPU"
+               label="Assemble to DCPU..."
                style="push">
             <visibleWhen>
                <with
@@ -162,6 +163,7 @@
          </command>
          <command
                commandId="AssembleToFloppy"
+               label="Assemble to floppy..."
                style="push">
             <visibleWhen>
                <with
@@ -187,6 +189,7 @@
          </command>
          <command
                commandId="WriteToDCPU"
+               label="Write to DCPU..."
                style="push">
             <visibleWhen>
                <with
@@ -202,6 +205,7 @@
          </command>
          <command
                commandId="WriteToFloppy"
+               label="Write to floppy..."
                style="push">
             <visibleWhen>
                <with

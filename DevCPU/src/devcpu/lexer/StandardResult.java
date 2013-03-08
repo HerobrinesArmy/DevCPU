@@ -1,5 +1,8 @@
 package devcpu.lexer;
 
+import devcpu.lexer.matchers.LexerTokenMatcher;
+import devcpu.lexer.tokens.LexerToken;
+
 public class StandardResult implements MatcherResult {
 	private boolean matched;
 //	private String remainingText;

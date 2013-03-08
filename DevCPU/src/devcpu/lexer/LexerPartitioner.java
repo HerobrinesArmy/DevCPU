@@ -8,6 +8,8 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
 
+import devcpu.lexer.tokens.LexerToken;
+
 public class LexerPartitioner implements IDocumentPartitioner {
 	private IDocument document;
 	private Lexer lexer = Lexer.get();

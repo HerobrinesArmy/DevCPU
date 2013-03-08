@@ -1,8 +1,24 @@
 package devcpu.lexer;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
+
+import devcpu.lexer.matchers.BasicOpCodeMatcher;
+import devcpu.lexer.matchers.CommentMatcher;
+import devcpu.lexer.matchers.DataLineMatcher;
+import devcpu.lexer.matchers.DirectiveMatcher;
+import devcpu.lexer.matchers.EndOfLineMatcher;
+import devcpu.lexer.matchers.LabelDefinitionMatcher;
+import devcpu.lexer.matchers.LexerTokenMatcher;
+import devcpu.lexer.matchers.SpecialOpCodeMatcher;
+import devcpu.lexer.tokens.AValueEndToken;
+import devcpu.lexer.tokens.AValueStartToken;
+import devcpu.lexer.tokens.BValueEndToken;
+import devcpu.lexer.tokens.BValueStartToken;
+import devcpu.lexer.tokens.EndOfLineToken;
+import devcpu.lexer.tokens.ErrorToken;
+import devcpu.lexer.tokens.LexerToken;
+import devcpu.lexer.tokens.TrueToken;
 
 public class Lexer {
 	public static final String REGEX_IDENTIFIER = "\\b[a-zA-Z_][a-zA-Z_0-9]*\\b";
@@ -12,6 +28,12 @@ public class Lexer {
 	public static final String REGEX_CHARACTER_VALUE = "'[^']'";
 	
 	private static Lexer lexer = new Lexer();
+	
+	private ArrayList<LexerToken> lastResult = new ArrayList<LexerToken>();
+	
+	private Lexer() {
+	}
+	
 	private ArrayList<LexerTokenMatcher> initialTokenMatchers = new ArrayList<LexerTokenMatcher>();
 	{
 		initialTokenMatchers.add(LabelDefinitionMatcher.get());
@@ -45,6 +67,8 @@ public class Lexer {
 			}
 			lineOffset += line.length() + 1;
 		}
+		lastResult = tokens;
+		System.out.println("Storing " + lastResult.size() + " tokens");
 		return tokens.toArray(new LexerToken[0]);
 	}
 	
@@ -107,5 +131,18 @@ public class Lexer {
 		for (LexerToken token : tokens) {
 			System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
 		}
+	}
+
+	public LexerToken getTokenAt(int offset) {
+		for (LexerToken token : lastResult) {
+			if (token.getEnd() > offset)
+			{
+				if (token.getStart() > offset) {
+					return null;
+				}
+				return token;
+			}
+		}
+		return null;
 	}
 }
