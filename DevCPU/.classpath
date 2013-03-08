@@ -7,11 +7,7 @@
 	<classpathentry exported="true" kind="lib" path="asm-debug-all.jar"/>
 	<classpathentry exported="true" kind="lib" path="AppleJavaExtensions.jar"/>
 	<classpathentry exported="true" kind="lib" path="lwjgl_util.jar"/>
-	<classpathentry exported="true" kind="lib" path="lwjgl.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DevCPU/native/windows"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lwjgl.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
