@@ -555,7 +555,7 @@ public class Assembler
   		}
       if (line.startsWith("#include ") || line.startsWith(".include "))
         try {
-          include(new URL(line.substring("#include ".length()))); //TODO FIXME XXX Change to find the file in the project
+//          include(new URL(line.substring("#include ".length()))); //TODO FIXME XXX Change to find the file in the project
         } catch (Exception e) {
 //          System.out.println("[" + fileName + ":" + lines + "] Failed to include file: " + line.trim());
           e.printStackTrace();
