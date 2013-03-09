@@ -4,17 +4,17 @@ import org.eclipse.debug.internal.ui.ColorManager;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
-public class RegisterToken extends TrimmedLexerToken{
-	public static final Color FOREGROUND = ColorManager.getDefault().getColor(new RGB(196, 128, 0));;
+public class DataValueStartToken extends TrimmedLexerToken{
+	public static final Color FOREGROUND = ColorManager.getDefault().getColor(new RGB(0,0,0));
 	public static final Color BACKGROUND = ColorManager.getDefault().getColor(new RGB(255, 255, 255));
 
-	public RegisterToken(String text, int start, int end) {
+	public DataValueStartToken(String text, int start, int end) {
 		super(text, start, end);
 	}
 
 	@Override
 	public String getType() {
-		return "DASM_REGISTER";
+		return "DASM_DATA_VALUE_START";
 	}
 
 	@Override

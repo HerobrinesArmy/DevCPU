@@ -7,32 +7,23 @@ import java.util.regex.Pattern;
 
 import devcpu.lexer.MatcherResult;
 import devcpu.lexer.StandardResult;
-import devcpu.lexer.tokens.AValueEndToken;
-import devcpu.lexer.tokens.AValueStartToken;
+import devcpu.lexer.tokens.DataValueEndToken;
+import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.LexerToken;
 
-public class AValueMatcher implements LexerTokenMatcher {
-	private static AValueMatcher matcher = new AValueMatcher();
+public class DataValueMatcher implements LexerTokenMatcher {
+	private static DataValueMatcher matcher = new DataValueMatcher();
 	private Pattern ignoredSeparators = Pattern.compile("[\\s\\,]*");
-	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
+	private ArrayList<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
-//		matchers.add(LiteralMatcher.get());
-//		matchers.add(RegisterMatcher.get());
-		matchers.add(AddressMatcher.get());
+		matchers.add(StringMatcher.get());
 		matchers.add(ExpressionMatcher.get());
-		/*
-		//push
-		pop
-		peek
-		pick literal
-		*/
-//		matchers.add(LabelMatcher.get());
 	}
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO
+		followTokenMatchers.add(DataValueMatcher.get());
 		followTokenMatchers.add(CommentMatcher.get());
 		followTokenMatchers.add(EndOfLineMatcher.get());
 		return followTokenMatchers;
@@ -50,7 +41,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 			return new StandardResult(false, null, offset, this);
 		} else {
 			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
-			tokens.add(new AValueStartToken("", offset, offset));
+			tokens.add(new DataValueStartToken("", offset, offset));
 			int endOffset = offset;
 			for (MatcherResult r : results) {
 				endOffset = r.getEndOffset();
@@ -58,12 +49,11 @@ public class AValueMatcher implements LexerTokenMatcher {
 					tokens.add(token);
 				}
 			}
-			tokens.add(new AValueEndToken("", endOffset, endOffset));
+			tokens.add(new DataValueEndToken("", endOffset, endOffset));
 			return new StandardResult(true, tokens.toArray(new LexerToken[0]), endOffset, this);
 		}
 	}
 	
-	//TODO super test
 	private ArrayList<MatcherResult> getTokens(String text, int offset, int lineOffset, List<LexerTokenMatcher> matchers) {
 		ArrayList<MatcherResult> matchResults = new ArrayList<MatcherResult>();
 		for (LexerTokenMatcher ltm : matchers) {
@@ -88,7 +78,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 		return null;
 	}
 	
-	public static AValueMatcher get() {
+	public static DataValueMatcher get() {
 		return matcher ;
 	}
 }

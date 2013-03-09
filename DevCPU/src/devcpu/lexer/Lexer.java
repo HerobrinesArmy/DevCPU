@@ -5,7 +5,7 @@ import java.util.List;
 
 import devcpu.lexer.matchers.BasicOpCodeMatcher;
 import devcpu.lexer.matchers.CommentMatcher;
-import devcpu.lexer.matchers.DataLineMatcher;
+import devcpu.lexer.matchers.DataMatcher;
 import devcpu.lexer.matchers.DirectiveMatcher;
 import devcpu.lexer.matchers.EndOfLineMatcher;
 import devcpu.lexer.matchers.LabelDefinitionMatcher;
@@ -15,6 +15,8 @@ import devcpu.lexer.tokens.AValueEndToken;
 import devcpu.lexer.tokens.AValueStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
 import devcpu.lexer.tokens.BValueStartToken;
+import devcpu.lexer.tokens.DataValueEndToken;
+import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.EndOfLineToken;
 import devcpu.lexer.tokens.ErrorToken;
 import devcpu.lexer.tokens.LexerToken;
@@ -26,6 +28,7 @@ public class Lexer {
 	public static final String REGEX_BINARY_VALUE = "\\b0b[01]{1,16}\\b";
 	public static final String REGEX_DECIMAL_VALUE = "\\-?[0-9]{1,5}\\b";
 	public static final String REGEX_CHARACTER_VALUE = "'[^']'";
+	public static final String REGEX_STRING = "\\\"(\\\\.|[^\\\"])*\\\"";
 	
 	private static Lexer lexer = new Lexer();
 	
@@ -42,7 +45,7 @@ public class Lexer {
 		initialTokenMatchers.add(DirectiveMatcher.get()); //TODO
 		initialTokenMatchers.add(SpecialOpCodeMatcher.get());
 		initialTokenMatchers.add(BasicOpCodeMatcher.get());
-		initialTokenMatchers.add(DataLineMatcher.get()); //TODO
+		initialTokenMatchers.add(DataMatcher.get()); //TODO
 	}
 	
 	public LexerToken[] generateTokens(String text) {
@@ -60,7 +63,7 @@ public class Lexer {
 			} else {
 				for (LexerToken token : lineTokens) {
 //					System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
-					if (includeZeroLength || !(token instanceof TrueToken || token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken)) {
+					if (!(token instanceof TrueToken) && (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken))) {
 						tokens.add(token);
 					}
 				}
@@ -116,12 +119,16 @@ public class Lexer {
 			"DASM_BASIC_OPCODE",
 			"DASM_LITERAL",
 			"DASM_REGISTER",
-			"DASM_ADDRESS_END",
+			"DASM_ADDRESS_START",
 			"DASM_ADDRESS_END",
 			"DASM_GROUP_START",
 			"DASM_GROUP_END",
 			"DASM_LABEL",
-			"DASM_OPERATOR"
+			"DASM_OPERATOR",
+			"DASM_STRING",
+			"DASM_DATA_VALUE_START",
+			"DASM_DATA_VALUE_END",
+			"DASM_DATA"
 		};
 	}
 	

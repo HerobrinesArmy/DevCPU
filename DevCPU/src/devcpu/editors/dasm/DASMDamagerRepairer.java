@@ -16,11 +16,13 @@ import org.eclipse.swt.graphics.RGB;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.CommentToken;
+import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
 import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
+import devcpu.lexer.tokens.StringToken;
 
 
 public class DASMDamagerRepairer implements IPresentationRepairer, IPresentationDamager {
@@ -58,6 +60,10 @@ public class DASMDamagerRepairer implements IPresentationRepairer, IPresentation
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), LiteralToken.FOREGROUND, LiteralToken.BACKGROUND, SWT.NORMAL));
 			} else if ("DASM_REGISTER".equals(token.getType())) {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), RegisterToken.FOREGROUND, RegisterToken.BACKGROUND, SWT.BOLD));
+			} else if ("DASM_STRING".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), StringToken.FOREGROUND, StringToken.BACKGROUND, SWT.NORMAL));
+			} else if ("DASM_DATA".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DataToken.FOREGROUND, DataToken.BACKGROUND, SWT.BOLD));
 			} else {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DEFAULT_FOREGROUND, DEFAULT_BACKGROUND, SWT.NORMAL));
 			}
