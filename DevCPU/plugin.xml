@@ -418,7 +418,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="devcpu.DASM"
-            class="devcpu.lexer.SyntaxColoringPreferencePage"
+            class="devcpu.editors.dasm.SyntaxColoringPreferencePage"
             id="devcpu.dasm.coloring"
             name="Syntax Coloring">
          <keywordReference

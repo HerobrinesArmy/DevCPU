@@ -1,4 +1,4 @@
-package devcpu.lexer;
+package devcpu.editors.dasm;
 
 import java.util.ArrayList;
 
@@ -8,9 +8,10 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TypedRegion;
 
+import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.LexerToken;
 
-public class LexerPartitioner implements IDocumentPartitioner {
+public class DASMPartitioner implements IDocumentPartitioner {
 	private IDocument document;
 	private Lexer lexer = Lexer.get();
 	private LexerToken[] tokens;

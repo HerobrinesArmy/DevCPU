@@ -1,4 +1,4 @@
-package devcpu.emulation;
+package devcpu.assembler;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,20 +14,12 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import devcpu.emulation.DCPU;
+import devcpu.emulation.OpCodes;
+
 /**
- * Highly experimental 1.7 update to Notch's 1.0 assembler
- * Use at your own risk
+ * DCPU-16 1.7 assembler, using some code from Notch's 1.0 assembler
  * @author Notch, Herobrine
- *
- * Rules for defining replacement text with #define:
- * Line may start with 0-N whitespace characters,
- * then '#' or '.',
- * then "define" (any case),
- * then 1-N whitespace characters,
- * then the key (1-N characters in the set [A-Za-z_0-9]),
- * then exactly 1 whitespace character,
- * and everything after that until the end of the line is the replacement text.
- * Will only replace text on lines following the definition.
  */
 public class Assembler
 {
@@ -527,72 +519,6 @@ public class Assembler
     }
   }
   
-  public static void main(String[] args) {
-  	Assembler assembler = new Assembler(new char[65536]);
-  	try {
-			assembler.assemble("testfile.txt");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
-	public void assemble(URL url) throws Exception {
-		include(url);
-	    for (Position pos : this.labelUsages.keySet()) {
-	      String label = (String)this.labelUsages.get(pos);
-	      if (label.startsWith("PC+")) {
-	        int toSkip = Integer.parseInt(label.substring(3));
-	        int pp = pos.pos - 1;
-	        for (int i = 0; i <= toSkip; i++) {
-	          pp += DCPU.getInstructionLength(this.ram[pp]);
-	        }
-	        this.ram[pos.pos] = (char)pp;
-	      } else {
-	        Position labelPos = pos.scope.findLabel(label);
-	        if (labelPos == null) {
-	          throw new IllegalArgumentException("Undefined label " + label);
-	        }
-	        this.ram[pos.pos] = (char)labelPos.pos;
-	      }
-	    }
-	}
-
-
-	private void include(URL url) throws Exception {
-		Scope oldScope = this.currentScope;
-    this.currentScope = new Scope(oldScope);
-    oldScope.inheritedScopes.add(this.currentScope);
-    BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-    String line = "";
-    int lines = 0;
-    while ((line = br.readLine()) != null) {
-      lines++;
-      line = line.trim();
-      for (String key : defines.keySet()) {
-  			line = line.replaceAll(key, defines.get(key));
-  		}
-      if (line.startsWith("#include ") || line.startsWith(".include "))
-        try {
-          include(new URL(line.substring("#include ".length())));
-        } catch (Exception e) {
-//          System.out.println("[" + fileName + ":" + lines + "] Failed to include file: " + line.trim());
-          e.printStackTrace();
-        }
-      else {
-        try {
-          parseLine(line);
-        } catch (Exception e) {
-//          System.out.println("[" + fileName + ":" + lines + "] Failed to parse line: " + line.trim());
-          e.printStackTrace();
-        }
-      }
-    }
-    br.close();
-    this.currentScope = oldScope;		
-	}
-
 	public void assemble(InputStream input) throws Exception {
 		include(input);
 	    for (Position pos : this.labelUsages.keySet()) {
@@ -613,7 +539,6 @@ public class Assembler
 	      }
 	    }
 	}
-
 
 	private void include(InputStream input) throws Exception {
 		Scope oldScope = this.currentScope;
