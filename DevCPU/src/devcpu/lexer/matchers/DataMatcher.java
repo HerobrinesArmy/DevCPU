@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import devcpu.lexer.MatcherResult;
 import devcpu.lexer.StandardResult;
-import devcpu.lexer.tokens.BasicOpCodeToken;
+import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.LexerToken;
 
 public class DataMatcher implements LexerTokenMatcher {
@@ -27,7 +27,7 @@ public class DataMatcher implements LexerTokenMatcher {
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
 			String match = m.group();
-			BasicOpCodeToken token = new BasicOpCodeToken(match, lineOffset + offset, lineOffset + offset + m.end());
+			LexerToken token = new DataToken(match, lineOffset + offset, lineOffset + offset + m.end());
 			return new StandardResult(true, new LexerToken[]{token}, offset + m.end(), this);
 		}
 		return new StandardResult(false, null, offset, this);

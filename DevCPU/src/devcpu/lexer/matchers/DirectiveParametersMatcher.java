@@ -5,20 +5,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import devcpu.lexer.Lexer;
 import devcpu.lexer.MatcherResult;
 import devcpu.lexer.StandardResult;
-import devcpu.lexer.tokens.DirectiveToken;
+import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.LexerToken;
 
-public class DirectiveMatcher implements LexerTokenMatcher {
-	private static DirectiveMatcher matcher = new DirectiveMatcher();
-	private Pattern pattern = Pattern.compile("\\s*[\\.#]"+ Lexer.REGEX_IDENTIFIER +"\\b[\\s\\,]*");
+public class DirectiveParametersMatcher implements LexerTokenMatcher {
+	private static DirectiveParametersMatcher matcher = new DirectiveParametersMatcher();
+	private Pattern pattern = Pattern.compile("\\s*[^;\\r\\n]*");
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		followTokenMatchers.add(DirectiveParametersMatcher.get());
+		followTokenMatchers.add(CommentMatcher.get());
+		followTokenMatchers.add(EndOfLineMatcher.get());
 		return followTokenMatchers;
 	}
 
@@ -28,13 +28,13 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
 			String match = m.group();
-			LexerToken token = new DirectiveToken(match, lineOffset + offset, lineOffset + offset + m.end());
+			LexerToken token = new DirectiveParametersToken(match, lineOffset + offset, lineOffset + offset + m.end());
 			return new StandardResult(true, new LexerToken[]{token}, offset + m.end(), this);
 		}
 		return new StandardResult(false, null, offset, this);
 	}
 	
-	public static DirectiveMatcher get() {
+	public static DirectiveParametersMatcher get() {
 		return matcher ;
 	}
 }

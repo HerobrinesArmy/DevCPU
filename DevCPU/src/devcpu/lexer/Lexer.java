@@ -42,10 +42,10 @@ public class Lexer {
 		initialTokenMatchers.add(LabelDefinitionMatcher.get());
 		initialTokenMatchers.add(CommentMatcher.get());
 		initialTokenMatchers.add(EndOfLineMatcher.get());
-		initialTokenMatchers.add(DirectiveMatcher.get()); //TODO
 		initialTokenMatchers.add(SpecialOpCodeMatcher.get());
 		initialTokenMatchers.add(BasicOpCodeMatcher.get());
-		initialTokenMatchers.add(DataMatcher.get()); //TODO
+		initialTokenMatchers.add(DataMatcher.get());
+		initialTokenMatchers.add(DirectiveMatcher.get()); //TODO
 	}
 	
 	public LexerToken[] generateTokens(String text) {
@@ -62,16 +62,18 @@ public class Lexer {
 				tokens.add(new ErrorToken(line, lineOffset, lineOffset + line.length()));
 			} else {
 				for (LexerToken token : lineTokens) {
-//					System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
-					if (!(token instanceof TrueToken) && (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken))) {
-						tokens.add(token);
+					if (!(token instanceof TrueToken)) {
+						System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
+						if (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken)) {
+							tokens.add(token);
+						}
 					}
 				}
 			}
 			lineOffset += line.length() + 1;
 		}
 		lastResult = tokens;
-		System.out.println("Storing " + lastResult.size() + " tokens");
+//		System.out.println("Storing " + lastResult.size() + " tokens");
 		return tokens.toArray(new LexerToken[0]);
 	}
 	
@@ -128,16 +130,10 @@ public class Lexer {
 			"DASM_STRING",
 			"DASM_DATA_VALUE_START",
 			"DASM_DATA_VALUE_END",
-			"DASM_DATA"
+			"DASM_DATA",
+			"DASM_DIRECTIVE_PARAMETERS",
+			"DASM_DIRECTIVE"
 		};
-	}
-	
-	public static void main(String[] args) {
-		Lexer l = Lexer.get();
-		LexerToken[] tokens = l.generateTokens("sub [(a)], 0b1010\nHWI 23\n;My comment that starts the file\r\n\n :the_label  ;it has a comment too\nset x,0xF10d;MOAR COMMENTS");
-		for (LexerToken token : tokens) {
-			System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
-		}
 	}
 
 	public LexerToken getTokenAt(int offset) {

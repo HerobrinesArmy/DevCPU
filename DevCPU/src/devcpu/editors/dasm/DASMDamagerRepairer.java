@@ -17,6 +17,8 @@ import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.CommentToken;
 import devcpu.lexer.tokens.DataToken;
+import devcpu.lexer.tokens.DirectiveParametersToken;
+import devcpu.lexer.tokens.DirectiveToken;
 import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
@@ -64,6 +66,10 @@ public class DASMDamagerRepairer implements IPresentationRepairer, IPresentation
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), StringToken.FOREGROUND, StringToken.BACKGROUND, SWT.NORMAL));
 			} else if ("DASM_DATA".equals(token.getType())) {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DataToken.FOREGROUND, DataToken.BACKGROUND, SWT.BOLD));
+			} else if ("DASM_DIRECTIVE".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DirectiveToken.FOREGROUND, DirectiveToken.BACKGROUND, SWT.BOLD));
+			} else if ("DASM_DIRECTIVE_PARAMETERS".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DirectiveParametersToken.FOREGROUND, DirectiveParametersToken.BACKGROUND, SWT.NORMAL));
 			} else {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DEFAULT_FOREGROUND, DEFAULT_BACKGROUND, SWT.NORMAL));
 			}
