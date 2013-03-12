@@ -14,6 +14,7 @@ import devcpu.lexer.tokens.LexerToken;
 public class AddressMatcher implements LexerTokenMatcher {
 	private static AddressMatcher matcher = new AddressMatcher();
 	private Pattern pattern = Pattern.compile("\\s*(\\[)\\s*([^\\];]+)\\s*(\\])");
+	private Pattern badLeftovers = Pattern.compile("[^\\s]");
 	private List<BoundableLexerTokenMatcher> innerMatchers = new ArrayList<BoundableLexerTokenMatcher>();
 	{
 		innerMatchers.add(ExpressionMatcher.get());
@@ -33,7 +34,6 @@ public class AddressMatcher implements LexerTokenMatcher {
 		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
 			int resultOffset = offset + m.end();
-			String inner = m.group(2);
 			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
 			tokens.add(new AddressStartToken(m.group(1), lineOffset + offset + m.start(1), lineOffset + offset + m.end(1)));
 			AddressEndToken endToken = new AddressEndToken(m.group(3), lineOffset + offset + m.start(3), lineOffset + offset + m.end(3));
@@ -41,11 +41,14 @@ public class AddressMatcher implements LexerTokenMatcher {
 			for (BoundableLexerTokenMatcher matcher : innerMatchers) {
 				MatcherResult result = matcher.match(text, offset+m.start(2), offset+m.end(2), lineOffset);
 				if (result.matched()) {
+					int end = 0;
 					for (LexerToken token : result.getTokens()) {
 						tokens.add(token);
+						end = token.getEnd();
 					}
-					//TODO check for anything between the end of the last token and the ']'
-					//Fail if non-whitespace found
+					if (badLeftovers.matcher(text.substring(end-lineOffset, resultOffset-1)).find()) {
+						return new StandardResult(false, null, offset, this); 
+					}
 					tokens.add(endToken);
 					return new StandardResult(true, tokens.toArray(new LexerToken[0]), resultOffset, this);
 				}

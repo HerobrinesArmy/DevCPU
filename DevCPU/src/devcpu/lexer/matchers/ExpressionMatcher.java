@@ -2,7 +2,6 @@ package devcpu.lexer.matchers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import devcpu.lexer.MatcherResult;
 import devcpu.lexer.StandardResult;

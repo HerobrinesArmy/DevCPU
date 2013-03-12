@@ -5,17 +5,17 @@ import org.eclipse.swt.graphics.RGB;
 
 import devcpu.editors.dasm.DASMColorProvider;
 
-public class AValueStartToken extends TrimmedLexerToken{
-	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(0,0,0));
+public class SimpleStackAccessToken extends TrimmedLexerToken{
+	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(196, 128, 0));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 
-	public AValueStartToken(String text, int start, int end) {
+	public SimpleStackAccessToken(String text, int start, int end) {
 		super(text, start, end);
 	}
 
 	@Override
 	public String getType() {
-		return "DASM_A_VALUE_START";
+		return "DASM_SIMPLE_STACK_ACCESS";
 	}
 
 	@Override

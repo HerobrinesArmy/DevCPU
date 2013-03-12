@@ -16,12 +16,9 @@ public class BValueMatcher implements LexerTokenMatcher {
 	private Pattern ignoredSeparators = Pattern.compile("[\\s\\,]*");
 	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
-//		matchers.add(LiteralMatcher.get());
-//		matchers.add(RegisterMatcher.get());
+		matchers.add(BSimpleStackAccessMatcher.get());
 		matchers.add(AddressMatcher.get());
 		matchers.add(ExpressionMatcher.get());
-		//Stuff from AValueMatcher
-//		matchers.add(LabelMatcher.get());
 	}
 	
 	@Override
