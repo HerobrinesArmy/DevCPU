@@ -6,7 +6,7 @@ import org.eclipse.swt.graphics.RGB;
 import devcpu.editors.dasm.DASMColorProvider;
 
 public class SimpleStackAccessToken extends TrimmedLexerToken{
-	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(196, 128, 0));
+	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(196, 0, 0));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 
 	public SimpleStackAccessToken(String text, int start, int end) {

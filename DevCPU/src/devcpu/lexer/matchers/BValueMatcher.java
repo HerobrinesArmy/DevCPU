@@ -17,6 +17,7 @@ public class BValueMatcher implements LexerTokenMatcher {
 	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
 		matchers.add(BSimpleStackAccessMatcher.get());
+		matchers.add(OffsetStackAccessMatcher.get());
 		matchers.add(AddressMatcher.get());
 		matchers.add(ExpressionMatcher.get());
 	}

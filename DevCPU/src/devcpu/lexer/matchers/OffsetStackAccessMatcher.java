@@ -7,56 +7,55 @@ import java.util.regex.Pattern;
 
 import devcpu.lexer.MatcherResult;
 import devcpu.lexer.StandardResult;
-import devcpu.lexer.tokens.AValueEndToken;
-import devcpu.lexer.tokens.AValueStartToken;
 import devcpu.lexer.tokens.LexerToken;
+import devcpu.lexer.tokens.OffsetStackAccessToken;
+import devcpu.lexer.tokens.PickValueEndToken;
+import devcpu.lexer.tokens.PickValueStartToken;
 
-public class AValueMatcher implements LexerTokenMatcher {
-	private static AValueMatcher matcher = new AValueMatcher();
-	private Pattern ignoredSeparators = Pattern.compile("[\\s\\,]*");
+public class OffsetStackAccessMatcher implements LexerTokenMatcher {
+	//TODO Try somehow to catch [sp+literal] here too, in its many expression forms??
+	//Otherwise, you'll need to look for it in values with address roots when you assemble.
+	private Pattern pattern = Pattern.compile("\\s*pick\\b",Pattern.CASE_INSENSITIVE);
+	private static OffsetStackAccessMatcher matcher = new OffsetStackAccessMatcher();
 	private List<LexerTokenMatcher> matchers = new ArrayList<LexerTokenMatcher>();
 	{
-		matchers.add(ASimpleStackAccessMatcher.get());
-		matchers.add(OffsetStackAccessMatcher.get());
-		matchers.add(AddressMatcher.get());
 		matchers.add(ExpressionMatcher.get());
 	}
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO
-		followTokenMatchers.add(CommentMatcher.get());
-		followTokenMatchers.add(EndOfLineMatcher.get());
+		followTokenMatchers.add(TrueMatcher.get());
 		return followTokenMatchers;
 	}
 
 	@Override
 	public MatcherResult match(String text, int offset, int lineOffset) {
 		String s = text.substring(offset);
-		Matcher m = ignoredSeparators.matcher(s);
+		Matcher m = pattern.matcher(s);
 		if (m.find() && m.start() == 0) {
-			offset += m.end();
-		}
-		ArrayList<MatcherResult> results = getTokens(text, offset, lineOffset, matchers);
-		if (results == null) {
-			return new StandardResult(false, null, offset, this);
-		} else {
 			ArrayList<LexerToken> tokens = new ArrayList<LexerToken>();
-			tokens.add(new AValueStartToken("", offset, offset));
-			int endOffset = offset;
-			for (MatcherResult r : results) {
-				endOffset = r.getEndOffset();
-				for (LexerToken token : r.getTokens()) {
-					tokens.add(token);
+			tokens.add(new OffsetStackAccessToken(m.group(), lineOffset + offset, lineOffset + offset + m.end()));
+			offset += m.end();
+			ArrayList<MatcherResult> results = getTokens(text, offset, lineOffset, matchers);
+			if (results == null) {
+				return new StandardResult(false, null, offset, this);
+			} else {
+				tokens.add(new PickValueStartToken("", offset, offset));
+				int endOffset = offset;
+				for (MatcherResult r : results) {
+					endOffset = r.getEndOffset();
+					for (LexerToken token : r.getTokens()) {
+						tokens.add(token);
+					}
 				}
+				tokens.add(new PickValueEndToken("", endOffset, endOffset));
+				return new StandardResult(true, tokens.toArray(new LexerToken[0]), endOffset, this);
 			}
-			tokens.add(new AValueEndToken("", endOffset, endOffset));
-			return new StandardResult(true, tokens.toArray(new LexerToken[0]), endOffset, this);
 		}
+		return new StandardResult(false, null, offset, this);
 	}
 	
-	//TODO super test
 	private ArrayList<MatcherResult> getTokens(String text, int offset, int lineOffset, List<LexerTokenMatcher> matchers) {
 		ArrayList<MatcherResult> matchResults = new ArrayList<MatcherResult>();
 		for (LexerTokenMatcher ltm : matchers) {
@@ -81,7 +80,7 @@ public class AValueMatcher implements LexerTokenMatcher {
 		return null;
 	}
 	
-	public static AValueMatcher get() {
+	public static OffsetStackAccessMatcher get() {
 		return matcher ;
 	}
 }

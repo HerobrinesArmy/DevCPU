@@ -5,17 +5,17 @@ import org.eclipse.swt.graphics.RGB;
 
 import devcpu.editors.dasm.DASMColorProvider;
 
-public class BValueEndToken extends StandardLexerToken{
+public class PickValueEndToken extends StandardLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(0,0,0));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 
-	public BValueEndToken(String text, int start, int end) {
+	public PickValueEndToken(String text, int start, int end) {
 		super(text, start, end);
 	}
 
 	@Override
 	public String getType() {
-		return "DASM_B_VALUE_END";
+		return "DASM_PICK_VALUE_END";
 	}
 
 	@Override

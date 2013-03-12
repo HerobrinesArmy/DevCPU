@@ -20,6 +20,8 @@ import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.EndOfLineToken;
 import devcpu.lexer.tokens.ErrorToken;
 import devcpu.lexer.tokens.LexerToken;
+import devcpu.lexer.tokens.PickValueEndToken;
+import devcpu.lexer.tokens.PickValueStartToken;
 import devcpu.lexer.tokens.TrueToken;
 
 public class Lexer {
@@ -64,7 +66,7 @@ public class Lexer {
 				for (LexerToken token : lineTokens) {
 					if (!(token instanceof TrueToken)) {
 						System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
-						if (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken)) {
+						if (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken || token instanceof PickValueStartToken || token instanceof PickValueEndToken)) {
 							tokens.add(token);
 						}
 					}
@@ -133,7 +135,10 @@ public class Lexer {
 			"DASM_DATA",
 			"DASM_DIRECTIVE_PARAMETERS",
 			"DASM_DIRECTIVE",
-			"DASM_SIMPLE_STACK_ACCESS"
+			"DASM_SIMPLE_STACK_ACCESS",
+			"DASM_OFFSET_STACK_ACCESS",
+			"DASM_PICK_VALUE_START",
+			"DASM_PICK_VALUE_END",
 		};
 	}
 

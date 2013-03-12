@@ -5,7 +5,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import devcpu.editors.dasm.DASMColorProvider;
 
-public class AValueStartToken extends TrimmedLexerToken{
+public class AValueStartToken extends StandardLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(0,0,0));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 

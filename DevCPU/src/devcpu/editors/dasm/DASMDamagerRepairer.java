@@ -22,6 +22,7 @@ import devcpu.lexer.tokens.DirectiveToken;
 import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
+import devcpu.lexer.tokens.OffsetStackAccessToken;
 import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
@@ -72,7 +73,9 @@ public class DASMDamagerRepairer implements IPresentationRepairer, IPresentation
 			} else if ("DASM_DIRECTIVE_PARAMETERS".equals(token.getType())) {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DirectiveParametersToken.FOREGROUND, DirectiveParametersToken.BACKGROUND, SWT.NORMAL));
 			} else if ("DASM_SIMPLE_STACK_ACCESS".equals(token.getType())) {
-				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), SimpleStackAccessToken.FOREGROUND, SimpleStackAccessToken.BACKGROUND, SWT.NORMAL));
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), SimpleStackAccessToken.FOREGROUND, SimpleStackAccessToken.BACKGROUND, SWT.BOLD));
+			} else if ("DASM_OFFSET_STACK_ACCESS".equals(token.getType())) {
+				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), OffsetStackAccessToken.FOREGROUND, OffsetStackAccessToken.BACKGROUND, SWT.BOLD));
 			} else {
 				presentation.addStyleRange(new StyleRange(token.getOffset(), token.getLength(), DEFAULT_FOREGROUND, DEFAULT_BACKGROUND, SWT.NORMAL));
 			}
