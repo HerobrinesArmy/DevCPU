@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.net.URL;
 
+import devcpu.assembler.OldAssembler;
+
 public class DCPUApplet extends Applet
   implements Runnable
 {
@@ -37,7 +39,7 @@ public class DCPUApplet extends Applet
     new VirtualSleepChamber().connectTo(cpu);
     new VirtualVectorDisplay().connectTo(cpu);
     try {
-    	new Assembler(cpu.ram).assemble(new URL(getParameter("source")));//getParameter("source"));
+    	new OldAssembler(cpu.ram).assemble(new URL(getParameter("source")));//getParameter("source"));
 //      DCPU.load(cpu.ram);
     } catch (Exception e1) {
       e1.printStackTrace();

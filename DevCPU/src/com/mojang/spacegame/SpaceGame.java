@@ -36,8 +36,8 @@ import util.GLX;
 import com.mojang.spacegame.renderer.Tesselator;
 import com.mojang.spacegame.renderer.Textures;
 
+import devcpu.assembler.OldAssembler;
 import devcpu.emulation.AWTKeyMapping;
-import devcpu.emulation.Assembler;
 import devcpu.emulation.DCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.VirtualClock;
@@ -69,11 +69,6 @@ public class SpaceGame
   public VirtualFloppyDrive vfloppydrive = (VirtualFloppyDrive) new VirtualFloppyDrive().connectTo(cpu);
   private VirtualSleepChamber vsleepchamber = (VirtualSleepChamber) new VirtualSleepChamber().connectTo(cpu);
   private VirtualVectorDisplay vvectordisplay = (VirtualVectorDisplay) new VirtualVectorDisplay().connectTo(cpu);
-//  {try {
-////      DCPU.load(cpu.ram);
-//    } catch (Exception e1) {
-//      e1.printStackTrace();
-//    } }
   private int monitorTexture = 0;
 
   float time = 0.0F;
@@ -750,7 +745,7 @@ private static ByteBuffer loadIcon(URL url)
 		{
 			game = new SpaceGame(SpaceGame.class.getResourceAsStream("/computer/testdump.dmp"));
 			try {
-				new Assembler(game.cpu.ram).assemble("crashtest.txt");
+				new OldAssembler(game.cpu.ram).assemble("crashtest.txt");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

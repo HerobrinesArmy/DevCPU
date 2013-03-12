@@ -14,7 +14,8 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import devcpu.emulation.Assembler;
+import devcpu.assembler.Assembler;
+import devcpu.assembler.OldAssembler;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -63,7 +64,7 @@ public class NavigatorCommandHandler implements IHandler {
 						Object[] res = listDialog.getResult();
 						for (Object o : res) {
 							if (o instanceof FloppyDisk) {
-								Assembler a = new Assembler(((FloppyDisk) o).data);
+								OldAssembler a = new OldAssembler(((FloppyDisk) o).data);
 								try {
 									a.assemble(file.getContents(true));
 								} catch (Exception e) {
@@ -97,7 +98,7 @@ public class NavigatorCommandHandler implements IHandler {
 							if (o instanceof DefaultControllableDCPU) {
 								Assembler a = new Assembler(((DefaultControllableDCPU) o).ram);
 								try {
-									a.assemble(file.getContents(true));
+									a.assemble(file);
 								} catch (Exception e) {
 									// TODO Error message
 									e.printStackTrace();
