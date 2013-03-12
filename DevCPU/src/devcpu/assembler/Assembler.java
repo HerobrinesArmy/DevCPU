@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.eclipse.core.resources.IFile;
 
 import devcpu.emulation.DCPU;
 import devcpu.emulation.OpCodes;
@@ -519,57 +520,11 @@ public class Assembler
     }
   }
   
-	public void assemble(InputStream input) throws Exception {
-		include(input);
-	    for (Position pos : this.labelUsages.keySet()) {
-	      String label = (String)this.labelUsages.get(pos);
-	      if (label.startsWith("PC+")) {
-	        int toSkip = Integer.parseInt(label.substring(3));
-	        int pp = pos.pos - 1;
-	        for (int i = 0; i <= toSkip; i++) {
-	          pp += DCPU.getInstructionLength(this.ram[pp]);
-	        }
-	        this.ram[pos.pos] = (char)pp;
-	      } else {
-	        Position labelPos = pos.scope.findLabel(label);
-	        if (labelPos == null) {
-	          throw new IllegalArgumentException("Undefined label " + label);
-	        }
-	        this.ram[pos.pos] = (char)labelPos.pos;
-	      }
-	    }
+	public void assemble(IFile file) throws Exception {
+		Assembly assembly = new Assembly(file);
 	}
 
 	private void include(InputStream input) throws Exception {
-		Scope oldScope = this.currentScope;
-    this.currentScope = new Scope(oldScope);
-    oldScope.inheritedScopes.add(this.currentScope);
-    BufferedReader br = new BufferedReader(new InputStreamReader(input));
-    String line = "";
-    int lines = 0;
-    while ((line = br.readLine()) != null) {
-      lines++;
-      line = line.trim();
-      for (String key : defines.keySet()) {
-  			line = line.replaceAll(key, defines.get(key));
-  		}
-      if (line.startsWith("#include ") || line.startsWith(".include "))
-        try {
-//          include(new URL(line.substring("#include ".length()))); //TODO FIXME XXX Change to find the file in the project
-        } catch (Exception e) {
-//          System.out.println("[" + fileName + ":" + lines + "] Failed to include file: " + line.trim());
-          e.printStackTrace();
-        }
-      else {
-        try {
-          parseLine(line);
-        } catch (Exception e) {
-//          System.out.println("[" + fileName + ":" + lines + "] Failed to parse line: " + line.trim());
-          e.printStackTrace();
-        }
-      }
-    }
-    br.close();
-    this.currentScope = oldScope;		
+
 	}
 }
