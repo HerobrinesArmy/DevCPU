@@ -3,8 +3,6 @@ package devcpu.assembler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +11,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 
 import devcpu.emulation.DCPU;
 import devcpu.emulation.OpCodes;
@@ -521,25 +516,4 @@ public class Assembler
       return null;
     }
   }
-  
-	public void assemble(IFile file) {
-		try {
-			Assembly assembly = new Assembly(file);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DuplicateLabelDefinitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IncludeFileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IncludeFileIsAncestorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }

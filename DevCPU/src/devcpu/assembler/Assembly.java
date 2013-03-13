@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import devcpu.emulation.DefaultControllableDCPU;
+
 public class Assembly {
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = true;
 
@@ -40,5 +42,10 @@ public class Assembly {
 
 	public void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
 		this.labelsCaseSensitive = labelsCaseSensitive;
+	}
+
+	public void assemble(DefaultControllableDCPU dcpu) {
+		Assembler assembler = new Assembler(dcpu.ram);
+		// TODO Auto-generated method stub
 	}
 }

@@ -8,13 +8,17 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import devcpu.assembler.Assembler;
+import devcpu.assembler.Assembly;
+import devcpu.assembler.DuplicateLabelDefinitionException;
+import devcpu.assembler.IncludeFileIsAncestorException;
+import devcpu.assembler.IncludeFileNotFoundException;
 import devcpu.assembler.OldAssembler;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
@@ -96,11 +100,24 @@ public class NavigatorCommandHandler implements IHandler {
 						Object[] res = listDialog.getResult();
 						for (Object o : res) {
 							if (o instanceof DefaultControllableDCPU) {
-								Assembler a = new Assembler(((DefaultControllableDCPU) o).ram);
+//								(((DefaultControllableDCPU) o).ram);
 								try {
-									a.assemble(file);
-								} catch (Exception e) {
-									// TODO Error message
+									Assembly a = new Assembly(file);
+									a.assemble((DefaultControllableDCPU) o);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (DuplicateLabelDefinitionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (CoreException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (IncludeFileNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (IncludeFileIsAncestorException e) {
+									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
