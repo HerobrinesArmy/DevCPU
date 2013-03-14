@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -13,8 +12,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
-import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
+import devcpu.assembler.exceptions.InvalidDefineFormatException;
+import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.DirectiveToken;
@@ -24,15 +24,13 @@ import devcpu.lexer.tokens.LexerToken;
 
 public class AssemblyDocument {
 	private IFile file;
-	private ArrayList<AssemblyLine> lines;
-	private ArrayList<Directive> directives = new ArrayList<Directive>();
-	private ArrayList<Include> includes = new ArrayList<Include>();
-	private LinkedHashMap<String,LabelDefinition> labelDefs = new LinkedHashMap<String, LabelDefinition>();
-	private LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
 	private Assembly assembly;
 	private AssemblyDocument parent;
+	private ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
+	private ArrayList<Directive> directives = new ArrayList<Directive>();
+	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
 
-	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) throws IOException, DuplicateLabelDefinitionException, CoreException {
+	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException {
 		this.file = file;
 		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release.
 		this.assembly = assembly;
@@ -40,10 +38,9 @@ public class AssemblyDocument {
 		readLines();
 	}
 
-	private void readLines() throws IOException, DuplicateLabelDefinitionException, CoreException {
+	private void readLines() throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException {
 		//TODO prompt if unsync?
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
-		lines = new ArrayList<AssemblyLine>();
 		String lineText = null;
 		int n = 0;
 		while((lineText=isr.readLine()) != null) {
@@ -56,23 +53,27 @@ public class AssemblyDocument {
 					directive.setParameters((DirectiveParametersToken)token);
 					directives.add(directive);
 					if (directive.isInclude()) {
-						includes.add(new Include(directive));
+						children.put(directive,loadInclude(new Include(directive)));
+					} else if (directive.isDefine()) {
+						Define define = new Define(directive);
+						assembly.defines.put(define.getKey(), define.getValue());
 					}
 				} else if (token instanceof LabelDefinitionToken) {
 					LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, assembly.isLabelsCaseSensitive());
-					if (labelDefs.containsKey(labelDef.getLabelName())) {
-						throw new DuplicateLabelDefinitionException(labelDefs.get(labelDef.getLabelName()),labelDef);
+					if (assembly.labelDefs.containsKey(labelDef.getLabelName())) {
+						throw new DuplicateLabelDefinitionException(assembly.labelDefs.get(labelDef.getLabelName()),labelDef);
 					}
-					labelDefs.put(labelDef.getLabelName(), labelDef);
+					assembly.labelDefs.put(labelDef.getLabelName(), labelDef);
 				} else if (token instanceof LabelToken) {
 					LabelUse labelUse = new LabelUse(line, (LabelToken) token, assembly.isLabelsCaseSensitive());
-					if (!labelUses.containsKey(labelUse.getLabelName())) {
-						labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
+					if (!assembly.labelUses.containsKey(labelUse.getLabelName())) {
+						assembly.labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
 					}
-					labelUses.get(labelUse.getLabelName()).add(labelUse);
+					assembly.labelUses.get(labelUse.getLabelName()).add(labelUse);
 				}
 			}
 			lines.add(line);
+			assembly.lines.add(line);
 		}		
 	}
 
@@ -88,22 +89,14 @@ public class AssemblyDocument {
 		return directives;
 	}
 
-	public ArrayList<Include> getIncludes() {
-		return includes;
-	}
-
-	public LinkedHashMap<String, LabelDefinition> getLabelDefs() {
-		return labelDefs;
-	}
-
-	public LinkedHashMap<String, List<LabelUse>> getLabelUses() {
-		return labelUses;
-	}
-
 	public Assembly getAssembly() {
 		return assembly;
 	}
 	
+	public LinkedHashMap<Directive, AssemblyDocument> getChildren() {
+		return children;
+	}
+
 	public boolean isRoot() {
 		return parent == null;
 	}
@@ -112,7 +105,7 @@ public class AssemblyDocument {
 		return parent;
 	}
 
-	public AssemblyDocument loadInclude(Include include) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, DuplicateLabelDefinitionException, CoreException {
+	private AssemblyDocument loadInclude(Include include) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, DuplicateLabelDefinitionException, CoreException, InvalidDefineFormatException {
 		IFile includeFile = locate(include);
 		if (includeFile == null) {
 			throw new IncludeFileNotFoundException(include);

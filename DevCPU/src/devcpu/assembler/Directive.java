@@ -39,4 +39,8 @@ public class Directive {
 	public boolean isInclude() {
 		return "INCLUDE".equals(directiveName) || "IMPORT".equals(directiveName);
 	}
+
+	public boolean isDefine() {
+		return "DEFINE".equals(directiveName);
+	}
 }

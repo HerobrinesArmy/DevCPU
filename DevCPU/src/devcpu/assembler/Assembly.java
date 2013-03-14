@@ -2,33 +2,33 @@ package devcpu.assembler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
-import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
+import devcpu.assembler.exceptions.InvalidDefineFormatException;
+import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class Assembly {
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = true;
-
 	private AssemblyDocument rootDocument;
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	private boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
+	
+	public ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
+	public LinkedHashMap<String,String> defines = new LinkedHashMap<String, String>();
+	public LinkedHashMap<String,LabelDefinition> labelDefs = new LinkedHashMap<String, LabelDefinition>();
+	public LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
 
-	public Assembly(IFile file) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException {
+	public Assembly(IFile file) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException {
 		rootDocument = new AssemblyDocument(file, this, null);
 		documents.add(rootDocument);
-		loadIncludes(rootDocument);
-	}
-
-	private void loadIncludes(AssemblyDocument document) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, DuplicateLabelDefinitionException, CoreException {
-		for (Include include : document.getIncludes()) {
-			//Why the hell are you doing this from here?
-			documents.add(document.loadInclude(include));
-		}		
+		//TODO?
 	}
 
 	public AssemblyDocument getRootDocument() {
