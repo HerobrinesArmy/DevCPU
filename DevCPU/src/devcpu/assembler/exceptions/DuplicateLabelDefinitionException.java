@@ -1,4 +1,6 @@
-package devcpu.assembler;
+package devcpu.assembler.exceptions;
+
+import devcpu.assembler.LabelDefinition;
 
 public class DuplicateLabelDefinitionException extends Exception {
 	private static final long serialVersionUID = 1L;

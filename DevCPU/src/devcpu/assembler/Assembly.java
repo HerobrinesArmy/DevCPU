@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
+import devcpu.assembler.exceptions.RecursiveInclusionException;
+import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class Assembly {
@@ -15,13 +18,13 @@ public class Assembly {
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	private boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
 
-	public Assembly(IFile file) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, IncludeFileIsAncestorException {
+	public Assembly(IFile file) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException {
 		rootDocument = new AssemblyDocument(file, this, null);
 		documents.add(rootDocument);
 		loadIncludes(rootDocument);
 	}
 
-	private void loadIncludes(AssemblyDocument document) throws IncludeFileNotFoundException, IncludeFileIsAncestorException, IOException, DuplicateLabelDefinitionException, CoreException {
+	private void loadIncludes(AssemblyDocument document) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, DuplicateLabelDefinitionException, CoreException {
 		for (Include include : document.getIncludes()) {
 			//Why the hell are you doing this from here?
 			documents.add(document.loadInclude(include));

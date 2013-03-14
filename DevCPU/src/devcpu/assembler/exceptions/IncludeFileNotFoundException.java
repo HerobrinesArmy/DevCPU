@@ -1,4 +1,6 @@
-package devcpu.assembler;
+package devcpu.assembler.exceptions;
+
+import devcpu.assembler.Include;
 
 public class IncludeFileNotFoundException extends Exception {
 	private static final long serialVersionUID = 1L;

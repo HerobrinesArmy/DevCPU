@@ -16,10 +16,10 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import devcpu.assembler.Assembly;
-import devcpu.assembler.DuplicateLabelDefinitionException;
-import devcpu.assembler.IncludeFileIsAncestorException;
-import devcpu.assembler.IncludeFileNotFoundException;
 import devcpu.assembler.OldAssembler;
+import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
+import devcpu.assembler.exceptions.RecursiveInclusionException;
+import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -116,7 +116,7 @@ public class NavigatorCommandHandler implements IHandler {
 								} catch (IncludeFileNotFoundException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								} catch (IncludeFileIsAncestorException e) {
+								} catch (RecursiveInclusionException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

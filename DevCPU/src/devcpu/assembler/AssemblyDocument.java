@@ -12,6 +12,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
+import devcpu.assembler.exceptions.RecursiveInclusionException;
+import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.DirectiveToken;
@@ -109,13 +112,13 @@ public class AssemblyDocument {
 		return parent;
 	}
 
-	public AssemblyDocument loadInclude(Include include) throws IncludeFileNotFoundException, IncludeFileIsAncestorException, IOException, DuplicateLabelDefinitionException, CoreException {
+	public AssemblyDocument loadInclude(Include include) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, DuplicateLabelDefinitionException, CoreException {
 		IFile includeFile = locate(include);
 		if (includeFile == null) {
 			throw new IncludeFileNotFoundException(include);
 		}
 		if (checkForAncestor(includeFile)) {
-			throw new IncludeFileIsAncestorException(include, includeFile);
+			throw new RecursiveInclusionException(include, includeFile);
 		}
 		return new AssemblyDocument(includeFile, assembly, this);
 	}
