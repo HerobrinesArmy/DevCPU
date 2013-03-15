@@ -9,6 +9,8 @@ public class AssemblyLine {
 	private AssemblyDocument document;
 	private int lineNumber;
 	private Directive directive;
+	private int offset;
+	private int size;
 
 	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens) {
 		this.document = document;
@@ -51,5 +53,21 @@ public class AssemblyLine {
 	
 	public boolean isDirective() {
 		return directive != null;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
+	public int getSize() {
+		return size;
 	}
 }

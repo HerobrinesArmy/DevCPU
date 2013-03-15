@@ -16,9 +16,21 @@ import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.lexer.Lexer;
+import devcpu.lexer.tokens.AValueEndToken;
+import devcpu.lexer.tokens.AValueStartToken;
+import devcpu.lexer.tokens.BValueEndToken;
+import devcpu.lexer.tokens.BasicOpCodeToken;
+import devcpu.lexer.tokens.DataToken;
+import devcpu.lexer.tokens.DataValueEndToken;
+import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
+import devcpu.lexer.tokens.LiteralToken;
+import devcpu.lexer.tokens.RegisterToken;
+import devcpu.lexer.tokens.SimpleStackAccessToken;
+import devcpu.lexer.tokens.SpecialOpCodeToken;
+import devcpu.lexer.tokens.StringToken;
 
 public class Assembly {
 	//Note: Defines will not be processed in directives
@@ -97,7 +109,112 @@ public class Assembly {
 	}
 
 	public void assemble(DefaultControllableDCPU dcpu) {
+		sizeAndLocateLines();
 		Assembler assembler = new Assembler(dcpu.ram);
-		// TODO Auto-generated method stub
+		//TODO
+	}
+
+	private void sizeAndLocateLines() {
+		int o = 0;
+		for (AssemblyLine line : lines) {
+			if (line.isDirective()) {
+				//TODO: Add origin directive (and other) handling here
+				line.setOffset(-1);
+			} else {
+				line.setOffset(o);
+				o += sizeLine(line);
+			}
+		}
+	}
+
+	private int sizeLine(AssemblyLine line) {
+		//TODO Note: Rule for now is: Use of labels or expressions disables short form literal optimization
+		//TODO: Handle the -1 case (unary operator token)
+		//Also, after looking over how you've done sizing here, you might want to check yourself into hospital for evaluation
+		int size = 0;
+		LexerToken[] tokens = line.getProcessedTokens();
+		for (int i = 0; i < tokens.length; i++) {// LexerToken token : line.getProcessedTokens()) {
+			LexerToken token = tokens[i];
+			if (token instanceof BasicOpCodeToken) {
+				size++;
+				//Check if b Value is a non-expression non-label literal and meets short literal requirements, or a simple stack accessor or register
+				if (tokens[(i+=2)] instanceof LiteralToken) {
+					if (tokens[i+1] instanceof BValueEndToken) {
+						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
+						if (val >= 31 && val != 0xFFFF) { //TODO: longform state check will go here and the two other instances of this check in this method
+							size++;
+						}
+					} else {
+						size++;
+					}
+				} else if (tokens[i] instanceof RegisterToken) {
+					if (!(tokens[i+1] instanceof BValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof SimpleStackAccessToken) {
+				} else {
+					size++;
+				}
+				while (!(tokens[++i] instanceof AValueStartToken)) {}
+				//Check a Value
+				if (tokens[++i] instanceof LiteralToken) {
+					if (tokens[i+1] instanceof AValueEndToken) {
+						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
+						if (val >= 31 && val != 0xFFFF) {
+							size++;
+						}
+					} else {
+						size++;
+					}
+				} else if (tokens[i] instanceof RegisterToken) {
+					if (!(tokens[i+1] instanceof AValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof SimpleStackAccessToken) {
+				} else {
+					size++;
+				}
+			} else if (token instanceof SpecialOpCodeToken) {
+				size++;
+				if (tokens[(i+=2)] instanceof LiteralToken) {
+					if (tokens[i+1] instanceof AValueEndToken) {
+						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
+						if (val >= 31 && val != 0xFFFF) {
+							size++;
+						}
+					} else {
+						size++;
+					}
+				} else if (tokens[i] instanceof RegisterToken) {
+					if (!(tokens[i+1] instanceof AValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof SimpleStackAccessToken) {
+				} else {
+					size++;
+				}
+			} else if (token instanceof DataToken) {
+				i++;
+				while (i < tokens.length && tokens[i] instanceof DataValueStartToken) {
+					token = tokens[++i];
+					if (!(tokens[i+1] instanceof DataValueEndToken)) {
+						size++;
+						while (!(tokens[++i] instanceof DataValueEndToken)) {}
+					} else {
+						if (token instanceof StringToken) {
+							//TODO: Decide whether strings should default to packed or not (currently they are not, and non-ascii characters are allowed in the string)
+							size += ((StringToken)token).getString().length();
+						} else {
+							//TODO: Do individual conditions for each possible value type?
+							size++;
+						}
+						i++;
+					}
+					i++;
+				}
+			}
+		}
+		line.setSize(size);
+		return size;
 	}
 }

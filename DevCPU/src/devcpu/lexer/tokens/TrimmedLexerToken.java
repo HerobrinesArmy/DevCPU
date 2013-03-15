@@ -1,10 +1,10 @@
 package devcpu.lexer.tokens;
 
 public abstract class TrimmedLexerToken extends LexerToken {
-	private String text;
-	private int start;
-	private int end;
-	private int length;
+	protected String text;
+	protected int start;
+	protected int end;
+	protected int length;
 	
 	public TrimmedLexerToken(String rawText, int startOffset, int endOffset) {
 		this.text = rawText.trim();
