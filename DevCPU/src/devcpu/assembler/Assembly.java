@@ -18,6 +18,8 @@ import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.AValueEndToken;
 import devcpu.lexer.tokens.AValueStartToken;
+import devcpu.lexer.tokens.AddressEndToken;
+import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
 import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataToken;
@@ -123,6 +125,7 @@ public class Assembly {
 			} else {
 				line.setOffset(o);
 				o += sizeLine(line);
+//				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
 		}
 	}
@@ -137,18 +140,19 @@ public class Assembly {
 			LexerToken token = tokens[i];
 			if (token instanceof BasicOpCodeToken) {
 				size++;
-				//Check if b Value is a non-expression non-label literal and meets short literal requirements, or a simple stack accessor or register
+				//Check if the b Value is a simple stack accessor or register
 				if (tokens[(i+=2)] instanceof LiteralToken) {
-					if (tokens[i+1] instanceof BValueEndToken) {
-						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-						if (val >= 31 && val != 0xFFFF) { //TODO: longform state check will go here and the two other instances of this check in this method
+					size++;
+				} else if (tokens[i] instanceof RegisterToken) {
+					if (!(tokens[i+1] instanceof BValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof AddressStartToken) {
+					if (tokens[++i] instanceof RegisterToken) {
+						if (!(tokens[++i] instanceof AddressEndToken)) {
 							size++;
 						}
 					} else {
-						size++;
-					}
-				} else if (tokens[i] instanceof RegisterToken) {
-					if (!(tokens[i+1] instanceof BValueEndToken)) {
 						size++;
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
@@ -156,7 +160,7 @@ public class Assembly {
 					size++;
 				}
 				while (!(tokens[++i] instanceof AValueStartToken)) {}
-				//Check a Value
+				//Check the a Value (can also be a non-expression non-label literal and meet short literal requirements)
 				if (tokens[++i] instanceof LiteralToken) {
 					if (tokens[i+1] instanceof AValueEndToken) {
 						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
@@ -168,6 +172,14 @@ public class Assembly {
 					}
 				} else if (tokens[i] instanceof RegisterToken) {
 					if (!(tokens[i+1] instanceof AValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof AddressStartToken) {
+					if (tokens[++i] instanceof RegisterToken) {
+						if (!(tokens[++i] instanceof AddressEndToken)) {
+							size++;
+						}
+					} else {
 						size++;
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
@@ -187,6 +199,14 @@ public class Assembly {
 					}
 				} else if (tokens[i] instanceof RegisterToken) {
 					if (!(tokens[i+1] instanceof AValueEndToken)) {
+						size++;
+					}
+				} else if (tokens[i] instanceof AddressStartToken) {
+					if (tokens[++i] instanceof RegisterToken) {
+						if (!(tokens[++i] instanceof AddressEndToken)) {
+							size++;
+						}
+					} else {
 						size++;
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
