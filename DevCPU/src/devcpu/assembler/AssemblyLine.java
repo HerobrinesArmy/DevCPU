@@ -4,16 +4,17 @@ import devcpu.lexer.tokens.LexerToken;
 
 public class AssemblyLine {
 	private String text;
-	private LexerToken[] tokens;
+	private LexerToken[] sourceTokens;
+	private LexerToken[] processedTokens;
 	private AssemblyDocument document;
 	private int lineNumber;
+	private Directive directive;
 
 	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens) {
 		this.document = document;
 		this.lineNumber = lineNumber;
 		this.text = lineText;
-		this.tokens = tokens;
-		
+		this.processedTokens = this.sourceTokens = tokens;
 	}
 	
 	public String getText() {
@@ -21,7 +22,15 @@ public class AssemblyLine {
 	}
 
 	public LexerToken[] getTokens() {
-		return tokens;
+		return sourceTokens;
+	}
+
+	public LexerToken[] getProcessedTokens() {
+		return processedTokens;
+	}
+
+	public void setProcessedTokens(LexerToken[] processedTokens) {
+		this.processedTokens = processedTokens;
 	}
 
 	public AssemblyDocument getDocument() {
@@ -30,5 +39,17 @@ public class AssemblyLine {
 
 	public int getLineNumber() {
 		return lineNumber;
+	}
+
+	public void setDirective(Directive directive) {
+		this.directive = directive;
+	}
+
+	public Directive getDirective() {
+		return directive;
+	}
+	
+	public boolean isDirective() {
+		return directive != null;
 	}
 }

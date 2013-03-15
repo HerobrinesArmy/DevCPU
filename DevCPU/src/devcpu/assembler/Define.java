@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
+import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.lexer.Lexer;
 
 public class Define {
@@ -12,12 +13,15 @@ public class Define {
 	private String key;
 	private String value;
 
-	public Define(Directive directive) throws InvalidDefineFormatException {
+	public Define(Directive directive) throws InvalidDefineFormatException, RecursiveDefinitionException {
 		this.directive = directive;
 		Matcher m = pattern.matcher(directive.getParametersToken().getText());
 		if (m.find() && m.start() == 0) {
 			this.key = m.group(1);
 			this.value = m.group(2);
+			if (Pattern.matches("\\b"+Pattern.quote(key)+"\\b", value)) {
+				throw new RecursiveDefinitionException(directive);
+			}
 		} else {
 			throw new InvalidDefineFormatException(directive);
 		}
