@@ -51,4 +51,8 @@ public class Directive {
 	public boolean isAlign() {
 		return "ALIGN".equals(directiveName);
 	}
+	
+	public boolean isReserve() {
+		return "RESERVE".equals(directiveName);
+	}
 }

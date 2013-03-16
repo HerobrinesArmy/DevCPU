@@ -17,12 +17,13 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import devcpu.assembler.Assembly;
 import devcpu.assembler.OldAssembler;
+import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
+import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
-import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -129,6 +130,9 @@ public class NavigatorCommandHandler implements IHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								} catch (OriginBacktrackException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (DirectiveExpressionEvaluationException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
+import de.congrace.exp4j.ExpressionBuilder;
+import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
@@ -34,7 +36,6 @@ import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
-import devcpu.util.Util;
 
 public class Assembly {
 	//Note: Defines will not be processed in directives
@@ -112,36 +113,58 @@ public class Assembly {
 		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException {
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException {
 		sizeAndLocateLines();
 		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
 	}
 
-	private void sizeAndLocateLines() throws OriginBacktrackException {
+	private void sizeAndLocateLines() throws OriginBacktrackException, DirectiveExpressionEvaluationException {
 		int o = 0;
 		for (AssemblyLine line : lines) {
 			if (line.isDirective()) {
 				line.setOffset(-1);
 				Directive directive = line.getDirective();
 				if (directive.isOrigin()) {
-					int newO = Util.parseValue(directive.getParametersToken().getText());
+					int newO;
+					try {
+						newO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
 					o = newO;
 				} else if (directive.isAlign()) {
-					int newO = Util.parseValue(directive.getParametersToken().getText());
+					int newO;
+					try {
+						newO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
 					o = newO;
-					line.setOffset(o);
+					line.setOffset(o); //Convenience for doing the padding.
+				} else if (directive.isReserve()) {
+					int dO;
+					try {
+						dO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (dO < 0) {
+						throw new OriginBacktrackException(directive);
+					}
+					o += dO;
+					line.setOffset(o); //Convenience for doing the padding.
 				}
 			} else {
 				line.setOffset(o);
 				o += sizeLine(line);
-//				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
+				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
 		}
 	}

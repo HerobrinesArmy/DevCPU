@@ -31,7 +31,8 @@ Bundle-ClassPath: .,
  lwjgl_test.jar,
  lwjgl_util_applet.jar,
  lwjgl-debug.jar,
- lzma.jar
+ lzma.jar,
+ exp4j-0.3.10.jar
 Export-Package: com.apple.eawt,
  com.apple.eio,
  com.mojang.spacegame,
