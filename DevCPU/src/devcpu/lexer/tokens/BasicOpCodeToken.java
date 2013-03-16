@@ -8,6 +8,8 @@ import devcpu.editors.dasm.DASMColorProvider;
 public class BasicOpCodeToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(127, 0, 85));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
+	private boolean nextWordB;
+	private boolean nextWordA;
 
 	public BasicOpCodeToken(String text, int start, int end) {
 		super(text, start, end);
@@ -41,5 +43,21 @@ public class BasicOpCodeToken extends TrimmedLexerToken{
 	@Override
 	public Object getData() {
 		return null;
+	}
+
+	public void setBValueNextWord(boolean nextWord) {
+		this.nextWordB = nextWord;
+	}
+	
+	public boolean isNextWordB() {
+		return nextWordB;
+	}
+	
+	public void setAValueNextWord(boolean nextWord) {
+		this.nextWordA = nextWord;
+	}
+	
+	public boolean isNextWordA() {
+		return nextWordA;
 	}
 }

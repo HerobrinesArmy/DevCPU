@@ -18,12 +18,14 @@ import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.emulation.DefaultControllableDCPU;
+import devcpu.emulation.OpCodes;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.AValueEndToken;
 import devcpu.lexer.tokens.AValueStartToken;
 import devcpu.lexer.tokens.AddressEndToken;
 import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
+import devcpu.lexer.tokens.BValueStartToken;
 import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.DataValueEndToken;
@@ -42,6 +44,9 @@ import devcpu.util.Util;
 public class Assembly {
 	//Note: Defines will not be processed in directives
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = true;
+	private static final int TYPE_SPECIAL = 1;
+	private static final int TYPE_BASIC = 2;
+	private static final int TYPE_DATA = 3;
 	private AssemblyDocument rootDocument;
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	private boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
@@ -125,8 +130,72 @@ public class Assembly {
 	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException {
 		sizeAndLocateLines();
 		assignLabelValues();
+		zeroRAM(dcpu.ram);
+		assembleToRAM(dcpu.ram);
 		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
+	}
+
+	private void assembleToRAM(char[] ram) {
+		int pc = 0;
+		int type;
+		int opCode;
+		int a;
+		int b;
+		for (AssemblyLine line : lines) {
+			pc = line.getOffset();
+			if (line.isDirective()) {
+				Directive directive = line.getDirective();
+				if (directive.isAlign()) {
+					int end = pc + line.getSize();
+					while (pc < end) {
+						ram[pc++] = 0;
+					}
+				} else if (directive.isAlign()) {
+					int end = pc + line.getSize();
+					while (pc < end) {
+						ram[pc++] = 0;
+					}
+				}
+			} else {
+				type = 0;
+				LexerToken[] tokens = line.getProcessedTokens();
+				for (int i = 0; i < tokens.length; i++) {
+					LexerToken token = tokens[i];
+					if (token instanceof SpecialOpCodeToken) {
+						type = TYPE_SPECIAL;
+						opCode = OpCodes.special.getId(token.getText().toUpperCase());
+						a = getA(tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
+						ram[pc] = (char)(opCode << 5 | a << 10);
+					} else if (token instanceof BasicOpCodeToken) {
+						type = TYPE_BASIC;
+						opCode = OpCodes.basic.getId(token.getText().toUpperCase());
+						a = getA(tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
+						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((SpecialOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
+						ram[pc] = (char)(opCode | b << 5 | a << 10);
+					} else if (token instanceof DataToken) {
+						type = TYPE_DATA;
+						//TODO
+					}
+				}
+			}
+		}
+	}
+
+	private int getB(LexerToken[] tokens, int index, int offset, char[] ram) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private int getA(LexerToken[] tokens, int index, int offset, char[] ram) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private void zeroRAM(char[] ram) {
+		for (int i = 0; i < ram.length; i++) {
+			ram[i] = 0;
+		}
 	}
 
 	private void assignLabelValues() {
@@ -141,8 +210,8 @@ public class Assembly {
 	private void sizeAndLocateLines() throws OriginBacktrackException, DirectiveExpressionEvaluationException {
 		int o = 0;
 		for (AssemblyLine line : lines) {
+			line.setOffset(o);
 			if (line.isDirective()) {
-				line.setOffset(-1);
 				Directive directive = line.getDirective();
 				if (directive.isOrigin()) {
 					int newO;
@@ -154,6 +223,7 @@ public class Assembly {
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
+					line.setSize(newO - o);
 					o = newO;
 				} else if (directive.isAlign()) {
 					int newO;
@@ -165,8 +235,8 @@ public class Assembly {
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
+					line.setSize(newO - o);
 					o = newO;
-					line.setOffset(o); //Convenience for doing the padding.
 				} else if (directive.isReserve()) {
 					int dO;
 					try {
@@ -178,10 +248,9 @@ public class Assembly {
 						throw new OriginBacktrackException(directive);
 					}
 					o += dO;
-					line.setOffset(o); //Convenience for doing the padding.
+					line.setSize(dO);
 				}
 			} else {
-				line.setOffset(o);
 				o += sizeLine(line);
 				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
@@ -218,21 +287,26 @@ public class Assembly {
 				//Check if the b Value is a simple stack accessor or register
 				if (tokens[(i+=2)] instanceof LiteralToken) {
 					size++;
+					((BasicOpCodeToken)token).setBValueNextWord(true);
 				} else if (tokens[i] instanceof RegisterToken) {
 					if (!(tokens[i+1] instanceof BValueEndToken)) {
 						size++;
+						((BasicOpCodeToken)token).setBValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof AddressStartToken) {
 					if (tokens[++i] instanceof RegisterToken) {
 						if (!(tokens[++i] instanceof AddressEndToken)) {
 							size++;
+							((BasicOpCodeToken)token).setBValueNextWord(true);
 						}
 					} else {
 						size++;
+						((BasicOpCodeToken)token).setBValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
 				} else {
 					size++;
+					((BasicOpCodeToken)token).setBValueNextWord(true);
 				}
 				while (!(tokens[++i] instanceof AValueStartToken)) {}
 				//Check the a Value (can also be a non-expression non-label literal and meet short literal requirements)
@@ -241,25 +315,31 @@ public class Assembly {
 						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
 						if (val >= 31 && val != 0xFFFF) {
 							size++;
+							((BasicOpCodeToken)token).setAValueNextWord(true);
 						}
 					} else {
 						size++;
+						((BasicOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof RegisterToken) {
 					if (!(tokens[i+1] instanceof AValueEndToken)) {
 						size++;
+						((BasicOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof AddressStartToken) {
 					if (tokens[++i] instanceof RegisterToken) {
 						if (!(tokens[++i] instanceof AddressEndToken)) {
 							size++;
+							((BasicOpCodeToken)token).setAValueNextWord(true);
 						}
 					} else {
 						size++;
+						((BasicOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
 				} else {
 					size++;
+					((BasicOpCodeToken)token).setAValueNextWord(true);
 				}
 			} else if (token instanceof SpecialOpCodeToken) {
 				size++;
@@ -268,25 +348,31 @@ public class Assembly {
 						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
 						if (val >= 31 && val != 0xFFFF) {
 							size++;
+							((SpecialOpCodeToken)token).setAValueNextWord(true);
 						}
 					} else {
 						size++;
+						((SpecialOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof RegisterToken) {
 					if (!(tokens[i+1] instanceof AValueEndToken)) {
 						size++;
+						((SpecialOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof AddressStartToken) {
 					if (tokens[++i] instanceof RegisterToken) {
 						if (!(tokens[++i] instanceof AddressEndToken)) {
 							size++;
+							((SpecialOpCodeToken)token).setAValueNextWord(true);
 						}
 					} else {
 						size++;
+						((SpecialOpCodeToken)token).setAValueNextWord(true);
 					}
 				} else if (tokens[i] instanceof SimpleStackAccessToken) {
 				} else {
 					size++;
+					((SpecialOpCodeToken)token).setAValueNextWord(true);
 				}
 			} else if (token instanceof DataToken) {
 				i++;

@@ -65,7 +65,7 @@ public class Lexer {
 			} else {
 				for (LexerToken token : lineTokens) {
 					if (!(token instanceof TrueToken)) {
-						System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
+//						System.out.println(token.getClass().getSimpleName() + " (" + token.getText() + ") ");
 						if (includeZeroLength || !(token instanceof AValueStartToken || token instanceof AValueEndToken || token instanceof BValueStartToken || token instanceof BValueEndToken || token instanceof DataValueStartToken || token instanceof DataValueEndToken || token instanceof PickValueStartToken || token instanceof PickValueEndToken)) {
 							tokens.add(token);
 						}
