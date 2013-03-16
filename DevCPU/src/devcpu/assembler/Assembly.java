@@ -182,12 +182,59 @@ public class Assembly {
 		}
 	}
 
-	private int getB(LexerToken[] tokens, int index, int offset, char[] ram) {
+	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) {
+		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
+		//TODO Isolate B Value
+		String register = "";
+		boolean hasNextWord = offset > 0;
+		boolean isAddress;
+		
+		//Disallowed value conditions:
+		//1. An operand for an operation other than addition or subtraction is or contains a register.
+		//2. The right operand for a subtraction is or contains a register.
+		//3. The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
+		//4. More than one register token exists in value
+		//5. Register token exists in expression outside of address
+		//6. PC or EX used in expression or address
+		
+		//After ruling out those conditions, all of which are invalid and should throw exceptions,
+		//you can replace any register with a zero, construct a string out of the expression, 
+		//and run it through exp4j to get the literal value. That literal value will be valid in 
+		//all value conditions. The presence of a register, combined with the value in offset and 
+		//whether it's an address value, is enough information to determine with certainty which 
+		//value to return (for use in the opcode).
+		
+		//Don't forget to set next word
+		
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	private int getA(LexerToken[] tokens, int index, int offset, char[] ram) {
+	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) {
+		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
+		Group value = new Group(tokens,i,AValueEndToken.class);
+		//TODO Isolate A Value
+		String register = "";
+		boolean hasNextWord = offset > 0;
+		boolean isAddress;
+		
+		//Disallowed value conditions:
+		//1. An operand for an operation other than addition or subtraction is or contains a register.
+		//2. The right operand for a subtraction is or contains a register.
+		//3. The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
+		//4. More than one register token exists in value
+		//5. Register token exists in expression outside of address
+		//6. PC or EX used in expression or address
+		
+		//After ruling out those conditions, all of which are invalid and should throw exceptions,
+		//you can replace any register with a zero, construct a string out of the expression, 
+		//and run it through exp4j to get the literal value. That literal value will be valid in 
+		//all value conditions. The presence of a register, combined with the value in offset and 
+		//whether it's an address value, is enough information to determine with certainty which 
+		//value to return (for use in the opcode).
+		
+		//Don't forget to set next word
+		
 		// TODO Auto-generated method stub
 		return 0;
 	}
