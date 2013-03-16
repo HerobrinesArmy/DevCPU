@@ -124,8 +124,18 @@ public class Assembly {
 
 	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException {
 		sizeAndLocateLines();
+		assignLabelValues();
 		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
+	}
+
+	private void assignLabelValues() {
+		for (String label : labelUses.keySet()) {
+			int o = labelDefs.get(label).getLine().getOffset();
+			for (LabelUse use : labelUses.get(label)) {
+				use.getToken().setValue(o);
+			}
+		}
 	}
 
 	private void sizeAndLocateLines() throws OriginBacktrackException, DirectiveExpressionEvaluationException {

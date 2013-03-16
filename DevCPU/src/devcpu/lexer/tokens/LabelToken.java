@@ -9,6 +9,7 @@ public class LabelToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(0, 0, 0));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	private boolean local;
+	private int value;
 
 	public LabelToken(String text, int start, int end) {
 		super(text, start, end);
@@ -49,5 +50,13 @@ public class LabelToken extends TrimmedLexerToken{
 	
 	public boolean isLocal() {
 		return local;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+	
+	public int getValue() {
+		return value;
 	}
 }
