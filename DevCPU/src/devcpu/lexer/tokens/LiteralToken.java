@@ -4,6 +4,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 import devcpu.editors.dasm.DASMColorProvider;
+import devcpu.util.Util;
 
 public class LiteralToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(64, 64, 64));
@@ -12,7 +13,7 @@ public class LiteralToken extends TrimmedLexerToken{
 
 	public LiteralToken(String text, int start, int end) {
 		super(text, start, end);
-		value = parseValue(this.text);
+		value = Util.parseValue(this.text);
 	}
 
 	@Override
@@ -47,20 +48,5 @@ public class LiteralToken extends TrimmedLexerToken{
 
 	public int getValue() {
 		return value;
-	}
-	
-	public static int parseValue(String text) {
-		int val = 0;
-		if (text.startsWith("'")) {
-			val = text.charAt(1);
-		} else if (text.startsWith("0x")) {
-    	val = Integer.parseInt(text.substring(2), 16);
-    } else if (text.startsWith("0b")) {
-    	val = Integer.parseInt(text.substring(2), 2);
-    } else {
-    	val = Integer.parseInt(text);
-    }
-//    val &= 0xFFFF;
-    return val;
 	}
 }

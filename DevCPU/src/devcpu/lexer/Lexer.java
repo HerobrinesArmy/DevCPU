@@ -47,7 +47,7 @@ public class Lexer {
 		initialTokenMatchers.add(SpecialOpCodeMatcher.get());
 		initialTokenMatchers.add(BasicOpCodeMatcher.get());
 		initialTokenMatchers.add(DataMatcher.get());
-		initialTokenMatchers.add(DirectiveMatcher.get()); //TODO
+		initialTokenMatchers.add(DirectiveMatcher.get());
 	}
 	
 	public LexerToken[] generateTokens(String text) {

@@ -34,6 +34,7 @@ import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
+import devcpu.util.Util;
 
 public class Assembly {
 	//Note: Defines will not be processed in directives
@@ -124,13 +125,13 @@ public class Assembly {
 				line.setOffset(-1);
 				Directive directive = line.getDirective();
 				if (directive.isOrigin()) {
-					int newO = LiteralToken.parseValue(directive.getParametersToken().getText());
+					int newO = Util.parseValue(directive.getParametersToken().getText());
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
 					o = newO;
 				} else if (directive.isAlign()) {
-					int newO = LiteralToken.parseValue(directive.getParametersToken().getText());
+					int newO = Util.parseValue(directive.getParametersToken().getText());
 					if (newO < o) {
 						throw new OriginBacktrackException(directive);
 					}
