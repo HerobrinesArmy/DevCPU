@@ -8,9 +8,19 @@ import devcpu.editors.dasm.DASMColorProvider;
 public class LabelDefinitionToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(0, 0, 127));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
+	private String name;
+	private boolean local;
 
 	public LabelDefinitionToken(String text, int start, int end) {
 		super(text, start, end);
+		if (this.text.startsWith(":")) {
+			name = this.text.substring(1);
+		} else {
+			name = this.text.substring(0,this.text.length()-1);
+		}
+		if (name.startsWith(".")) {
+			local = true;
+		}
 	}
 
 	@Override
@@ -41,5 +51,13 @@ public class LabelDefinitionToken extends TrimmedLexerToken{
 	@Override
 	public Object getData() {
 		return null;
+	}
+	
+	public boolean isLocal() {
+		return local;
+	}
+	
+	public String getName() {
+		return name;
 	}
 }

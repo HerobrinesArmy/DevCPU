@@ -28,6 +28,7 @@ import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.DataValueEndToken;
 import devcpu.lexer.tokens.DataValueStartToken;
+import devcpu.lexer.tokens.ErrorToken;
 import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
@@ -65,6 +66,7 @@ public class Assembly {
 		for (String key : defines.keySet()) {
 			patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
 		}
+		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
 			if (!line.isDirective() || (!line.getDirective().isDefine() && !line.getDirective().isInclude())) {
 				boolean retokenize = false;
@@ -80,21 +82,27 @@ public class Assembly {
 				}
 				for (LexerToken token : line.getTokens()) {
 					if (token instanceof LabelDefinitionToken) {
-						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive);
+						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+						if (!labelDef.isLocal()) {
+							lastDefinedGlobalLabel = labelDef.getLabelName();
+						}
 						if (labelDefs.containsKey(labelDef.getLabelName())) {
 							throw new DuplicateLabelDefinitionException(labelDefs.get(labelDef.getLabelName()),labelDef);
 						}
 						labelDefs.put(labelDef.getLabelName(), labelDef);
 					} else if (token instanceof LabelToken) {
-						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive);
+						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
 						if (!labelUses.containsKey(labelUse.getLabelName())) {
 							labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
 						}
 						labelUses.get(labelUse.getLabelName()).add(labelUse);
+					} else if (token instanceof ErrorToken) {
+						//TODO Throw exception
+						System.err.println("Error tokenizing line " + line.getLineNumber() + " in " + line.getDocument().getFile().getName() + ": " + line.getText());
 					}
+					//TODO: Additional validity checkes?
 				}
 			}
-			//TODO: Check for Error tokens here
 		}
 	}
 
@@ -182,9 +190,6 @@ public class Assembly {
 	//	    } else if (v.startsWith("'") && text.endsWith("'") && text.length()==3) {
 	//				val = text.charAt(1);
 				}
-//		    else if (s[i].substring(0,1).matches("\\d")){
-//					s[i] = ""+ Integer.parseInt(s[i]);
-//		    }
 			}
 		}
 		return Util.join(s, ' ');

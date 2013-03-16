@@ -7,12 +7,19 @@ public class LabelUse {
 	private LabelToken token;
 	private boolean caseSensitive;
 	private String labelName;
+	private boolean local;
 
-	public LabelUse(AssemblyLine line, LabelToken token, boolean caseSensitive) {
+	public LabelUse(AssemblyLine line, LabelToken token, boolean caseSensitive, String lastDefinedGlobalLabel) {
 		this.line = line;
 		this.token = token;
 		this.caseSensitive = caseSensitive;
-		this.labelName = caseSensitive ? token.getText().replace(":", "") : token.getText().replace(":", "").toUpperCase();
+		if (token.isLocal()) {
+			local = true;
+			//TODO Handle the case where lastDefined is null
+			this.labelName = caseSensitive ? lastDefinedGlobalLabel + token.getText() : (lastDefinedGlobalLabel + token.getText()).toUpperCase();
+		} else {
+			this.labelName = caseSensitive ? token.getText() : token.getText().toUpperCase();
+		}
 	}
 
 	public AssemblyLine getLine() {
@@ -29,5 +36,9 @@ public class LabelUse {
 
 	public String getLabelName() {
 		return labelName;
+	}
+	
+	public boolean isLocal() {
+		return local;
 	}
 }

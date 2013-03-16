@@ -13,7 +13,7 @@ import devcpu.lexer.tokens.LexerToken;
 
 public class LabelMatcher implements LexerTokenMatcher {
 	private static LabelMatcher matcher = new LabelMatcher();
-	private Pattern pattern = Pattern.compile("\\s*"+Lexer.REGEX_IDENTIFIER);
+	private Pattern pattern = Pattern.compile("\\s*("+Lexer.REGEX_IDENTIFIER+"|\\."+Lexer.REGEX_IDENTIFIER+")");
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {	
