@@ -17,6 +17,7 @@ public class ExpressionMatcher implements BoundableLexerTokenMatcher {
 	
 	private List<LexerTokenMatcher> unaryOperatorMatchers = new ArrayList<LexerTokenMatcher>();
 	{
+		unaryOperatorMatchers.add(UnaryOperatorMatcher.get());
 		//TODO Add unary operator matching before all operand matches
 	}
 
