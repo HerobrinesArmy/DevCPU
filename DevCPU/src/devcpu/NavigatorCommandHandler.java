@@ -19,6 +19,7 @@ import devcpu.assembler.Assembly;
 import devcpu.assembler.OldAssembler;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
+import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
@@ -125,6 +126,9 @@ public class NavigatorCommandHandler implements IHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								} catch (RecursiveDefinitionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (OriginBacktrackException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

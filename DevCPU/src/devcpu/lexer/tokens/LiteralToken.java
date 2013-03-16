@@ -49,7 +49,7 @@ public class LiteralToken extends TrimmedLexerToken{
 		return value;
 	}
 	
-	private static int parseValue(String text) {
+	public static int parseValue(String text) {
 		int val = 0;
 		if (text.startsWith("'")) {
 			val = text.charAt(1);

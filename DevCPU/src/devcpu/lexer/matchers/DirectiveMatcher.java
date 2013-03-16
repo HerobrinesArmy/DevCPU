@@ -19,6 +19,9 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 		allowedDirectives.add("include");
 		allowedDirectives.add("import");
 		allowedDirectives.add("define");
+		allowedDirectives.add("origin");
+		allowedDirectives.add("org");
+		allowedDirectives.add("align");
 	}
 	
 	@Override

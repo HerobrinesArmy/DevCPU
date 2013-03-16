@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.CoreException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
+import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -110,18 +111,32 @@ public class Assembly {
 		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) {
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException {
 		sizeAndLocateLines();
 		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
 	}
 
-	private void sizeAndLocateLines() {
+	private void sizeAndLocateLines() throws OriginBacktrackException {
 		int o = 0;
 		for (AssemblyLine line : lines) {
 			if (line.isDirective()) {
-				//TODO: Add origin directive (and other) handling here
 				line.setOffset(-1);
+				Directive directive = line.getDirective();
+				if (directive.isOrigin()) {
+					int newO = LiteralToken.parseValue(directive.getParametersToken().getText());
+					if (newO < o) {
+						throw new OriginBacktrackException(directive);
+					}
+					o = newO;
+				} else if (directive.isAlign()) {
+					int newO = LiteralToken.parseValue(directive.getParametersToken().getText());
+					if (newO < o) {
+						throw new OriginBacktrackException(directive);
+					}
+					o = newO;
+					line.setOffset(o);
+				}
 			} else {
 				line.setOffset(o);
 				o += sizeLine(line);

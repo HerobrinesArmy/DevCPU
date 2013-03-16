@@ -43,4 +43,12 @@ public class Directive {
 	public boolean isDefine() {
 		return "DEFINE".equals(directiveName);
 	}
+	
+	public boolean isOrigin() {
+		return "ORIGIN".equals(directiveName) || "ORG".equals(directiveName);
+	}
+	
+	public boolean isAlign() {
+		return "ALIGN".equals(directiveName);
+	}
 }
