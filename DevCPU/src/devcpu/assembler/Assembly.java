@@ -36,6 +36,7 @@ import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
+import devcpu.util.Util;
 
 public class Assembly {
 	//Note: Defines will not be processed in directives
@@ -65,7 +66,7 @@ public class Assembly {
 			patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
 		}
 		for (AssemblyLine line : lines) {
-			if (!line.isDirective()) {
+			if (!line.isDirective() || (!line.getDirective().isDefine() && !line.getDirective().isInclude())) {
 				boolean retokenize = false;
 				String text = line.getText();
 				for (Pattern pattern : patterns.keySet()) {
@@ -93,7 +94,7 @@ public class Assembly {
 					}
 				}
 			}
-			//TODO: Check for validity here?
+			//TODO: Check for Error tokens here
 		}
 	}
 
@@ -128,7 +129,7 @@ public class Assembly {
 				if (directive.isOrigin()) {
 					int newO;
 					try {
-						newO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
 					} catch (Exception e) {
 						throw new DirectiveExpressionEvaluationException(directive);
 					}
@@ -139,7 +140,7 @@ public class Assembly {
 				} else if (directive.isAlign()) {
 					int newO;
 					try {
-						newO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
 					} catch (Exception e) {
 						throw new DirectiveExpressionEvaluationException(directive);
 					}
@@ -151,7 +152,7 @@ public class Assembly {
 				} else if (directive.isReserve()) {
 					int dO;
 					try {
-						dO = (int) new ExpressionBuilder(directive.getParametersToken().getText()).build().calculate();
+						dO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
 					} catch (Exception e) {
 						throw new DirectiveExpressionEvaluationException(directive);
 					}
@@ -167,6 +168,26 @@ public class Assembly {
 				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
 		}
+	}
+
+	private String decimalize(String text) {
+		//TODO Document that character literals (i.e. 1+'a' <--) are not allowed in directive parameter expressions
+		String[] s = text.split("\\b");
+		for (int i = 0; i < s.length; i++) {
+			if (s[i].length() > 0) {
+				if (s[i].startsWith("0x")) {
+					s[i] = ""+Integer.parseInt(s[i].substring(2), 16);
+		    } else if (s[i].startsWith("0b")) {
+		    	s[i] = ""+ Integer.parseInt(s[i].substring(2), 2);
+	//	    } else if (v.startsWith("'") && text.endsWith("'") && text.length()==3) {
+	//				val = text.charAt(1);
+				}
+//		    else if (s[i].substring(0,1).matches("\\d")){
+//					s[i] = ""+ Integer.parseInt(s[i]);
+//		    }
+			}
+		}
+		return Util.join(s, ' ');
 	}
 
 	private int sizeLine(AssemblyLine line) {

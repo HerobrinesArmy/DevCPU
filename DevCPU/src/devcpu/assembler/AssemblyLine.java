@@ -1,5 +1,6 @@
 package devcpu.assembler;
 
+import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.LexerToken;
 
 public class AssemblyLine {
@@ -33,6 +34,13 @@ public class AssemblyLine {
 
 	public void setProcessedTokens(LexerToken[] processedTokens) {
 		this.processedTokens = processedTokens;
+		if (directive != null) {
+			for (LexerToken token : processedTokens) {
+				if (token instanceof DirectiveParametersToken) {
+					directive.setParameters((DirectiveParametersToken)token);
+				}
+			}
+		}
 	}
 
 	public AssemblyDocument getDocument() {
