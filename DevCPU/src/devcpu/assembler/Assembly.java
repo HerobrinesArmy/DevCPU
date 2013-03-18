@@ -18,6 +18,7 @@ import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
+import devcpu.assembler.exceptions.UndefinedLabelException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
 import devcpu.assembler.expression.Register;
@@ -47,7 +48,7 @@ import devcpu.util.Util;
 
 public class Assembly {
 	//Note: Defines will not be processed in directives
-	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = true;
+	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
 	private static final int TYPE_SPECIAL = 1;
 	private static final int TYPE_BASIC = 2;
 	private static final int TYPE_DATA = 3;
@@ -89,7 +90,7 @@ public class Assembly {
 				if (retokenize) {
 					line.setProcessedTokens(Lexer.get().generateTokens(text, true));
 				}
-				for (LexerToken token : line.getTokens()) {
+				for (LexerToken token : line.getProcessedTokens()) {
 					if (token instanceof LabelDefinitionToken) {
 						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
 						if (!labelDef.isLocal()) {
@@ -131,12 +132,12 @@ public class Assembly {
 		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException {
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException {
 		sizeAndLocateLines();
 		assignLabelValues();
 		zeroRAM(dcpu.ram);
 		assembleToRAM(dcpu.ram);
-		Assembler assembler = new Assembler(dcpu.ram);
+//		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
 	}
 
@@ -174,8 +175,8 @@ public class Assembly {
 					} else if (token instanceof BasicOpCodeToken) {
 						type = TYPE_BASIC;
 						opCode = OpCodes.basic.getId(token.getText().toUpperCase());
-						a = getA(tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
-						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((SpecialOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
+						a = getA(tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
+						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
 						ram[pc] = (char)(opCode | b << 5 | a << 10);
 					} else if (token instanceof DataToken) {
 						type = TYPE_DATA;
@@ -194,7 +195,7 @@ public class Assembly {
 		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
 		Group value = null;
 		if (tokens[i+1] instanceof AddressStartToken) {
-			value = new Address(tokens,i,AddressEndToken.class);
+			value = new Address(tokens,i+1,AddressEndToken.class);
 			isAddress = true;
 		} else {
 			value = new Group(tokens,i,BValueEndToken.class);	
@@ -215,6 +216,7 @@ public class Assembly {
 			}
 		}
 		String expression = value.getExpression();
+		System.out.println(expression);
 		//TODO
 		
 		
@@ -225,6 +227,7 @@ public class Assembly {
 		//4. 	More than one register token exists in value
 		//5. 	Register token exists in expression outside of address
 		//6. 	PC or EX used in expression or address
+		//7. Simple stack accessor used in expression or address
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
@@ -239,20 +242,36 @@ public class Assembly {
 		return 0;
 	}
 
-	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) {
+	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException {
 		boolean isAddress;
+		String register = "";
+		boolean hasNextWord = offset > 0;
+		
 		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
 		Group value = null;
 		if (tokens[i+1] instanceof AddressStartToken) {
-			value = new Address(tokens,i,AddressEndToken.class);
+			value = new Address(tokens,i+1,AddressEndToken.class);
 			isAddress = true;
 		} else {
 			value = new Group(tokens,i,AValueEndToken.class);	
+			isAddress = false;
 		}
-		
-		//TODO Isolate A Value
-		String register = "";
-		boolean hasNextWord = offset > 0;
+		List<Register> registers = value.getRegisters();
+		if (registers.size() > 1) {
+			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
+		} else if (registers.size() == 1) {
+			register = registers.get(0).getRegister();
+			if (register.equals("EX") || register.equals("PC")) {
+				if (isAddress || value.isExpression()) {
+					//TODO Exception
+				}
+			}
+			if (!isAddress && value.isExpression()) {
+				//TODO Exception
+			}
+		}
+		String expression = value.getExpression();
+		System.out.println(expression);
 		
 		//Disallowed value conditions:
 		//1. An operand for an operation other than addition or subtraction is or contains a register.
@@ -261,6 +280,7 @@ public class Assembly {
 		//4. More than one register token exists in value
 		//5. Register token exists in expression outside of address
 		//6. PC or EX used in expression or address
+		//7. Simple stack accessor used in expression or address
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
@@ -281,8 +301,11 @@ public class Assembly {
 		}
 	}
 
-	private void assignLabelValues() {
+	private void assignLabelValues() throws UndefinedLabelException {
 		for (String label : labelUses.keySet()) {
+			if (!labelDefs.containsKey(label)) {
+				throw new UndefinedLabelException(label, labelUses.get(label));
+			}
 			int o = labelDefs.get(label).getLine().getOffset();
 			for (LabelUse use : labelUses.get(label)) {
 				use.getToken().setValue(o);

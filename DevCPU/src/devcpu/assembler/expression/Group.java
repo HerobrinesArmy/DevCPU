@@ -66,7 +66,7 @@ public class Group implements Operand {
 				list.add((Register) value);
 			}
 		}
-		return null;
+		return list;
 	}
 
 	public boolean isExpression() {
