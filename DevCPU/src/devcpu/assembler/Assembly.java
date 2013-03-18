@@ -10,6 +10,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import de.congrace.exp4j.ExpressionBuilder;
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
+import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
@@ -49,6 +52,7 @@ import devcpu.util.Util;
 public class Assembly {
 	//Note: Defines will not be processed in directives
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
+	private static final String REGISTERS = "ABCXYZIJ";
 	private static final int TYPE_SPECIAL = 1;
 	private static final int TYPE_BASIC = 2;
 	private static final int TYPE_DATA = 3;
@@ -132,16 +136,17 @@ public class Assembly {
 		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException {
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		sizeAndLocateLines();
 		assignLabelValues();
 		zeroRAM(dcpu.ram);
 		assembleToRAM(dcpu.ram);
+		System.out.println(dcpu.ram);
 //		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
 	}
 
-	private void assembleToRAM(char[] ram) throws TooManyRegistersInExpressionException {
+	private void assembleToRAM(char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
 		int type;
 		int opCode;
@@ -187,8 +192,10 @@ public class Assembly {
 		}
 	}
 
-	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException {
+	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		boolean isAddress;
+		boolean isExpression;
+		boolean hasSimpleStackAccessor;
 		String register = "";
 		boolean hasNextWord = offset > 0;
 		
@@ -201,33 +208,98 @@ public class Assembly {
 			value = new Group(tokens,i,BValueEndToken.class);	
 			isAddress = false;
 		}
+		
+		isExpression = value.isExpression();
+		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
 		List<Register> registers = value.getRegisters();
+		//Register validity checks
 		if (registers.size() > 1) {
 			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
 		} else if (registers.size() == 1) {
 			register = registers.get(0).getRegister();
 			if (register.equals("EX") || register.equals("PC")) {
-				if (isAddress || value.isExpression()) {
-					//TODO Exception
+				if (isAddress || isExpression) {
+					throw new BadValueException(tokens, register + " used in an address or expression.");
 				}
 			}
-			if (!isAddress && value.isExpression()) {
-				//TODO Exception
+			if (!isAddress && isExpression) {
+				throw new BadValueException(tokens, register + " used in an expression outside of an address."); 
+			}
+			if (value.scanForRegistersInUnaryOperations()) {
+				throw new BadValueException(tokens, register + " used in a unary operation.");
+			}
+			if (value.scanForRegistersBeingSubtracted()) {
+				throw new BadValueException(tokens, register + " subtracted.");
+			}
+			if (value.scanForRegistersInDisallowedOperations()) {
+				throw new BadValueException(tokens, register + " used in disallowed operation.");
 			}
 		}
-		String expression = value.getExpression();
-		System.out.println(expression);
-		//TODO
+		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
+		//SSA validity checks
+		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
+			throw new BadValueException(tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
+		}
 		
+		if (hasNextWord) {
+			ram[offset] = (char) literal;
+			if (isAddress) {
+				if (registers.size() == 1) {
+					if (register.equals("SP")) { //0x1a | [SP + next word] / PICK n
+						return 0x1a;
+					} else { //0x10-0x17 | [register + next word]
+						return 0x10 + REGISTERS.indexOf(register);
+					}
+				} else { //0x1e | [next word]
+					return 0x1e;
+				}
+			} else if (value.hasPickValue()) { //0x1a | [SP + next word] / PICK n
+				return 0x1a;
+			} else {//0x1f | next word (literal)
+				return 0x1f;
+			}
+		} else { //Not next word
+			if (isAddress) {
+//				if (register.equals("SP")) { //0x19 | [SP] / PEEK
+//					return 0x19; //TODO FIXME I think this is actually guaranteed to be a simple stack accessor
+//				} else { //0x08-0x0f | [register]
+				return 0x08 + REGISTERS.indexOf(register);
+//				}
+			} else {
+				if (registers.size() == 1) {
+					if (register.equals("SP")) { //0x1b | SP
+						return 0x1b;
+					}
+					if (register.equals("PC")) { //0x1c | PC
+						return 0x1c;
+					}
+					if (register.equals("EX")) { //0x1d | EX
+						return 0x1d;
+					}
+					//0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
+					return REGISTERS.indexOf(register);
+				} else if (hasSimpleStackAccessor) {
+					String accessor = value.getSimpleStackAccessor().getAccessor();
+					if (accessor.equals("PUSH") || accessor.equals("[--SP]") || accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
+						return 0x18;
+					}
+					if (accessor.equals("PEEK") || accessor.equals("[SP]")) { //0x19 | [SP] / PEEK
+						return 0x19;
+					}
+				} else { //0x20-0x3f | literal value 0xffff-0x1e (-1..30) (literal) (only for a)
+					return 0x21 + literal; //TODO Test for cast behavior with 65535
+				}
+			}
+		}
 		//Disallowed value conditions:
-		//1. An operand for an operation other than addition or subtraction is or contains a register.
-		//2. The right operand for a subtraction is or contains a register.
-		//3. The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
+		//1.  An operand for an operation other than addition or subtraction is or contains a register.
+		//2.  The right operand for a subtraction is or contains a register.
+		//3.  The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
 		//4. 	More than one register token exists in value
 		//5. 	Register token exists in expression outside of address
 		//6. 	PC or EX used in expression or address
-		//7. Simple stack accessor used in expression or address
+		//7.  Simple stack accessor used in expression or address
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
@@ -238,12 +310,14 @@ public class Assembly {
 		
 		//Don't forget to set next word
 		
-		// TODO Auto-generated method stub
+		System.out.println("Didn't find its value.");
 		return 0;
 	}
 
-	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException {
+	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		boolean isAddress;
+		boolean isExpression;
+		boolean hasSimpleStackAccessor;
 		String register = "";
 		boolean hasNextWord = offset > 0;
 		
@@ -256,31 +330,98 @@ public class Assembly {
 			value = new Group(tokens,i,AValueEndToken.class);	
 			isAddress = false;
 		}
+		
+		isExpression = value.isExpression();
+		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
 		List<Register> registers = value.getRegisters();
+		//Register validity checks
 		if (registers.size() > 1) {
 			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
 		} else if (registers.size() == 1) {
 			register = registers.get(0).getRegister();
 			if (register.equals("EX") || register.equals("PC")) {
-				if (isAddress || value.isExpression()) {
-					//TODO Exception
+				if (isAddress || isExpression) {
+					throw new BadValueException(tokens, register + " used in an address or expression.");
 				}
 			}
-			if (!isAddress && value.isExpression()) {
-				//TODO Exception
+			if (!isAddress && isExpression) {
+				throw new BadValueException(tokens, register + " used in an expression outside of an address."); 
+			}
+			if (value.scanForRegistersInUnaryOperations()) {
+				throw new BadValueException(tokens, register + " used in a unary operation.");
+			}
+			if (value.scanForRegistersBeingSubtracted()) {
+				throw new BadValueException(tokens, register + " subtracted.");
+			}
+			if (value.scanForRegistersInDisallowedOperations()) {
+				throw new BadValueException(tokens, register + " used in disallowed operation.");
 			}
 		}
-		String expression = value.getExpression();
-		System.out.println(expression);
+		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
+		//SSA validity checks
+		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
+			throw new BadValueException(tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
+		}
+		
+		if (hasNextWord) {
+			ram[offset] = (char) literal;
+			if (isAddress) {
+				if (registers.size() == 1) {
+					if (register.equals("SP")) { //0x1a | [SP + next word] / PICK n
+						return 0x1a;
+					} else { //0x10-0x17 | [register + next word]
+						return 0x10 + REGISTERS.indexOf(register);
+					}
+				} else { //0x1e | [next word]
+					return 0x1e;
+				}
+			} else if (value.hasPickValue()) { //0x1a | [SP + next word] / PICK n
+				return 0x1a;
+			} else {//0x1f | next word (literal)
+				return 0x1f;
+			}
+		} else { //Not next word
+			if (isAddress) {
+//				if (register.equals("SP")) { //0x19 | [SP] / PEEK
+//					return 0x19; //TODO FIXME I think this is actually guaranteed to be a simple stack accessor
+//				} else { //0x08-0x0f | [register]
+				return 0x08 + REGISTERS.indexOf(register);
+//				}
+			} else {
+				if (registers.size() == 1) {
+					if (register.equals("SP")) { //0x1b | SP
+						return 0x1b;
+					}
+					if (register.equals("PC")) { //0x1c | PC
+						return 0x1c;
+					}
+					if (register.equals("EX")) { //0x1d | EX
+						return 0x1d;
+					}
+					//0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
+					return REGISTERS.indexOf(register);
+				} else if (hasSimpleStackAccessor) {
+					String accessor = value.getSimpleStackAccessor().getAccessor();
+					if (accessor.equals("PUSH") || accessor.equals("[--SP]") || accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
+						return 0x18;
+					}
+					if (accessor.equals("PEEK") || accessor.equals("[SP]")) { //0x19 | [SP] / PEEK
+						return 0x19;
+					}
+				} else { //0x20-0x3f | literal value 0xffff-0x1e (-1..30) (literal) (only for a)
+					return 0x21 + literal; //TODO Test for cast behavior with 65535
+				}
+			}
+		}
 		//Disallowed value conditions:
-		//1. An operand for an operation other than addition or subtraction is or contains a register.
-		//2. The right operand for a subtraction is or contains a register.
-		//3. The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
-		//4. More than one register token exists in value
-		//5. Register token exists in expression outside of address
-		//6. PC or EX used in expression or address
-		//7. Simple stack accessor used in expression or address
+		//1.  An operand for an operation other than addition or subtraction is or contains a register.
+		//2.  The right operand for a subtraction is or contains a register.
+		//3.  The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
+		//4. 	More than one register token exists in value
+		//5. 	Register token exists in expression outside of address
+		//6. 	PC or EX used in expression or address
+		//7.  Simple stack accessor used in expression or address
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
@@ -291,7 +432,7 @@ public class Assembly {
 		
 		//Don't forget to set next word
 		
-		// TODO Auto-generated method stub
+		System.out.println("Didn't find its value.");
 		return 0;
 	}
 

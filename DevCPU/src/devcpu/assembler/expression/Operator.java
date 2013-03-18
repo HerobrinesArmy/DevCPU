@@ -16,5 +16,9 @@ public class Operator implements Value {
 	@Override
 	public String getExpression() {
 		return token.getText();
+	}
+
+	public String getOperator() {
+		return token.getText();
 	}	
 }

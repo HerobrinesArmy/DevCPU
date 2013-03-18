@@ -15,8 +15,11 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import de.congrace.exp4j.UnknownFunctionException;
+import de.congrace.exp4j.UnparsableExpressionException;
 import devcpu.assembler.Assembly;
 import devcpu.assembler.OldAssembler;
+import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
@@ -141,6 +144,15 @@ public class NavigatorCommandHandler implements IHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								} catch (UndefinedLabelException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (BadValueException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (UnknownFunctionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (UnparsableExpressionException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

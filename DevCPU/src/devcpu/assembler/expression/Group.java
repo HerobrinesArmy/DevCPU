@@ -12,6 +12,7 @@ import devcpu.lexer.tokens.OperatorToken;
 import devcpu.lexer.tokens.PickValueEndToken;
 import devcpu.lexer.tokens.PickValueStartToken;
 import devcpu.lexer.tokens.RegisterToken;
+import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.UnaryOperatorToken;
 
 public class Group implements Operand {
@@ -34,6 +35,8 @@ public class Group implements Operand {
 				values.add(new Operator(token));
 			} else if (token instanceof UnaryOperatorToken) {
 				values.add(new UnaryOperator(token));
+			} else if (token instanceof SimpleStackAccessToken) {
+				values.add(new SimpleStackAccessor((SimpleStackAccessToken) token));
 			} else {
 				System.out.println("ERMAHGERD YER FERGERT ERBERT " + token.getClass().getCanonicalName());
 			}
@@ -84,5 +87,122 @@ public class Group implements Operand {
 			expression += value.getExpression();
 		}
 		return expression;
+	}
+
+	public boolean hasSimpleStackAccessor() {
+		for (Value value : values) {
+			if (value instanceof Group) {
+				if (((Group) value).hasSimpleStackAccessor()) {
+					return true;
+				}
+			} else if (value instanceof SimpleStackAccessor) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public SimpleStackAccessor getSimpleStackAccessor() {
+		for (Value value : values) {
+			if (value instanceof Group) {
+				SimpleStackAccessor accessor = ((Group) value).getSimpleStackAccessor();
+				if (accessor != null) {
+					return accessor;
+				}
+			} else if (value instanceof SimpleStackAccessor) {
+				return (SimpleStackAccessor) value;
+			}
+		}
+		return null;
+	}
+
+	public boolean scanForRegistersInUnaryOperations() {
+		Value lastValue = null;
+		for (Value value : values) {
+			if (lastValue instanceof UnaryOperator) {
+				if (value instanceof Register) {
+					return true;
+				} else if (value instanceof Group) {
+					if (((Group) value).containsRegister()) {
+						return true;
+					}
+				}
+			}
+			if (value instanceof Group) {
+				if (((Group) value).scanForRegistersInUnaryOperations()) {
+					return true;
+				}
+			}
+			lastValue = value;
+		}
+		return false;
+	}
+
+	public boolean scanForRegistersBeingSubtracted() {
+		Value lastValue = null;
+		for (Value value : values) {
+			if (lastValue instanceof Operator) {
+				if (((Operator)lastValue).getOperator().equals("-")) {
+					if (value instanceof Register) {
+						return true;
+					} else if (value instanceof Group) {
+						if (((Group) value).containsRegister()) {
+							return true;
+						}
+					}
+				}
+			}
+			if (value instanceof Group) {
+				if (((Group) value).scanForRegistersBeingSubtracted()) {
+					return true;
+				}
+			}
+			lastValue = value;
+		}
+		return false;
+	}
+
+	public boolean scanForRegistersInDisallowedOperations() {
+		Value lastValue = null;
+		for (Value value : values) {
+			if (lastValue instanceof Operator) {
+				if (!((Operator)lastValue).getOperator().equals("+")) {
+					if (value instanceof Register) {
+						return true;
+					} else if (value instanceof Group) {
+						if (((Group) value).containsRegister()) {
+							return true;
+						}
+					}
+				}
+			}
+			if (value instanceof Group) {
+				if (((Group) value).scanForRegistersInDisallowedOperations()) {
+					return true;
+				}
+			}
+			if (value instanceof Operator) {
+				if (!((Operator) value).getOperator().equals("+") && !((Operator) value).getOperator().equals("-")) {
+					if (lastValue instanceof Register) {
+						return true;
+					} else if (lastValue instanceof Group) {
+						if (((Group) lastValue).containsRegister()) {
+							return true;
+						}
+					}
+				}
+			}
+			lastValue = value;
+		}
+		return false;
+	}
+
+	public boolean hasPickValue() {
+		for (Value value : values) {
+			if (value instanceof PickValue) {
+				return true; //Note: Lexer behavior guarantees pick only occurs as the first value
+			}
+		}
+		return false;
 	}
 }
