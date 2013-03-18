@@ -24,6 +24,7 @@ import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
+import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -133,6 +134,9 @@ public class NavigatorCommandHandler implements IHandler {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								} catch (DirectiveExpressionEvaluationException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (TooManyRegistersInExpressionException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}

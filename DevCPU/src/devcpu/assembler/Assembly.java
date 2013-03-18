@@ -17,6 +17,10 @@ import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
+import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
+import devcpu.assembler.expression.Address;
+import devcpu.assembler.expression.Group;
+import devcpu.assembler.expression.Register;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.OpCodes;
 import devcpu.lexer.Lexer;
@@ -127,7 +131,7 @@ public class Assembly {
 		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException {
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException {
 		sizeAndLocateLines();
 		assignLabelValues();
 		zeroRAM(dcpu.ram);
@@ -136,7 +140,7 @@ public class Assembly {
 		//TODO
 	}
 
-	private void assembleToRAM(char[] ram) {
+	private void assembleToRAM(char[] ram) throws TooManyRegistersInExpressionException {
 		int pc = 0;
 		int type;
 		int opCode;
@@ -182,20 +186,45 @@ public class Assembly {
 		}
 	}
 
-	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) {
-		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
-		//TODO Isolate B Value
+	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException {
+		boolean isAddress;
 		String register = "";
 		boolean hasNextWord = offset > 0;
-		boolean isAddress;
+		
+		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
+		Group value = null;
+		if (tokens[i+1] instanceof AddressStartToken) {
+			value = new Address(tokens,i,AddressEndToken.class);
+			isAddress = true;
+		} else {
+			value = new Group(tokens,i,BValueEndToken.class);	
+			isAddress = false;
+		}
+		List<Register> registers = value.getRegisters();
+		if (registers.size() > 1) {
+			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
+		} else if (registers.size() == 1) {
+			register = registers.get(0).getRegister();
+			if (register.equals("EX") || register.equals("PC")) {
+				if (isAddress || value.isExpression()) {
+					//TODO Exception
+				}
+			}
+			if (!isAddress && value.isExpression()) {
+				//TODO Exception
+			}
+		}
+		String expression = value.getExpression();
+		//TODO
+		
 		
 		//Disallowed value conditions:
 		//1. An operand for an operation other than addition or subtraction is or contains a register.
 		//2. The right operand for a subtraction is or contains a register.
 		//3. The operand for a unary operation is or contains a register. (allow even number of negations? Not for now. Screw weird people)
-		//4. More than one register token exists in value
-		//5. Register token exists in expression outside of address
-		//6. PC or EX used in expression or address
+		//4. 	More than one register token exists in value
+		//5. 	Register token exists in expression outside of address
+		//6. 	PC or EX used in expression or address
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
@@ -211,12 +240,19 @@ public class Assembly {
 	}
 
 	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) {
+		boolean isAddress;
 		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
-		Group value = new Group(tokens,i,AValueEndToken.class);
+		Group value = null;
+		if (tokens[i+1] instanceof AddressStartToken) {
+			value = new Address(tokens,i,AddressEndToken.class);
+			isAddress = true;
+		} else {
+			value = new Group(tokens,i,AValueEndToken.class);	
+		}
+		
 		//TODO Isolate A Value
 		String register = "";
 		boolean hasNextWord = offset > 0;
-		boolean isAddress;
 		
 		//Disallowed value conditions:
 		//1. An operand for an operation other than addition or subtraction is or contains a register.

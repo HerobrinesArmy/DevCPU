@@ -1,4 +1,4 @@
-package devcpu.assembler;
+package devcpu.assembler.expression;
 
 import devcpu.lexer.tokens.LexerToken;
 
