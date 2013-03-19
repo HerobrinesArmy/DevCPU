@@ -186,10 +186,45 @@ public class Assembly {
 					} else if (token instanceof DataToken) {
 						type = TYPE_DATA;
 						//TODO
+					} else if (token instanceof DataValueStartToken) {
+						pc = assembleData(tokens, i+1, ram, pc);
 					}
 				}
 			}
 		}
+	}
+
+	private int assembleData(LexerToken[] tokens, int i, char[] ram, int pc) throws UnknownFunctionException, UnparsableExpressionException {
+		LexerToken token = tokens[i];
+		if (token instanceof StringToken) {
+			return assembleString(((StringToken) token).getString(), ram, pc);
+		} else {
+			return assembleExpression(tokens, i, ram, pc);
+		}
+	}
+
+	private int assembleExpression(LexerToken[] tokens, int i, char[] ram, int pc) throws UnknownFunctionException, UnparsableExpressionException {
+		String expression = "";
+		while (!(tokens[i] instanceof DataValueEndToken)) {
+			LexerToken token = tokens[i++];
+			if (token instanceof LabelToken) { //Wait, is this even possible at this point...
+				expression += ""+((LabelToken)token).getValue();
+			} else if (token instanceof LiteralToken) {
+				expression += ""+((LiteralToken)token).getValue();
+			} else {
+				expression += token.getText();
+			}
+		}
+		int val = (int) new ExpressionBuilder(expression).build().calculate();
+		ram[pc++] = (char) val;
+		return pc;
+	}
+
+	private int assembleString(String string, char[] ram, int pc) {
+		for (char c : string.toCharArray()) {
+			ram[pc++] = c;
+		}
+		return pc;
 	}
 
 	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
@@ -336,7 +371,7 @@ public class Assembly {
 		List<Register> registers = value.getRegisters();
 		//Register validity checks
 		if (registers.size() > 1) {
-			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
+			throw new TooManyRegistersInExpressionException(registers, tokens, "a");
 		} else if (registers.size() == 1) {
 			register = registers.get(0).getRegister();
 			if (register.equals("EX") || register.equals("PC")) {
@@ -383,11 +418,7 @@ public class Assembly {
 			}
 		} else { //Not next word
 			if (isAddress) {
-//				if (register.equals("SP")) { //0x19 | [SP] / PEEK
-//					return 0x19; //TODO FIXME I think this is actually guaranteed to be a simple stack accessor
-//				} else { //0x08-0x0f | [register]
 				return 0x08 + REGISTERS.indexOf(register);
-//				}
 			} else {
 				if (registers.size() == 1) {
 					if (register.equals("SP")) { //0x1b | SP
@@ -399,8 +430,7 @@ public class Assembly {
 					if (register.equals("EX")) { //0x1d | EX
 						return 0x1d;
 					}
-					//0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
-					return REGISTERS.indexOf(register);
+					return REGISTERS.indexOf(register); //0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
 				} else if (hasSimpleStackAccessor) {
 					String accessor = value.getSimpleStackAccessor().getAccessor();
 					if (accessor.equals("PUSH") || accessor.equals("[--SP]") || accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
@@ -425,12 +455,10 @@ public class Assembly {
 		
 		//After ruling out those conditions, all of which are invalid and should throw exceptions,
 		//you can replace any register with a zero, construct a string out of the expression, 
-		//and run it through exp4j to get the literal value. That literal value will be valid in 
+		//and run it through exp4j to get the literal value. That literal value will be valid in 	
 		//all value conditions. The presence of a register, combined with the value in offset and 
 		//whether it's an address value, is enough information to determine with certainty which 
 		//value to return (for use in the opcode).
-		
-		//Don't forget to set next word
 		
 		System.out.println("Didn't find its value.");
 		return 0;
