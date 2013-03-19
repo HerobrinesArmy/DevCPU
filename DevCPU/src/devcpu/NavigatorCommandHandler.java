@@ -111,8 +111,11 @@ public class NavigatorCommandHandler implements IHandler {
 							if (o instanceof DefaultControllableDCPU) {
 //								(((DefaultControllableDCPU) o).ram);
 								try {
+									long start = System.nanoTime();
 									Assembly a = new Assembly(file);
 									a.assemble((DefaultControllableDCPU) o);
+									long stop = System.nanoTime();
+									System.out.println(file.getName() + " assembled to " + ((DefaultControllableDCPU) o).getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds");
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

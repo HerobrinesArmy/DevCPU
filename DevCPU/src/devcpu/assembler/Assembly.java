@@ -141,7 +141,7 @@ public class Assembly {
 		assignLabelValues();
 		zeroRAM(dcpu.ram);
 		assembleToRAM(dcpu.ram);
-		System.out.println(dcpu.ram);
+//		System.out.println(dcpu.ram);
 //		Assembler assembler = new Assembler(dcpu.ram);
 		//TODO
 	}
@@ -555,7 +555,7 @@ public class Assembly {
 				}
 			} else {
 				o += sizeLine(line);
-				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
+//				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
 		}
 	}
