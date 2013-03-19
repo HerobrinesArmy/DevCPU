@@ -161,10 +161,21 @@ public class Assembly {
 					while (pc < end) {
 						ram[pc++] = 0;
 					}
-				} else if (directive.isAlign()) {
+				} else if (directive.isReserve()) {
 					int end = pc + line.getSize();
 					while (pc < end) {
 						ram[pc++] = 0;
+					}
+				} else if (directive.isFill()) {
+					LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
+					String valText = "";
+					int i = 0;
+					while (!(paramTokens[++i] instanceof AValueStartToken)) {}
+					while (!(paramTokens[++i] instanceof AValueEndToken)) {valText += paramTokens[i].getText();}
+					char v = (char)(int) new ExpressionBuilder(decimalize(valText)).build().calculate();
+					int end = pc + line.getSize();
+					while (pc < end) {
+						ram[pc++] = v;
 					}
 				}
 			} else {
@@ -512,6 +523,23 @@ public class Assembly {
 					}
 					line.setSize(newO - o);
 					o = newO;
+				} else if (directive.isFill()) {
+					int dO;
+					try {
+						LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
+						String spanText = "";
+						int i = 0;
+						while (!(paramTokens[++i] instanceof BValueStartToken)) {}
+						while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
+						dO = (int) new ExpressionBuilder(decimalize(spanText)).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (dO < 0) {
+						throw new OriginBacktrackException(directive);
+					}
+					line.setSize(dO);
+					o += dO;
 				} else if (directive.isReserve()) {
 					int dO;
 					try {

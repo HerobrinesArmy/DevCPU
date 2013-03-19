@@ -23,6 +23,7 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 		allowedDirectives.add("org");
 		allowedDirectives.add("align");
 		allowedDirectives.add("reserve");
+		allowedDirectives.add("fill");
 	}
 	
 	@Override

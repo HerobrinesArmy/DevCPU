@@ -55,4 +55,8 @@ public class Directive {
 	public boolean isReserve() {
 		return "RESERVE".equals(directiveName);
 	}
+
+	public boolean isFill() {
+		return "FILL".equals(directiveName);
+	}
 }
