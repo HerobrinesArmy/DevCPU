@@ -548,13 +548,21 @@ public class DCPU
         if (cmd != 0)
         {
           int atype = opcode >> 10 & 0x3F;
-          str = OpCodes.special.getName(cmd) + " " + getStr(atype, true);
+          if (OpCodes.special.getNames().contains(cmd)) {
+          	str = OpCodes.special.getName(cmd) + " " + getStr(atype, true);
+          } else {
+          	str = "???";
+          }
           return str;
         }
       } else {
       	String atype = getStr(opcode >> 10 & 0x3F, true);
       	String btype = getStr(opcode >> 5 & 0x1F, false);
-      	str = OpCodes.basic.getName(cmd) + " " + btype + ", " + atype;
+      	if (OpCodes.basic.getNames().contains(cmd)) {
+      		str = OpCodes.basic.getName(cmd) + " " + btype + ", " + atype;
+      	} else {
+      		str = "???";
+      	}
       	return str;
       }
       return "!?!?!?";

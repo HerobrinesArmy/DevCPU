@@ -142,7 +142,9 @@ public class VirtualFloppyDrive extends DCPUHardware
 			switch (operation.type) {
 	  	case FloppyOperation.READ:
 	  		for (int i = 0; i < 512; i++) {
-	  			dcpu.ram[operation.memory + i] = floppy.data[operation.sector * WORDS_PER_SECTOR + i];
+	  			if (operation.memory + i <= 65535) { //TODO
+	  				dcpu.ram[operation.memory + i] = floppy.data[operation.sector * WORDS_PER_SECTOR + i];
+	  			}
 	  		}
 	  		track = operation.sector / SECTORS_PER_TRACK;
 //	  		System.out.println("Read sector " + operation.sector + " in track " + track + " to 0x" +  Integer.toHexString(operation.memory));
