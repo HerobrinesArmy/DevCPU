@@ -23,6 +23,7 @@ public class Group implements Operand {
 		while (!terminator.isInstance(token = tokens[++i])) {
 			if (token instanceof GroupStartToken) {
 				values.add(new Group(tokens,i,GroupEndToken.class));
+				while (!(tokens[++i] instanceof GroupEndToken)) {}
 			} else if (token instanceof PickValueStartToken) {
 				values.add(new PickValue(tokens, i, PickValueEndToken.class));
 			} else if (token instanceof LabelToken) {
@@ -82,11 +83,11 @@ public class Group implements Operand {
 	}
 
 	public String getExpression() {
-		String expression = "";
+		String expression = "(";
 		for (Value value : values) {
 			expression += value.getExpression();
 		}
-		return expression;
+		return expression + ")";
 	}
 
 	public boolean hasSimpleStackAccessor() {
