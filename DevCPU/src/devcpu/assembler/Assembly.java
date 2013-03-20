@@ -727,4 +727,20 @@ public class Assembly {
 		line.setSize(size);
 		return size;
 	}
+
+	public int getFileCount() {
+		return 1 + treeCountChildren(rootDocument);
+	}
+
+	private int treeCountChildren(AssemblyDocument doc) {
+		int n = 0;
+		for (AssemblyDocument child : doc.getChildren().values()) {
+			n += 1 + treeCountChildren(child);
+		}
+		return n;
+	}
+
+	public int getLineCount() {
+		return lines.size();
+	}
 }

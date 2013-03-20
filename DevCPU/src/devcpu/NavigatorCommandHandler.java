@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -111,11 +112,12 @@ public class NavigatorCommandHandler implements IHandler {
 							if (o instanceof DefaultControllableDCPU) {
 //								(((DefaultControllableDCPU) o).ram);
 								try {
+									IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
 									long start = System.nanoTime();
 									Assembly a = new Assembly(file);
 									a.assemble((DefaultControllableDCPU) o);
 									long stop = System.nanoTime();
-									System.out.println(file.getName() + " assembled to " + ((DefaultControllableDCPU) o).getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds");
+									os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + ((DefaultControllableDCPU) o).getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds\n");
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
