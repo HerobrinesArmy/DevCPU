@@ -27,6 +27,6 @@ public class DCPUSourceLocator implements IPersistableSourceLocator {
 	@Override
 	public void initializeDefaults(ILaunchConfiguration configuration) throws CoreException {
 		// TODO Auto-generated method stub
-
+//XXX Hit
 	}
 }

@@ -8,7 +8,6 @@ import java.util.Random;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.MemoryByte;
 
-import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUEngine {
@@ -20,8 +19,10 @@ public class DCPUEngine {
 	Hashtable stackframeTable = new Hashtable();
 	
 	Random random = new Random();
-	public DCPUEngine() {
-		System.out.println("DCPUEngine");
+	private DefaultControllableDCPU dcpu;
+
+	public DCPUEngine(DefaultControllableDCPU dcpu) {
+		this.dcpu = dcpu;
 	}
 	
 	/**
@@ -33,7 +34,6 @@ public class DCPUEngine {
 	 */
 	synchronized public MemoryByte[] getBytesFromAddress( BigInteger address, long length)
 	throws RuntimeException {
-		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUs().get(0);
 		if (memoryBlockTable == null)
 		{		
 			// create new memoryBlock table

@@ -18,7 +18,6 @@ import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
-import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrievalExtension {
@@ -26,7 +25,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	boolean fSuspend = true;
 	
 	protected ILaunch fLaunch;
-	protected DCPUEngine fEngine = new DCPUEngine();
+	protected DCPUEngine engine;// = new DCPUEngine();
 	protected ArrayList fMemoryBlocks = new ArrayList();
 	protected IThread fThread;
 	protected boolean fBusy;
@@ -42,6 +41,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		super(null);
 		fLaunch = launch;
 		this.dcpu = dcpu;
+		this.engine = new DCPUEngine(dcpu);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 		System.out.println("DCPUDebugTarget");
 	}
@@ -57,6 +57,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
 	 */
 	public boolean hasThreads() throws DebugException {
+		//XXX hit in debug perspective
 		return false;
 	}
 
@@ -72,6 +73,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
 	 */
 	public IDebugTarget getDebugTarget() {
+		//XXX hit in debug perspective
 		return this;
 	}
 
@@ -79,6 +81,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
 	 */
 	public ILaunch getLaunch() {
+		//XXX hit in debug perspective
 		return fLaunch;
 	}
 
@@ -86,6 +89,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
+		//XXX hit in debug perspective
 		return !fTerminate;
 	}
 
@@ -93,6 +97,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
+		//XXX hit
 		return fTerminate;
 	}
 
@@ -100,6 +105,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
+	//XXX hit upon exit
 		fTerminate = true;
 		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));		
 	}
@@ -115,6 +121,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
+		//XXX hit in debug perspective
 		return !fSuspend && !fTerminate;
 	}
 
@@ -122,6 +129,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
+		//XXX hit in debug perspective
 		return fSuspend;
 	}
 
@@ -130,7 +138,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 */
 	public void resume() throws DebugException {
 		fSuspend = false;
-		fEngine.resume();
+		engine.resume();
 		fireEvent(new DebugEvent(this, DebugEvent.RESUME));
 	}
 
@@ -167,6 +175,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
 	 */
 	public boolean canDisconnect() {
+		//XXX hit in debug perspective
 		//TODO
 		return false;
 	}
@@ -183,6 +192,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
 	 */
 	public boolean isDisconnected() {
+		//XXX hit
 		
 		return false;
 	}
@@ -190,7 +200,8 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval()
 	 */
-	public boolean supportsStorageRetrieval() {	
+	public boolean supportsStorageRetrieval() {
+		//XXX hit in debug perspective from MemoryViewUtil
 		return true;
 	}	
 	
@@ -199,7 +210,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 */
 	public DCPUEngine getEngine()
 	{
-		return fEngine;
+		return engine;
 	}
 
 	/**
@@ -220,6 +231,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public Object getAdapter(Class adapter) {
+		//XXX hit in debug perspective for IModelProxyFactory2, IModelProxyFactory, IElementLabelProvider, IDebugModelProvider, ILaunch, ISourceDisplay, IMemoryBlockRetrieval, IElementMememntoProvider, IElementContentProvider, IColumnPresentationFactory, IAddMemoryBlocksTarget, IViewerInputProvider, ITerminateHandler, IStepIntoHandler, IStepFiltersHandler, ISuspendHandler, IDropToFrameHandler, IRestartHandler, IStepReturnHandler, IStepOverHandler, IResumeHandler, IDisconnectHandler, IModelSelectionPolicyFactory, IViewActionProvider
 		
 		if (adapter == ILaunch.class)
 			return getLaunch();
@@ -228,6 +240,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public IThread[] getThreads() throws DebugException {
+		//XXX hit in debug perspective
 //		if (isTerminated())
 			return new IThread[0];
 		
@@ -235,10 +248,12 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public String getName() throws DebugException {
+		//XXX hit in debug perspective
 		return "[Debug Target:] " + dcpu.getID();
 	}
 
 	public String getModelIdentifier() {
+		//XXX hit in debug perspective
 		return "example.debug.memoryview";
 	}
 
@@ -246,7 +261,8 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension#getExtendedMemoryBlock(java.lang.String, java.lang.Object)
 	 */
 	public IMemoryBlockExtension getExtendedMemoryBlock(String expression, Object context) throws DebugException {
-		
+
+		//XXX hit upon adding memory view
 		// ask debug engine for an address
 		BigInteger address = new BigInteger(expression);// getEngine().evaluateExpression(expression, context);
 		
