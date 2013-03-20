@@ -319,8 +319,10 @@
       <launchConfigurationType
             delegate="devcpu.launch.DCPULaunchDelegate"
             id="devcpu.dcpulaunch"
-            modes="run,debug"
-            name="DCPU Launch Configuration">
+            modes="run, debug"
+            name="DCPU Launch Configuration"
+            sourceLocatorId="devcpu.sourcelocator"
+            sourcePathComputerId="devcpu.sourcepathcomputer">
       </launchConfigurationType>
    </extension>
    <extension
@@ -448,6 +450,77 @@
             id="devcpu.keyword_dasm"
             label="DASM">
       </keyword>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="devcpu.launch.DCPUSourceLocator"
+            id="devcpu.sourcelocator"
+            name="DCPU Source Locator">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="devcpu.launch.DCPUSourcePathComputerDelegate"
+            id="devcpu.sourcepathcomputer">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceContainerTypes">
+      <sourceContainerType
+            class="devcpu.launch.DCPUSourceContainerTypeDelegate"
+            id="devcpu.sourcecontainertype"
+            name="DevCPU Source Container Type">
+      </sourceContainerType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.processFactories">
+      <processFactory
+            class="devcpu.launch.DCPUProcessFactory"
+            id="devcpu.processfactory">
+      </processFactory>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.statusHandlers">
+      <statusHandler
+            class="devcpu.launch.DCPURunningStatusHandler"
+            code="1"
+            id="devcpu.statushandler.running"
+            plugin="devcpu">
+      </statusHandler>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="devcpu.launch.DCPULaunchShortcut"
+            icon="icons/dcpu.png"
+            id="devcpu.launchshortcut"
+            label="DCPU Launch Shortcut"
+            modes="run, debug">
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <or>
+                        <test
+                              property="org.eclipse.debug.ui.matchesPattern"
+                              value="*.dasm">
+                        </test>
+                        <test
+                              property="org.eclipse.debug.ui.matchesPattern"
+                              value="*.dasm16">
+                        </test>
+                     </or>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
    </extension>
 
 </plugin>
