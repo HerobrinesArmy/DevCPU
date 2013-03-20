@@ -9,6 +9,7 @@ import devcpu.lexer.Lexer;
 
 public class Define {
 	private static final Pattern pattern = Pattern.compile("\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
+	private static final Pattern extractPattern = Pattern.compile("\\s*[#\\.]" + Lexer.REGEX_IDENTIFIER + "\\s*" + Lexer.REGEX_IDENTIFIER + "\\s*([^;\\r\\n]*)");
 	private Directive directive;
 	private String key;
 	private String value;
@@ -37,5 +38,17 @@ public class Define {
 
 	public String getValue() {
 		return value;
+	}
+
+	public static String extractValue(String text) {
+		Matcher m = extractPattern.matcher(text);
+		if (m.find() && m.start() == 0) {
+			return m.group(1);
+		}
+		return null;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 }

@@ -61,7 +61,7 @@ public class Assembly {
 	private boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
 	
 	public ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
-	public LinkedHashMap<String,String> defines = new LinkedHashMap<String, String>();
+	public LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
 	public LinkedHashMap<String,LabelDefinition> labelDefs = new LinkedHashMap<String, LabelDefinition>();
 	public LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
 
@@ -76,22 +76,48 @@ public class Assembly {
 	private void processDefinesAndCollectLabels() throws DuplicateLabelDefinitionException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
-		LinkedHashMap<Pattern,String> patterns = new LinkedHashMap<Pattern, String>();
+		LinkedHashMap<Pattern,Define> patterns = new LinkedHashMap<Pattern, Define>();
 		for (String key : defines.keySet()) {
 			patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
 		}
 		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
-			if (!line.isDirective() || (!line.getDirective().isDefine() && !line.getDirective().isInclude())) {
+//			if (!line.isDirective() || (!line.getDirective().isDefine() && !line.getDirective().isInclude())) {
+			String pass = "";
+			boolean isDefine = false;
+			if (line.isDirective()) {
+				if (line.getDirective().isDefine()) {
+					isDefine = true;
+					try {
+						pass = new Define(line.getDirective()).getKey();
+					} catch (InvalidDefineFormatException e) {
+						e.printStackTrace();
+					} catch (RecursiveDefinitionException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+//			boolean checkMatch = false;
+//			if (pass.length() > 0) {
+//				checkMatch = true;
+//			}
 				boolean retokenize = false;
 				String text = line.getText();
 				for (Pattern pattern : patterns.keySet()) {
+					if (isDefine) {
+						if (patterns.get(pattern).getDirective().getLine().equals(line)) {
+							continue;
+						}
+					}
 					if (pattern.matcher(text).find()) {
 						retokenize = true;
-						text = text.replaceAll(pattern.pattern(), patterns.get(pattern));
+						text = text.replaceAll(pattern.pattern(), patterns.get(pattern).getValue());
 					}
 				}
 				if (retokenize) {
+					if (isDefine) {
+						defines.get(pass).setValue(Define.extractValue(text));
+					}
 					line.setProcessedTokens(Lexer.get().generateTokens(text, true));
 				}
 				for (LexerToken token : line.getProcessedTokens()) {
@@ -116,7 +142,7 @@ public class Assembly {
 					}
 					//TODO: Additional validity checkes?
 				}
-			}
+//			}
 		}
 	}
 

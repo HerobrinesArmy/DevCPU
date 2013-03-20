@@ -55,7 +55,7 @@ public class AssemblyDocument {
 						children.put(directive,loadInclude(new Include(directive)));
 					} else if (directive.isDefine()) {
 						Define define = new Define(directive);
-						assembly.defines.put(define.getKey(), define.getValue());
+						assembly.defines.put(define.getKey(), define);
 					}
 				}
 			}

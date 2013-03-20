@@ -26,7 +26,7 @@ import devcpu.lexer.tokens.TrueToken;
 
 public class Lexer {
 	public static final String REGEX_IDENTIFIER = "\\b[a-zA-Z_][a-zA-Z_0-9]*\\b";
-	public static final String REGEX_HEXADECIMAL_VALUE = "\\b0x[0-9A-Fa-f]{1,4}\\b";
+	public static final String REGEX_HEXADECIMAL_VALUE = "\\b0x[0-9A-Fa-f]{1,5}\\b";
 	public static final String REGEX_BINARY_VALUE = "\\b0b[01]{1,16}\\b";
 	public static final String REGEX_DECIMAL_VALUE = "\\-?[0-9]{1,5}\\b";
 	public static final String REGEX_CHARACTER_VALUE = "'[^']'";
