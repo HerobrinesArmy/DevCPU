@@ -1,37 +1,46 @@
-/*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package devcpu.launch;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
+import devcpu.Activator;
+import devcpu.emulation.DefaultControllableDCPU;
+
 /**
- * Sample Launch configuraiton delegate
+ * DCPU Launch configuraiton delegate
  * For creating the debug target that supports IMemoryBlockExtension
  * */
-public class DCPULaunchDelegate extends
-		LaunchConfigurationDelegate {
-
+public class DCPULaunchDelegate extends LaunchConfigurationDelegate {
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void launch(ILaunchConfiguration configuration, String mode,
-			ILaunch launch, IProgressMonitor monitor) throws CoreException {
-		IDebugTarget target = new DCPUDebugTarget(launch);
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		String uid = (String) configuration.getAttributes().get("DCPU");
+		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUFromUniqueID(uid);
+		IDebugTarget target = new DCPUDebugTarget(launch, dcpu);
 		launch.addDebugTarget(target);
-
 	}
-
+	
+	@Override
+	public boolean buildForLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
+		// TODO Auto-generated method stub
+		return super.buildForLaunch(configuration, mode, monitor);
+	}
+	
+	@Override
+	protected IBreakpoint[] getBreakpoints(ILaunchConfiguration configuration) {
+		// TODO Auto-generated method stub
+		return super.getBreakpoints(configuration);
+	}
+	
+	@Override
+	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
+		// TODO Auto-generated method stub
+		return super.getLaunch(configuration, mode);
+	}
 }

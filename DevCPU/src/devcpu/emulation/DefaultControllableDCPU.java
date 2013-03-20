@@ -14,27 +14,19 @@ import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
-import org.eclipse.debug.core.model.IMemoryBlockExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.MemoryByte;
-import org.eclipse.debug.internal.ui.DebugUIPlugin;
-import org.eclipse.debug.internal.ui.memory.MemoryRenderingManager;
 import org.eclipse.debug.internal.ui.viewers.provisional.IAsynchronousContentAdapter;
-import org.eclipse.debug.ui.DebugUITools;
-import org.eclipse.debug.ui.memory.IMemoryRendering;
-import org.eclipse.debug.ui.memory.IMemoryRenderingContainer;
-import org.eclipse.debug.ui.memory.IMemoryRenderingSite;
-import org.eclipse.debug.ui.memory.IMemoryRenderingType;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 
+import devcpu.Activator;
 import devcpu.DCPUManager;
-import devcpu.launch.DCPUMemoryBlock;
 import devcpu.launch.DCPUMemoryUnit;
 
 public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebugTarget {
@@ -42,6 +34,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 	private String id = "DCPU";
 	private DCPUManager manager;
 	private Hashtable memoryBlockTable;
+	private String uid;
 //	private ArrayList<DCPUTickListener> tickListeners = new ArrayList<>();
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
@@ -52,37 +45,39 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 	private void doInitDebugEnvironment() {
 		try { //TODO
-//			ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
-//			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
-//			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
-//			ILaunch launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
-			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
-		  if (page != null)
-
-		  {
-
-		     try
-
-		     {
-
-		    	 IViewPart view = page.showView("org.eclipse.debug.ui.MemoryView"); 
-
-		        IMemoryRenderingSite memoryView = (IMemoryRenderingSite) view; 
-		        IMemoryBlockExtension mbe = new DCPUMemoryBlock(this); 
-		        DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {mbe}); 
-
-		        IMemoryRenderingType renderingType = DebugUITools.getMemoryRenderingManager().getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
-		        IMemoryRendering rendering = renderingType.createRendering(); 
-
-		        IMemoryRenderingContainer container = memoryView.getContainer(DebugUIPlugin.getUniqueIdentifier() + ".MemoryView.RenderingViewPane.1"); 
-
-		        rendering.init(container, mbe);
-		        
-		        container.addMemoryRendering(rendering);	
-		       }
-		       catch (Exception e) {e.printStackTrace();}
-		  }
+			this.uid = Activator.getShip().getDCPUManager().assignUniqueID(this);
+			ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
+			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
+			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
+			workingCopy.setAttribute("DCPU",uid);
+			ILaunch launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
+//			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//
+//		  if (page != null)
+//
+//		  {
+//
+//		     try
+//
+//		     {
+//
+//		    	 IViewPart view = page.showView("org.eclipse.debug.ui.MemoryView"); 
+//
+//		        IMemoryRenderingSite memoryView = (IMemoryRenderingSite) view; 
+//		        IMemoryBlockExtension mbe = new DCPUMemoryBlock(this); 
+//		        DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {mbe}); 
+//
+//		        IMemoryRenderingType renderingType = DebugUITools.getMemoryRenderingManager().getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
+//		        IMemoryRendering rendering = renderingType.createRendering(); 
+//
+//		        IMemoryRenderingContainer container = memoryView.getContainer(DebugUIPlugin.getUniqueIdentifier() + ".MemoryView.RenderingViewPane.1"); 
+//
+//		        rendering.init(container, mbe);
+//		        
+//		        container.addMemoryRendering(rendering);	
+//		       }
+//		       catch (Exception e) {e.printStackTrace();}
+//		  }
 
 //			MemoryView view = (MemoryView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.eclipse.debug.ui.MemoryView");;
 //			DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {new DCPUMemoryBlock(new DCPUDebugTarget(launch), "0", new BigInteger("0"))});

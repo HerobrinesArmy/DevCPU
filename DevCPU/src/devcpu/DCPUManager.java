@@ -1,6 +1,8 @@
 package devcpu;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -8,6 +10,7 @@ import devcpu.emulation.Ship;
 
 public class DCPUManager {
 	private ArrayList<DefaultControllableDCPU> dcpus = new ArrayList<DefaultControllableDCPU>();
+	private LinkedHashMap<String,DefaultControllableDCPU> uidMap = new LinkedHashMap<String, DefaultControllableDCPU>();
 	private int id;
 	private Ship ship;
 	
@@ -38,5 +41,19 @@ public class DCPUManager {
 			view.mapTo(null);
 		}
 		dcpus.remove(dcpu);
+	}
+
+	public String assignUniqueID(DefaultControllableDCPU dcpu) {
+		String uid = nextUniqueID();
+		uidMap.put(uid, dcpu);
+		return uid;
+	}
+
+	private String nextUniqueID() {
+		return UUID.randomUUID().toString();
+	}
+
+	public DefaultControllableDCPU getDCPUFromUniqueID(String uid) {
+		return uidMap.get(uid);
 	}
 }

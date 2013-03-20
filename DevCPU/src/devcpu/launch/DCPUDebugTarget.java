@@ -19,6 +19,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
 import devcpu.Activator;
+import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrievalExtension {
 	boolean fTerminate = false;
@@ -29,15 +30,18 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	protected ArrayList fMemoryBlocks = new ArrayList();
 	protected IThread fThread;
 	protected boolean fBusy;
+	private DefaultControllableDCPU dcpu;
 	
 	
 	/**
 	 * Creates SampleDebugTarget
 	 * @param launch the launch this debug target belongs to
+	 * @param dcpu 
 	 */
-	public DCPUDebugTarget(ILaunch launch) {
+	public DCPUDebugTarget(ILaunch launch, DefaultControllableDCPU dcpu) {
 		super(null);
 		fLaunch = launch;
+		this.dcpu = dcpu;
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 		System.out.println("DCPUDebugTarget");
 	}
@@ -231,7 +235,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public String getName() throws DebugException {
-		return "[Debug Target:] Silly Program";
+		return "[Debug Target:] " + dcpu.getID();
 	}
 
 	public String getModelIdentifier() {
@@ -249,7 +253,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		// if address can be evaluated to an address, create memory block
 		if (address != null)
 		{
-			IMemoryBlockExtension memoryBlock =  new DCPUMemoryBlock(Activator.getShip().getDCPUManager().getDCPUs().get(0));//TODO
+			IMemoryBlockExtension memoryBlock =  new DCPUMemoryBlock(dcpu);//TODO
 			fMemoryBlocks.add(memoryBlock);
 			
 			return memoryBlock;
