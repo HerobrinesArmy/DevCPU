@@ -7,7 +7,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.DebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IMemoryBlock;
+import org.eclipse.debug.core.model.IMemoryBlockExtension;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.MemoryByte;
 import org.eclipse.debug.internal.ui.elements.adapters.MemoryBlockContentAdapter;
@@ -19,7 +19,7 @@ import org.eclipse.debug.ui.memory.IMemoryBlockTablePresentation;
 
 import devcpu.emulation.DefaultControllableDCPU;
 
-public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
+public class DCPUMemoryBlockExtension extends DebugElement implements IMemoryBlockExtension {
 
 	private String expression;
 	private DefaultControllableDCPU dcpu;
@@ -30,7 +30,7 @@ public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
 	private ArrayList<Object> connections = new ArrayList<Object>();
 	private DCPUDebugTarget target;
 		
-	public DCPUMemoryBlock(DefaultControllableDCPU dcpu, DCPUDebugTarget target) {
+	public DCPUMemoryBlockExtension(DefaultControllableDCPU dcpu, DCPUDebugTarget target) {
 		super(target);
 		this.dcpu = dcpu;
 		this.target = target;
@@ -165,7 +165,7 @@ public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
 	 */
 	public long getLength() {
 		System.out.println("DCPUMemoryBlock getLength");
-		return 64;//65536*2;
+		return 65536*2;
 	}
 
 	/* (non-Javadoc)
@@ -218,6 +218,7 @@ public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
 	 */
 	public Object getAdapter(Class adapter) {
 		//XXX Asked for ILabelDecorator, IPersistableDebugElement, IModelProxyFactory, IAsynchronousContentAdapter, IMemoryBlockTablePresentation
+		System.out.println("DCPUMemoryBlock getAdapter " + adapter.getCanonicalName());
 		if (adapter.equals(IAsynchronousContentAdapter.class)) {
 			return new MemoryBlockContentAdapter();
 		}
@@ -230,10 +231,6 @@ public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
 		if (adapter.equals(IModelProxyFactory.class)) {
 			return new DefaultModelProxyFactory(); //TODO
 		}
-		if (adapter.equals(IMemoryBlockRetrieval.class)) {
-			return getDebugTarget();
-		}
-		System.out.println("DCPUMemoryBlock getAdapter " + adapter.getCanonicalName());
 		//TODO
 //		if (adapter.equals(IMemoryBlockRetrievalExtension.class))
 //			return getDebugTarget();	

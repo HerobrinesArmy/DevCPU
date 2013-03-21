@@ -37,7 +37,7 @@ public class DCPUProcess implements IProcess {
 
 	@Override
 	public String getLabel() {
-		return target.getName();
+		return "Process: " + target.getDCPU().getID();
 	}
 
 	@Override

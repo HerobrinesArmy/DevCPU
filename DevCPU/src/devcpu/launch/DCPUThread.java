@@ -20,7 +20,7 @@ public class DCPUThread extends DebugElement implements IThread {
 	{
 		super(target);
 		this.target = target;
-		this.stackFrame = new DCPUStackFrame(this, target.getName());
+		this.stackFrame = new DCPUStackFrame(this);
 //		fireEvent(new DebugEvent(this, DebugEvent.SUSPEND));
 	}
 	
@@ -56,7 +56,7 @@ public class DCPUThread extends DebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		return target.getName();
+		return "Thread: " + target.getDCPU().getID();
 	}
 
 	/* (non-Javadoc)

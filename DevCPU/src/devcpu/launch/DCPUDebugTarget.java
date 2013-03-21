@@ -13,6 +13,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockExtension;
+import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
@@ -20,7 +21,7 @@ import org.eclipse.debug.core.model.IThread;
 import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
 
-public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrievalExtension {
+public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval {
 	boolean terminated = false;
 	boolean suspended = true;
 	boolean connected = false;
@@ -45,7 +46,13 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		this.process = new DCPUProcess(this);
 		this.thread = new DCPUThread(this);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+		try {
+			memoryBlocks.add((DCPUMemoryBlock) getMemoryBlock(0, 65536*2));
+		} catch (DebugException e) {
+			e.printStackTrace();
+		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
+		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[0]));
 	}
 	
 	/* (non-Javadoc)
@@ -221,11 +228,12 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	public Object getAdapter(Class adapter) {
 		//XXX hit in debug perspective for IModelProxyFactory2, IModelProxyFactory, IElementLabelProvider, IDebugModelProvider, ILaunch, ISourceDisplay, IMemoryBlockRetrieval, IElementMememntoProvider, IElementContentProvider, IColumnPresentationFactory, IAddMemoryBlocksTarget, IViewerInputProvider, ITerminateHandler, IStepIntoHandler, IStepFiltersHandler, ISuspendHandler, IDropToFrameHandler, IRestartHandler, IStepReturnHandler, IStepOverHandler, IResumeHandler, IDisconnectHandler, IModelSelectionPolicyFactory, IViewActionProvider
-		
 		if (adapter == ILaunch.class) {
 			return getLaunch();
+		} else if (adapter == IMemoryBlockRetrieval.class) {
+			return this;
 		}
-		
+		System.out.println("DCPUDebugTarget getAdapter " + adapter.getCanonicalName());
 		return super.getAdapter(adapter);
 	}
 
@@ -234,25 +242,22 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public String getName() {
-		return dcpu.getID();
+		return "Debug Target: " + dcpu.getID();
 	}
 
 	public String getModelIdentifier() {
 		return "devcpu.memoryview";
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension#getExtendedMemoryBlock(java.lang.String, java.lang.Object)
-	 */
-	public IMemoryBlockExtension getExtendedMemoryBlock(String expression, Object context) {
-		//XXX hit upon adding memory view
-		DCPUMemoryBlock memoryBlock =  new DCPUMemoryBlock(dcpu, this);//TODO
-		memoryBlocks.add(memoryBlock);
-		return memoryBlock;
-//		IStatus status = new Status(IStatus.ERROR, "devcpu.memoryview", 0, "Expression cannot be evaluated to an address", null);
-//		DebugException exception = new DebugException(status);
-//		throw exception;
-	}
+//
+//	/* (non-Javadoc)
+//	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension#getExtendedMemoryBlock(java.lang.String, java.lang.Object)
+//	 */
+//	public IMemoryBlockExtension getExtendedMemoryBlock(String expression, Object context) {
+//		//XXX hit upon adding memory view
+//		DCPUMemoryBlock memoryBlock =  new DCPUMemoryBlock(dcpu, this);//TODO
+//		memoryBlocks.add(memoryBlock);
+//		return memoryBlock;
+//	}
 
 	public char getRegisterValue(DCPURegister register) {
 		//TODO This is stupid.
@@ -274,5 +279,9 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			return dcpu.ia;
 		}
 		return 0;
+	}
+
+	public DefaultControllableDCPU getDCPU() {
+		return dcpu;
 	}
 }

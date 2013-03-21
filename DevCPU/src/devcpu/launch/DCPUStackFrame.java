@@ -14,23 +14,18 @@ import org.eclipse.debug.core.model.IVariable;
 public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	private DCPUThread thread;
 	private DCPURegisterGroup registerGroup;
-	private long timeStamp;
-	private String name;
 	private ArrayList<DCPUVariable> variables = new ArrayList<DCPUVariable>();
 	private DCPUDebugTarget target;
 	
 	/**
 	 * Constructs a DCPUStackFrame
 	 * @param thread
-	 * @param name
 	 */
-	public DCPUStackFrame(DCPUThread thread, String name)
+	public DCPUStackFrame(DCPUThread thread)
 	{
 		super(thread.getDebugTarget());
 		this.target = (DCPUDebugTarget)thread.getDebugTarget();
 		this.thread = thread;
-		this.name = name;
-		timeStamp = System.currentTimeMillis();
 	}
 	
 	public IThread getThread() {
@@ -68,7 +63,7 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public String getName() throws DebugException {
-		return name + " " + timeStamp;
+		return "Frame: " + target.getDCPU().getID();
 	}
 
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
