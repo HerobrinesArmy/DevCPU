@@ -320,9 +320,7 @@
             delegate="devcpu.launch.DCPULaunchDelegate"
             id="devcpu.dcpulaunch"
             modes="run, debug"
-            name="DCPU Launch Configuration"
-            sourceLocatorId="devcpu.sourcelocator"
-            sourcePathComputerId="devcpu.sourcepathcomputer">
+            name="DCPU Launch Configuration">
       </launchConfigurationType>
    </extension>
    <extension
@@ -451,14 +449,14 @@
             label="DASM">
       </keyword>
    </extension>
-   <extension
+  <!-- <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             class="devcpu.launch.DCPUSourceLocator"
             id="devcpu.sourcelocator"
             name="DCPU Source Locator">
       </sourceLocator>
-   </extension>
+   </extension> -->
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
       <sourcePathComputer

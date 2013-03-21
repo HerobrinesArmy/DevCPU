@@ -23,7 +23,8 @@ public class DCPULaunchDelegate extends LaunchConfigurationDelegate {
 		String uid = (String) configuration.getAttributes().get("DCPU");
 		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUFromUniqueID(uid);
 //		IDebugTarget target = dcpu;//new DCPUDebugTarget(launch, dcpu);
-		IDebugTarget target = new DCPUDebugTarget(launch, dcpu);
+		DCPUDebugTarget target = new DCPUDebugTarget(launch, dcpu);
+		launch.setSourceLocator(new DCPUSourceLocator(target)); //Can be removed
 		launch.addDebugTarget(target);
 	}
 	

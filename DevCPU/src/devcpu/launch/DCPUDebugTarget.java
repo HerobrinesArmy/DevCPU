@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.DebugElement;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -43,6 +44,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		this.process = new DCPUProcess(this);
 		this.thread = new DCPUThread(this);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 	}
 	
 	/* (non-Javadoc)

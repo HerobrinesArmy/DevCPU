@@ -1,5 +1,7 @@
 package devcpu.launch;
 
+import java.util.ArrayList;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.DebugElement;
@@ -10,11 +12,12 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
 public class DCPUStackFrame extends DebugElement implements IStackFrame {
-
-	private DCPUThread fThread;
-	private DCPURegisterGroup fRegisterGroup;
+	private DCPUThread thread;
+	private DCPURegisterGroup registerGroup;
 	private long timeStamp;
-	private String fName;
+	private String name;
+	private ArrayList<DCPUVariable> variables = new ArrayList<DCPUVariable>();
+	private DCPUDebugTarget target;
 	
 	/**
 	 * Constructs a DCPUStackFrame
@@ -24,18 +27,18 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	public DCPUStackFrame(DCPUThread thread, String name)
 	{
 		super(thread.getDebugTarget());
-		fThread = thread;
-		fName = name;
+		this.target = (DCPUDebugTarget)thread.getDebugTarget();
+		this.thread = thread;
+		this.name = name;
 		timeStamp = System.currentTimeMillis();
 	}
 	
 	public IThread getThread() {
-		return fThread;
+		return thread;
 	}
 
 	public IVariable[] getVariables() throws DebugException {
-		
-		return new IVariable[]{new DCPUVariable(this, "sampleVariable")};
+		return variables.toArray(new IVariable[0]);//new IVariable[]{new DCPUVariable(this, "sampleVariable")};
 	}
 
 	public boolean hasVariables() throws DebugException {
@@ -43,31 +46,36 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public Object getAdapter(Class adapter) {
-		if (adapter == ILaunch.class)
+		if (adapter == ILaunch.class) {
 			return getLaunch();
+		}
 		return super.getAdapter(adapter);
 	}
 
 	public int getLineNumber() throws DebugException {
+		//TODO
 		return 0;
 	}
 
 	public int getCharStart() throws DebugException {
+		//TODO
 		return 0;
 	}
 
 	public int getCharEnd() throws DebugException {
+		//TODO
 		return 0;
 	}
 
 	public String getName() throws DebugException {
-		return "[Stackframe:] " + fName + " " + timeStamp;
+		return name + " " + timeStamp;
 	}
 
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		if (fRegisterGroup == null)
-			fRegisterGroup = new DCPURegisterGroup(this);
-		return new IRegisterGroup[] {fRegisterGroup};
+		if (registerGroup == null) {
+			registerGroup = new DCPURegisterGroup(this, target);
+		}
+		return new IRegisterGroup[] {registerGroup};
 	}
 
 	public boolean hasRegisterGroups() throws DebugException {
@@ -75,76 +83,77 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public String getModelIdentifier() {
-		return fThread.getModelIdentifier();
+		return thread.getModelIdentifier();
 	}
 
 	public IDebugTarget getDebugTarget() {
-		return fThread.getDebugTarget();
+		return thread.getDebugTarget();
 	}
 
 	public ILaunch getLaunch() {
-		return fThread.getDebugTarget().getLaunch();
+		return thread.getDebugTarget().getLaunch();
 	}
 
 	public boolean canStepInto() {
+		//TODO
 		return false;
 	}
 
 	public boolean canStepOver() {
-		return fThread.canStepOver();
+		return thread.canStepOver();
 	}
 
 	public boolean canStepReturn() {
+		//TODO
 		return false;
 	}
 
 	public boolean isStepping() {
+		//TODO
 		return false;
 	}
 
 	public void stepInto() throws DebugException {
-
+		//TODO
 	}
 
 	public void stepOver() throws DebugException {
-		fThread.stepOver();
+		thread.stepOver();
 	}
 
 	public void stepReturn() throws DebugException {
-
+		//TODO
 	}
 
 	public boolean canResume() {
-		return fThread.canResume();
+		return thread.canResume();
 	}
 
 	public boolean canSuspend() {
-		return fThread.canSuspend();
+		return thread.canSuspend();
 	}
 
 	public boolean isSuspended() {
-		return fThread.isSuspended();
+		return thread.isSuspended();
 	}
 
 	public void resume() throws DebugException {
-		fThread.resume();
-
+		thread.resume();
 	}
 
 	public void suspend() throws DebugException {
-		fThread.suspend();
+		thread.suspend();
 	}
 
 	public boolean canTerminate() {
-		return fThread.canTerminate();
+		return thread.canTerminate();
 	}
 
 	public boolean isTerminated() {
-		return fThread.isTerminated();
+		return thread.isTerminated();
 	}
 
 	public void terminate() throws DebugException {
-		fThread.terminate();
-
+		thread.terminate();
 	}
 }

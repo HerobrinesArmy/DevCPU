@@ -5,15 +5,32 @@ import org.eclipse.debug.core.model.IRegister;
 import org.eclipse.debug.core.model.IRegisterGroup;
 
 public class DCPURegister extends DCPUVariable implements IRegister {
+	private DCPURegisterGroup group;
+	private DCPUDebugTarget target;
+	private DCPUStackFrame frame;
+	private String name;
 
-	private DCPURegisterGroup fGroup;
-	DCPURegister(DCPUStackFrame frame, DCPURegisterGroup group, String name) {
+	public DCPURegister(DCPUStackFrame frame, DCPURegisterGroup group, String name, DCPUDebugTarget target) {
 		super(frame, name);
-		fGroup = group;
+		this.frame = frame;
+		this.group = group;
+		this.name = name;
+		this.target = target;
 	}
 
 	public IRegisterGroup getRegisterGroup() throws DebugException {
-		return fGroup;
+		return group;
 	}
 
+	public DCPUDebugTarget getDebugTarget() {
+		return target;
+	}
+
+	public DCPUStackFrame getStackFrame() {
+		return frame;
+	}
+
+	public String getName() {
+		return name;
+	}
 }
