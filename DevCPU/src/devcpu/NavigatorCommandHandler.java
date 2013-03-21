@@ -9,6 +9,10 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.console.IOConsoleOutputStream;
@@ -96,7 +100,7 @@ public class NavigatorCommandHandler implements IHandler {
 				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 				Object firstElement = structuredSelection.getFirstElement();
 				if (firstElement instanceof IFile) {
-					IFile file = (IFile) firstElement;
+					final IFile file = (IFile) firstElement;
 					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
 					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
 					listDialog.setElements(dcpus.toArray());
@@ -110,57 +114,68 @@ public class NavigatorCommandHandler implements IHandler {
 						Object[] res = listDialog.getResult();
 						for (Object o : res) {
 							if (o instanceof DefaultControllableDCPU) {
-//								(((DefaultControllableDCPU) o).ram);
-								try {
-									IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
-									long start = System.nanoTime();
-									Assembly a = new Assembly(file);
-									a.assemble((DefaultControllableDCPU) o);
-									long stop = System.nanoTime();
-									os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + ((DefaultControllableDCPU) o).getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds\n");
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (DuplicateLabelDefinitionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (CoreException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (IncludeFileNotFoundException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (RecursiveInclusionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (InvalidDefineFormatException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (RecursiveDefinitionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (OriginBacktrackException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (DirectiveExpressionEvaluationException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (TooManyRegistersInExpressionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (UndefinedLabelException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (BadValueException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (UnknownFunctionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (UnparsableExpressionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+								final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+								Job job = new Job("Assemble " + file.getName()) {
+									protected IStatus run(IProgressMonitor monitor) {
+										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
+										
+										try {
+											IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
+											long start = System.nanoTime();
+											Assembly a = new Assembly(file);
+											a.assemble(dcpu);
+											long stop = System.nanoTime();
+											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + dcpu.getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (DuplicateLabelDefinitionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (CoreException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (IncludeFileNotFoundException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (RecursiveInclusionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (InvalidDefineFormatException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (RecursiveDefinitionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (OriginBacktrackException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (DirectiveExpressionEvaluationException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (TooManyRegistersInExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UndefinedLabelException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (BadValueException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UnknownFunctionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UnparsableExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										
+										monitor.done();
+										return Status.OK_STATUS;
+									}
+								};
+								job.setUser(true);
+								job.schedule();									
 							}
 						}
 					}

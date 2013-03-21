@@ -50,12 +50,8 @@ import devcpu.lexer.tokens.StringToken;
 import devcpu.util.Util;
 
 public class Assembly {
-	//Note: Defines will not be processed in directives
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
 	public static final String REGISTERS = "ABCXYZIJ";
-	private static final int TYPE_SPECIAL = 1;
-	private static final int TYPE_BASIC = 2;
-	private static final int TYPE_DATA = 3;
 	private AssemblyDocument rootDocument;
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	private boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
@@ -64,25 +60,25 @@ public class Assembly {
 	public LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
 	public LinkedHashMap<String,LabelDefinition> labelDefs = new LinkedHashMap<String, LabelDefinition>();
 	public LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
+	private int missed;
+	private int shortened;
 
-	public Assembly(IFile file) throws IOException, DuplicateLabelDefinitionException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
+	public Assembly(IFile file) throws IOException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
 		rootDocument = new AssemblyDocument(file, this, null);
 		documents.add(rootDocument);
 		//TODO: Evaluate what should really be in the constructor and what should wait until assemble
-		processDefinesAndCollectLabels();
-		//TODO?
 	}
 
-	private void processDefinesAndCollectLabels() throws DuplicateLabelDefinitionException {
+	private void preprocessAndSize() throws DuplicateLabelDefinitionException, DirectiveExpressionEvaluationException, OriginBacktrackException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
+		int o = 0;
 		LinkedHashMap<Pattern,Define> patterns = new LinkedHashMap<Pattern, Define>();
 		for (String key : defines.keySet()) {
 			patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
 		}
 		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
-//			if (!line.isDirective() || (!line.getDirective().isDefine() && !line.getDirective().isInclude())) {
 			String pass = "";
 			boolean isDefine = false;
 			if (line.isDirective()) {
@@ -97,84 +93,121 @@ public class Assembly {
 					}
 				}
 			}
-//			boolean checkMatch = false;
-//			if (pass.length() > 0) {
-//				checkMatch = true;
-//			}
-				boolean retokenize = false;
-				String text = line.getText();
-				for (Pattern pattern : patterns.keySet()) {
-					if (isDefine) {
-						if (patterns.get(pattern).getDirective().getLine().equals(line)) {
-							continue;
-						}
-					}
-					if (pattern.matcher(text).find()) {
-						retokenize = true;
-						text = text.replaceAll(pattern.pattern(), patterns.get(pattern).getValue());
+			boolean retokenize = false;
+			String text = line.getText();
+			for (Pattern pattern : patterns.keySet()) {
+				if (isDefine) {
+					if (patterns.get(pattern).getDirective().getLine().equals(line)) {
+						continue;
 					}
 				}
-				if (retokenize) {
-					if (isDefine) {
-						defines.get(pass).setValue(Define.extractValue(text));
-					}
-					line.setProcessedTokens(Lexer.get().generateTokens(text, true));
+				if (pattern.matcher(text).find()) {
+					retokenize = true;
+					text = text.replaceAll(pattern.pattern(), patterns.get(pattern).getValue());
 				}
-				for (LexerToken token : line.getProcessedTokens()) {
-					if (token instanceof LabelDefinitionToken) {
-						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
-						if (!labelDef.isLocal()) {
-							lastDefinedGlobalLabel = labelDef.getLabelName();
-						}
-						if (labelDefs.containsKey(labelDef.getLabelName())) {
-							throw new DuplicateLabelDefinitionException(labelDefs.get(labelDef.getLabelName()),labelDef);
-						}
-						labelDefs.put(labelDef.getLabelName(), labelDef);
-					} else if (token instanceof LabelToken) {
-						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
-						if (!labelUses.containsKey(labelUse.getLabelName())) {
-							labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
-						}
-						labelUses.get(labelUse.getLabelName()).add(labelUse);
-					} else if (token instanceof ErrorToken) {
-						//TODO Throw exception
-						System.err.println("Error tokenizing line " + line.getLineNumber() + " in " + line.getDocument().getFile().getName() + ": " + line.getText());
-					}
-					//TODO: Additional validity checkes?
+			}
+			if (retokenize) {
+				if (isDefine) {
+					defines.get(pass).setValue(Define.extractValue(text));
 				}
-//			}
+				line.setProcessedTokens(Lexer.get().generateTokens(text, true));
+			}
+			for (LexerToken token : line.getProcessedTokens()) {
+				if (token instanceof LabelDefinitionToken) {
+					LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+					if (!labelDef.isLocal()) {
+						lastDefinedGlobalLabel = labelDef.getLabelName();
+					}
+					if (labelDefs.containsKey(labelDef.getLabelName())) {
+						throw new DuplicateLabelDefinitionException(labelDefs.get(labelDef.getLabelName()),labelDef);
+					}
+					labelDefs.put(labelDef.getLabelName(), labelDef);
+				} else if (token instanceof LabelToken) {
+					LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+					if (!labelUses.containsKey(labelUse.getLabelName())) {
+						labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
+					}
+					labelUses.get(labelUse.getLabelName()).add(labelUse);
+				} else if (token instanceof ErrorToken) {
+					//TODO Throw exception
+					System.err.println("Error tokenizing line " + line.getLineNumber() + " in " + line.getDocument().getFile().getName() + ": " + line.getText());
+				}
+				//TODO: Additional validity checks?
+			}
+			line.setOffset(o);
+			if (line.isDirective()) {
+				Directive directive = line.getDirective();
+				if (directive.isOrigin()) {
+					int newO;
+					try {
+						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (newO < o) {
+						throw new OriginBacktrackException(directive);
+					}
+					line.setSize(newO - o);
+					o = newO;
+				} else if (directive.isAlign()) {
+					int newO;
+					try {
+						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (newO < o) {
+						throw new OriginBacktrackException(directive);
+					}
+					line.setSize(newO - o);
+					o = newO;
+				} else if (directive.isFill()) {
+					int dO;
+					try {
+						LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
+						String spanText = "";
+						int i = 0;
+						while (!(paramTokens[++i] instanceof BValueStartToken)) {}
+						while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
+						dO = (int) new ExpressionBuilder(decimalize(spanText)).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (dO < 0) {
+						throw new OriginBacktrackException(directive);
+					}
+					line.setSize(dO);
+					o += dO;
+				} else if (directive.isReserve()) {
+					int dO;
+					try {
+						dO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+					} catch (Exception e) {
+						throw new DirectiveExpressionEvaluationException(directive);
+					}
+					if (dO < 0) {
+						throw new OriginBacktrackException(directive);
+					}
+					o += dO;
+					line.setSize(dO);
+				}
+			} else {
+				o += sizeLine(line);
+//					System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
+			}
 		}
 	}
 
-	public AssemblyDocument getRootDocument() {
-		return rootDocument;
-	}
-	
-	public IFile getFile() {
-		return rootDocument.getFile();
-	}
-
-	public boolean isLabelsCaseSensitive() {
-		return labelsCaseSensitive;
-	}
-
-	public void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
-		this.labelsCaseSensitive = labelsCaseSensitive;
-	}
-
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
-		sizeAndLocateLines();
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException, DuplicateLabelDefinitionException {
+		preprocessAndSize();
 		assignLabelValues();
 		zeroRAM(dcpu.ram);
 		assembleToRAM(dcpu.ram);
 //		System.out.println(dcpu.ram);
-//		Assembler assembler = new Assembler(dcpu.ram);
-		//TODO
 	}
 
 	private void assembleToRAM(char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
-		int type;
 		int opCode;
 		int a;
 		int b;
@@ -193,6 +226,7 @@ public class Assembly {
 						ram[pc++] = 0;
 					}
 				} else if (directive.isFill()) {
+					//TODO This is hackish. Make it not hackish.
 					LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
 					String valText = "";
 					int i = 0;
@@ -205,24 +239,20 @@ public class Assembly {
 					}
 				}
 			} else {
-				type = 0;
 				LexerToken[] tokens = line.getProcessedTokens();
 				for (int i = 0; i < tokens.length; i++) {
 					LexerToken token = tokens[i];
 					if (token instanceof SpecialOpCodeToken) {
-						type = TYPE_SPECIAL;
 						opCode = OpCodes.special.getId(token.getText().toUpperCase());
 						a = getA(tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
 						ram[pc] = (char)(opCode << 5 | a << 10);
 					} else if (token instanceof BasicOpCodeToken) {
-						type = TYPE_BASIC;
 						opCode = OpCodes.basic.getId(token.getText().toUpperCase());
 						a = getA(tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
 						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
 						ram[pc] = (char)(opCode | b << 5 | a << 10);
 					} else if (token instanceof DataToken) {
-						type = TYPE_DATA;
-						//TODO
+						//TODO?
 					} else if (token instanceof DataValueStartToken) {
 						pc = assembleData(tokens, i+1, ram, pc);
 					}
@@ -353,14 +383,12 @@ public class Assembly {
 					return REGISTERS.indexOf(register);
 				} else if (hasSimpleStackAccessor) {
 					String accessor = value.getSimpleStackAccessor().getAccessor();
-					if (accessor.equals("PUSH") || accessor.equals("[--SP]") || accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
+					if (accessor.equals("PUSH") || accessor.equals("[--SP]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
 						return 0x18;
 					}
 					if (accessor.equals("PEEK") || accessor.equals("[SP]")) { //0x19 | [SP] / PEEK
 						return 0x19;
 					}
-				} else { //0x20-0x3f | literal value 0xffff-0x1e (-1..30) (literal) (only for a)
-					return 0x21 + literal; //TODO Test for cast behavior with 65535
 				}
 			}
 		}
@@ -380,8 +408,7 @@ public class Assembly {
 		//whether it's an address value, is enough information to determine with certainty which 
 		//value to return (for use in the opcode).
 		
-		//Don't forget to set next word
-		
+		//TODO Exception
 		System.out.println("Didn't find its value.");
 		return 0;
 	}
@@ -451,6 +478,9 @@ public class Assembly {
 			} else if (value.hasPickValue()) { //0x1a | [SP + next word] / PICK n
 				return 0x1a;
 			} else {//0x1f | next word (literal)
+				if (ram[offset] < 31 || ram[offset] == 0xFFFF) {
+					missed++;
+				}
 				return 0x1f;
 			}
 		} else { //Not next word
@@ -470,14 +500,15 @@ public class Assembly {
 					return REGISTERS.indexOf(register); //0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
 				} else if (hasSimpleStackAccessor) {
 					String accessor = value.getSimpleStackAccessor().getAccessor();
-					if (accessor.equals("PUSH") || accessor.equals("[--SP]") || accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
+					if (accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
 						return 0x18;
 					}
 					if (accessor.equals("PEEK") || accessor.equals("[SP]")) { //0x19 | [SP] / PEEK
 						return 0x19;
 					}
 				} else { //0x20-0x3f | literal value 0xffff-0x1e (-1..30) (literal) (only for a)
-					return 0x21 + literal; //TODO Test for cast behavior with 65535
+					shortened++;
+					return 0x21 + literal;
 				}
 			}
 		}
@@ -497,6 +528,7 @@ public class Assembly {
 		//whether it's an address value, is enough information to determine with certainty which 
 		//value to return (for use in the opcode).
 		
+		//TODO Exception
 		System.out.println("Didn't find its value.");
 		return 0;
 	}
@@ -515,73 +547,6 @@ public class Assembly {
 			int o = labelDefs.get(label).getLine().getOffset();
 			for (LabelUse use : labelUses.get(label)) {
 				use.getToken().setValue(o);
-			}
-		}
-	}
-
-	private void sizeAndLocateLines() throws OriginBacktrackException, DirectiveExpressionEvaluationException {
-		int o = 0;
-		for (AssemblyLine line : lines) {
-			line.setOffset(o);
-			if (line.isDirective()) {
-				Directive directive = line.getDirective();
-				if (directive.isOrigin()) {
-					int newO;
-					try {
-						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-					} catch (Exception e) {
-						throw new DirectiveExpressionEvaluationException(directive);
-					}
-					if (newO < o) {
-						throw new OriginBacktrackException(directive);
-					}
-					line.setSize(newO - o);
-					o = newO;
-				} else if (directive.isAlign()) {
-					int newO;
-					try {
-						newO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-					} catch (Exception e) {
-						throw new DirectiveExpressionEvaluationException(directive);
-					}
-					if (newO < o) {
-						throw new OriginBacktrackException(directive);
-					}
-					line.setSize(newO - o);
-					o = newO;
-				} else if (directive.isFill()) {
-					int dO;
-					try {
-						LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
-						String spanText = "";
-						int i = 0;
-						while (!(paramTokens[++i] instanceof BValueStartToken)) {}
-						while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
-						dO = (int) new ExpressionBuilder(decimalize(spanText)).build().calculate();
-					} catch (Exception e) {
-						throw new DirectiveExpressionEvaluationException(directive);
-					}
-					if (dO < 0) {
-						throw new OriginBacktrackException(directive);
-					}
-					line.setSize(dO);
-					o += dO;
-				} else if (directive.isReserve()) {
-					int dO;
-					try {
-						dO = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-					} catch (Exception e) {
-						throw new DirectiveExpressionEvaluationException(directive);
-					}
-					if (dO < 0) {
-						throw new OriginBacktrackException(directive);
-					}
-					o += dO;
-					line.setSize(dO);
-				}
-			} else {
-				o += sizeLine(line);
-//				System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 			}
 		}
 	}
@@ -605,11 +570,11 @@ public class Assembly {
 
 	private int sizeLine(AssemblyLine line) {
 		//TODO Note: Rule for now is: Use of labels or expressions disables short form literal optimization
-		//TODO: Handle the -1 case (unary operator token)
+		//TODO: Handle the -1 case (unary operator token) if you're not already
 		//Also, after looking over how you've done sizing here, you might want to check yourself into hospital for evaluation
 		int size = 0;
 		LexerToken[] tokens = line.getProcessedTokens();
-		for (int i = 0; i < tokens.length; i++) {// LexerToken token : line.getProcessedTokens()) {
+		for (int i = 0; i < tokens.length; i++) {
 			LexerToken token = tokens[i];
 			if (token instanceof BasicOpCodeToken) {
 				size++;
@@ -742,5 +707,34 @@ public class Assembly {
 
 	public int getLineCount() {
 		return lines.size();
+	}
+
+	public int getSize() {
+		AssemblyLine lastLine = lines.get(lines.size()-1);
+		return lastLine.getOffset() + lastLine.getSize();
+	}
+	
+	public int getMissedShortLiteralEstimate() {
+		return missed;
+	}
+	
+	public int getAssembledShortLiteralCount() {
+		return shortened;
+	}
+	
+	public AssemblyDocument getRootDocument() {
+		return rootDocument;
+	}
+	
+	public IFile getFile() {
+		return rootDocument.getFile();
+	}
+
+	public boolean isLabelsCaseSensitive() {
+		return labelsCaseSensitive;
+	}
+
+	public void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
+		this.labelsCaseSensitive = labelsCaseSensitive;
 	}
 }

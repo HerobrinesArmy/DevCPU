@@ -33,6 +33,7 @@ public class AssemblyDocument {
 		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release.
 		this.assembly = assembly;
 		this.parent = parent;
+		//TODO Move this out of the constructor (but don't forget to call it!)
 		readLines();
 	}
 
