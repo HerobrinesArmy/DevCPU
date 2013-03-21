@@ -8,15 +8,14 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
 public class DCPUVariable extends DebugElement implements IVariable{
-
-	private final DCPUStackFrame fFrame;
-	private String fName;
+	private final DCPUStackFrame frame;
+	private String name;
 
 	DCPUVariable(DCPUStackFrame frame, String name)
 	{
 		super(frame.getDebugTarget());
-		fFrame = frame;
-		fName = name;
+		this.frame = frame;
+		this.name = name;
 	}
 
 	public IValue getValue() throws DebugException {
@@ -24,46 +23,49 @@ public class DCPUVariable extends DebugElement implements IVariable{
 	}
 
 	public String getName() throws DebugException {
-		return fName;
+		return name;
 	}
 
 	public String getReferenceTypeName() throws DebugException {
-		return "";
+		return "Variable";
 	}
 
 	public boolean hasValueChanged() throws DebugException {
-		return false;
+		//TODO
+		return true;
 	}
 
 	public String getModelIdentifier() {
-		return fFrame.getModelIdentifier();
+		return frame.getModelIdentifier();
 	}
 
 	public IDebugTarget getDebugTarget() {
-		return fFrame.getDebugTarget();
+		return frame.getDebugTarget();
 	}
 
 	public ILaunch getLaunch() {
-		return fFrame.getLaunch();
+		return frame.getLaunch();
 	}
-
 
 	public void setValue(IValue value) throws DebugException {
-		
+		//TODO
 	}
+	
 	public boolean supportsValueModification() {
-		return false;
+		return true;
 	}
 
 	public boolean verifyValue(IValue value) throws DebugException {
+		//TODO
 		return false;
 	}
 
 	public void setValue(String expression) throws DebugException {
-		
+		//TODO
 	}
 
 	public boolean verifyValue(String expression) throws DebugException {
+		//TODO
 		return false;
 	}
 }

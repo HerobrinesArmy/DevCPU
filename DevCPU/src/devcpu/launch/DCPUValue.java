@@ -8,25 +8,30 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
 public class DCPUValue extends DebugElement implements IValue {
-
-	private DCPUVariable fVariable;
+	private DCPUVariable variable;
+	private boolean isRegister;
 	
 	public DCPUValue(DCPUVariable variable)
 	{
 		super(variable.getDebugTarget());
-		fVariable = variable;  
+		this.variable = variable;
+		this.isRegister = variable instanceof DCPURegister;
 	}
 	
 	public String getReferenceTypeName() throws DebugException {
-		return "";
+		return "Word";
 	}
 
 	public String getValueString() throws DebugException {
-		return String.valueOf(System.currentTimeMillis());
+		if (isRegister) {
+			char v = ((DCPUDebugTarget)variable.getDebugTarget()).getRegisterValue((DCPURegister)variable);
+			return "0x" + (v < 0x1000 ? "0" : "") + (v < 0x100 ? "0" : "") + (v < 0x10 ? "0" : "") + Integer.toHexString(v);
+		}
+		return "?";
 	}
 
 	public boolean isAllocated() throws DebugException {
-		return false;
+		return true;
 	}
 
 	public IVariable[] getVariables() throws DebugException {
@@ -38,15 +43,14 @@ public class DCPUValue extends DebugElement implements IValue {
 	}
 
 	public String getModelIdentifier() {
-		return fVariable.getModelIdentifier();
+		return variable.getModelIdentifier();
 	}
 
 	public IDebugTarget getDebugTarget() {
-		return fVariable.getDebugTarget();
+		return variable.getDebugTarget();
 	}
 
 	public ILaunch getLaunch() {
-		return fVariable.getLaunch();
+		return variable.getLaunch();
 	}
-
 }

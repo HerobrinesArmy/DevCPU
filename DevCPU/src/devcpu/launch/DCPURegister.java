@@ -33,4 +33,9 @@ public class DCPURegister extends DCPUVariable implements IRegister {
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public String getReferenceTypeName() throws DebugException {
+		return "Register";
+	}
 }

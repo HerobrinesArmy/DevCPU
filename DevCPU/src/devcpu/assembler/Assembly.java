@@ -52,7 +52,7 @@ import devcpu.util.Util;
 public class Assembly {
 	//Note: Defines will not be processed in directives
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
-	private static final String REGISTERS = "ABCXYZIJ";
+	public static final String REGISTERS = "ABCXYZIJ";
 	private static final int TYPE_SPECIAL = 1;
 	private static final int TYPE_BASIC = 2;
 	private static final int TYPE_DATA = 3;

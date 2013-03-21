@@ -204,12 +204,12 @@ public class DCPUThread extends DebugElement implements IThread {
 		if (adapter == ILaunch.class) {
 			return target.getLaunch();
 		}
-		else {
-			Object o = target.getAdapter(adapter);
-			if (o != null) {
-				return o;
-			}
-		}
+//		else {
+//			Object o = target.getAdapter(adapter);
+//			if (o != null) {
+//				return o;
+//			}
+//		}
 		return super.getAdapter(adapter);
 	}
 }

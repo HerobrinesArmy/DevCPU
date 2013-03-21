@@ -17,6 +17,7 @@ import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
+import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrievalExtension {
@@ -251,5 +252,27 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 //		IStatus status = new Status(IStatus.ERROR, "devcpu.memoryview", 0, "Expression cannot be evaluated to an address", null);
 //		DebugException exception = new DebugException(status);
 //		throw exception;
+	}
+
+	public char getRegisterValue(DCPURegister register) {
+		//TODO This is stupid.
+		String r = register.getName();
+		int i = Assembly.REGISTERS.indexOf(r);
+		if (i >= 0) {
+			return dcpu.registers[i];
+		}
+		if ("PC".equals(r)) {
+			return dcpu.pc;
+		}
+		if ("SP".equals(r)) {
+			return dcpu.sp;
+		}
+		if ("EX".equals(r)) {
+			return dcpu.ex;
+		}
+		if ("IA".equals(r)) {
+			return dcpu.ia;
+		}
+		return 0;
 	}
 }
