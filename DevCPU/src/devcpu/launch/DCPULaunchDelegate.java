@@ -22,6 +22,7 @@ public class DCPULaunchDelegate extends LaunchConfigurationDelegate {
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		String uid = (String) configuration.getAttributes().get("DCPU");
 		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUFromUniqueID(uid);
+//		IDebugTarget target = dcpu;//new DCPUDebugTarget(launch, dcpu);
 		IDebugTarget target = new DCPUDebugTarget(launch, dcpu);
 		launch.addDebugTarget(target);
 	}

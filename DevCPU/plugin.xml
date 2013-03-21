@@ -522,5 +522,13 @@
          </contextualLaunch>
       </shortcut>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="devcpu.launch.DCPUBreakpoint"
+            id="devcpu.breakpoint"
+            markerType="org.eclipse.debug.core.lineBreakpointMarker">
+      </breakpoint>
+   </extension>
 
 </plugin>
