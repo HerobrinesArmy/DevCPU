@@ -23,7 +23,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import de.congrace.exp4j.UnknownFunctionException;
 import de.congrace.exp4j.UnparsableExpressionException;
 import devcpu.assembler.Assembly;
-import devcpu.assembler.OldAssembler;
 import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
@@ -63,7 +62,7 @@ public class NavigatorCommandHandler implements IHandler {
 				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 				Object firstElement = structuredSelection.getFirstElement();
 				if (firstElement instanceof IFile) {
-					IFile file = (IFile) firstElement;
+					final IFile file = (IFile) firstElement;
 					ArrayList<FloppyDisk> disks = Activator.getShip().getFloppyManager().getAvailableDisks();
 					for (FloppyDisk disk : new ArrayList<FloppyDisk>(disks)) {
 						if (disk.isWriteProtected()) {
@@ -82,50 +81,17 @@ public class NavigatorCommandHandler implements IHandler {
 						Object[] res = listDialog.getResult();
 						for (Object o : res) {
 							if (o instanceof FloppyDisk) {
-								OldAssembler a = new OldAssembler(((FloppyDisk) o).data);
-								try {
-									a.assemble(file.getContents(true));
-								} catch (Exception e) {
-									// TODO Error message; get rid of any catches in Assembler.
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-				}
-			}
-		} else if (event.getCommand().getId().equals(ASSEMBLE_TO_DCPU)) {
-			ISelection selection = HandlerUtil.getCurrentSelection(event);
-			if (selection instanceof IStructuredSelection) {
-				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-				Object firstElement = structuredSelection.getFirstElement();
-				if (firstElement instanceof IFile) {
-					final IFile file = (IFile) firstElement;
-					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
-					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
-					listDialog.setElements(dcpus.toArray());
-					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
-					listDialog.setEmptySelectionMessage("Select a DCPU");
-					listDialog.setMessage("Choose the DCPU on which to assemble the file.\nExisting memory contents will be zeroed prior to assembly.");
-					// listDialog.setMultipleSelection(false); //TODO consider allowing multiple selection. Why the hell not?
-					listDialog.setTitle("Assemble to DCPU");
-					int open = listDialog.open();
-					if (open == ListSelectionDialog.OK) {
-						Object[] res = listDialog.getResult();
-						for (Object o : res) {
-							if (o instanceof DefaultControllableDCPU) {
-								final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+								final FloppyDisk disk = (FloppyDisk) o;
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
-										
 										try {
 											IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
 											long start = System.nanoTime();
 											Assembly a = new Assembly(file);
-											a.assemble(dcpu);
+											a.assemble(disk);
 											long stop = System.nanoTime();
-											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + dcpu.getID() + "'s RAM in " + ((double)(stop-start))/1e6 + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
+											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + disk.getID() + " in " + (int)((stop-start)/1e6f) + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
 										} catch (IOException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
@@ -169,13 +135,104 @@ public class NavigatorCommandHandler implements IHandler {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										}
-										
 										monitor.done();
 										return Status.OK_STATUS;
 									}
 								};
 								job.setUser(true);
-								job.schedule();									
+								job.schedule();
+//								OldAssembler a = new OldAssembler(((FloppyDisk) o).data);
+//								try {
+//									a.assemble(file.getContents(true));
+//								} catch (Exception e) {
+//									// TODO Error message; get rid of any catches in Assembler.
+//									e.printStackTrace();
+//								}
+							}
+						}
+					}
+				}
+			}
+		} else if (event.getCommand().getId().equals(ASSEMBLE_TO_DCPU)) {
+			ISelection selection = HandlerUtil.getCurrentSelection(event);
+			if (selection instanceof IStructuredSelection) {
+				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+				Object firstElement = structuredSelection.getFirstElement();
+				if (firstElement instanceof IFile) {
+					final IFile file = (IFile) firstElement;
+					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					listDialog.setElements(dcpus.toArray());
+					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
+					listDialog.setEmptySelectionMessage("Select a DCPU");
+					listDialog.setMessage("Choose the DCPU on which to assemble the file.\nExisting memory contents will be zeroed prior to assembly.");
+					// listDialog.setMultipleSelection(false); //TODO consider allowing multiple selection. Why the hell not?
+					listDialog.setTitle("Assemble to DCPU");
+					int open = listDialog.open();
+					if (open == ListSelectionDialog.OK) {
+						Object[] res = listDialog.getResult();
+						for (Object o : res) {
+							if (o instanceof DefaultControllableDCPU) {
+								final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+								Job job = new Job("Assemble " + file.getName()) {
+									protected IStatus run(IProgressMonitor monitor) {
+										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
+										try {
+											IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
+											long start = System.nanoTime();
+											Assembly a = new Assembly(file);
+											a.assemble(dcpu);
+											long stop = System.nanoTime();
+											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (DuplicateLabelDefinitionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (CoreException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (IncludeFileNotFoundException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (RecursiveInclusionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (InvalidDefineFormatException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (RecursiveDefinitionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (OriginBacktrackException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (DirectiveExpressionEvaluationException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (TooManyRegistersInExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UndefinedLabelException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (BadValueException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UnknownFunctionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (UnparsableExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										monitor.done();
+										return Status.OK_STATUS;
+									}
+								};
+								job.setUser(true);
+								job.schedule();
 							}
 						}
 					}

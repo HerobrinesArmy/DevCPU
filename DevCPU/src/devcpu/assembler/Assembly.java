@@ -26,6 +26,7 @@ import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
 import devcpu.assembler.expression.Register;
 import devcpu.emulation.DefaultControllableDCPU;
+import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.OpCodes;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.AValueEndToken;
@@ -62,11 +63,38 @@ public class Assembly {
 	public LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
 	private int missed;
 	private int shortened;
+	private long timer;
 
 	public Assembly(IFile file) throws IOException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
+		timerStart();
 		rootDocument = new AssemblyDocument(file, this, null);
+		System.out.println(timerEnd() + "ms in Line Loading");
 		documents.add(rootDocument);
 		//TODO: Evaluate what should really be in the constructor and what should wait until assemble
+	}
+	
+	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException, DuplicateLabelDefinitionException {
+		timerStart();
+		preprocessAndSize();
+		System.out.println(timerReset() + "ms in Preprocessing");
+		assignLabelValues();
+		System.out.println(timerReset() + "ms in Label Value Assignment");
+		zeroBuffer(dcpu.ram);
+		System.out.println(timerReset() + "ms to zero RAM");
+		assembleToBuffer(dcpu.ram);
+		System.out.println(timerReset() + "ms in Final Assembly");
+	}
+	
+	public void assemble(FloppyDisk disk) throws DuplicateLabelDefinitionException, DirectiveExpressionEvaluationException, OriginBacktrackException, UndefinedLabelException, TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+		timerStart();
+		preprocessAndSize();
+		System.out.println(timerReset() + "ms in Preprocessing");
+		assignLabelValues();
+		System.out.println(timerReset() + "ms in Label Value Assignment");
+		zeroBuffer(disk.data);
+		System.out.println(timerReset() + "ms to zero disk data");
+		assembleToBuffer(disk.data);
+		System.out.println(timerReset() + "ms in Final Assembly");
 	}
 
 	private void preprocessAndSize() throws DuplicateLabelDefinitionException, DirectiveExpressionEvaluationException, OriginBacktrackException {
@@ -198,15 +226,7 @@ public class Assembly {
 		}
 	}
 
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException, DuplicateLabelDefinitionException {
-		preprocessAndSize();
-		assignLabelValues();
-		zeroRAM(dcpu.ram);
-		assembleToRAM(dcpu.ram);
-//		System.out.println(dcpu.ram);
-	}
-
-	private void assembleToRAM(char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+	private void assembleToBuffer(char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
 		int opCode;
 		int a;
@@ -533,9 +553,9 @@ public class Assembly {
 		return 0;
 	}
 
-	private void zeroRAM(char[] ram) {
-		for (int i = 0; i < ram.length; i++) {
-			ram[i] = 0;
+	private void zeroBuffer(char[] buf) {
+		for (int i = 0; i < buf.length; i++) {
+			buf[i] = 0;
 		}
 	}
 
@@ -736,5 +756,20 @@ public class Assembly {
 
 	public void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
 		this.labelsCaseSensitive = labelsCaseSensitive;
+	}
+
+	private int timerEnd() {
+		return (int) ((System.nanoTime() - timer) / 1e6f);
+	}
+	
+	private int timerReset() {
+		long end = System.nanoTime();
+		int delta = (int) ((end - timer) / 1e6f);
+		timer = end;
+		return delta;
+	}
+
+	private void timerStart() {
+		this.timer = System.nanoTime();
 	}
 }
