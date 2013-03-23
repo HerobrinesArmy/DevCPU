@@ -112,12 +112,6 @@
          <newWizardShortcut
                id="devcpu.dasmfilewizard">
          </newWizardShortcut>
- <!--        <view
-               id="devcpu.console"
-               minimized="false"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss">
-         </view> -->
       </perspectiveExtension>
       <perspectiveExtension
             targetID="DevCPU.perspective">
@@ -456,7 +450,7 @@
             id="devcpu.sourcelocator"
             name="DCPU Source Locator">
       </sourceLocator>
-   </extension> -->
+   </extension>
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
       <sourcePathComputer
@@ -519,7 +513,7 @@
             </enablement>
          </contextualLaunch>
       </shortcut>
-   </extension>
+   </extension>-->
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
