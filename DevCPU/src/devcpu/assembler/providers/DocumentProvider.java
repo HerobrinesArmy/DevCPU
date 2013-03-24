@@ -1,7 +1,7 @@
-package devcpu.assembler.exceptions;
+package devcpu.assembler.providers;
 
 import devcpu.assembler.AssemblyDocument;
 
-public interface IDocumentException {
+public interface DocumentProvider {
 	public AssemblyDocument getDocument();
 }

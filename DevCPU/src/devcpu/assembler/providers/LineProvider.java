@@ -1,7 +1,7 @@
-package devcpu.assembler.exceptions;
+package devcpu.assembler.providers;
 
 import devcpu.assembler.AssemblyLine;
 
-public interface ILineException {
+public interface LineProvider {
 	public AssemblyLine getLine();
 }

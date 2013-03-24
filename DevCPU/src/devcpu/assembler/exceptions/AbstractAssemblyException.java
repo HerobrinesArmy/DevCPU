@@ -1,8 +1,9 @@
 package devcpu.assembler.exceptions;
 
 import devcpu.assembler.Assembly;
+import devcpu.assembler.providers.AssemblyProvider;
 
-public abstract class AbstractAssemblyException extends Exception implements IAssemblyException {
+public abstract class AbstractAssemblyException extends Exception implements AssemblyProvider {
 	private static final long serialVersionUID = 1L;
 	protected Assembly assembly;
 	

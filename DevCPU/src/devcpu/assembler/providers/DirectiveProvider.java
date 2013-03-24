@@ -1,7 +1,7 @@
-package devcpu.assembler.exceptions;
+package devcpu.assembler.providers;
 
 import devcpu.assembler.Directive;
 
-public interface IDirectiveException {
+public interface DirectiveProvider {
 	public Directive getDirective();
 }
