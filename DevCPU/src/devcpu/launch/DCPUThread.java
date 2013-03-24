@@ -200,6 +200,8 @@ public class DCPUThread extends DebugElement implements IThread {
 		target.terminate();
 	}
 	
+	@Override
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == ILaunch.class) {
 			return target.getLaunch();

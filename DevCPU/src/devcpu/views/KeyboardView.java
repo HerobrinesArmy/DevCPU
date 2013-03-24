@@ -20,9 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
 
 import devcpu.Activator;
 import devcpu.MappedView;
@@ -116,7 +114,7 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				attachSubmenu.removeAll();
-				for (DCPUHardware h : Activator.getDefault().getShip().getHardwareManager().getDevices(VirtualKeyboard.class)) {
+				for (DCPUHardware h : Activator.getShip().getHardwareManager().getDevices(VirtualKeyboard.class)) {
 					final VirtualKeyboard vm = ((VirtualKeyboard)h);
 					attachSubmenu.add(new Action(vm.getID()) {
 						public void run() {
@@ -163,9 +161,6 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 		};
 		detachAction.setText("Detach Viewer");
 		detachAction.setToolTipText("Detach the viewer from the Generic Keyboard");
-		detachAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
 	}
 
 	@Override

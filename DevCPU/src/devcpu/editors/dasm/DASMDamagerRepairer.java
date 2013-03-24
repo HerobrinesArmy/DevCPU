@@ -1,6 +1,5 @@
 package devcpu.editors.dasm;
 
-import org.eclipse.debug.internal.ui.ColorManager;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -31,8 +30,8 @@ import devcpu.lexer.tokens.StringToken;
 
 public class DASMDamagerRepairer implements IPresentationRepairer, IPresentationDamager {
 
-	private static final Color DEFAULT_FOREGROUND = ColorManager.getDefault().getColor(new RGB(0, 0, 0));
-	private static final Color DEFAULT_BACKGROUND = ColorManager.getDefault().getColor(new RGB(255, 255, 255));
+	private static final Color DEFAULT_FOREGROUND = DASMColorProvider.get().getColor(new RGB(0, 0, 0));
+	private static final Color DEFAULT_BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	
 	private IDocument document;
 

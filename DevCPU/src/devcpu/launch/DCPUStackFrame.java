@@ -40,6 +40,8 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 		return true;
 	}
 
+	@Override
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == ILaunch.class) {
 			return getLaunch();

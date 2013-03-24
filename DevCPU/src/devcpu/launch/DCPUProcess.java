@@ -15,6 +15,7 @@ public class DCPUProcess implements IProcess {
 		this.target = debugTarget;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		return target.getAdapter(adapter);

@@ -25,6 +25,10 @@ public class DCPUSourceLocator implements IPersistableSourceLocator {
 		return null;
 	}
 
+	public DCPUDebugTarget getTarget() {
+		return target;
+	}
+
 	@Override
 	public void initializeFromMemento(String memento) throws CoreException {
 		// TODO Auto-generated method stub

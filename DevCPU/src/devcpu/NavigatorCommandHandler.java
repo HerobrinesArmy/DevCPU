@@ -23,16 +23,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import de.congrace.exp4j.UnknownFunctionException;
 import de.congrace.exp4j.UnparsableExpressionException;
 import devcpu.assembler.Assembly;
-import devcpu.assembler.exceptions.BadValueException;
-import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
-import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
-import devcpu.assembler.exceptions.IncludeFileNotFoundException;
-import devcpu.assembler.exceptions.InvalidDefineFormatException;
-import devcpu.assembler.exceptions.OriginBacktrackException;
-import devcpu.assembler.exceptions.RecursiveDefinitionException;
-import devcpu.assembler.exceptions.RecursiveInclusionException;
-import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
-import devcpu.assembler.exceptions.UndefinedLabelException;
+import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -92,46 +83,19 @@ public class NavigatorCommandHandler implements IHandler {
 											a.assemble(disk);
 											long stop = System.nanoTime();
 											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + disk.getID() + " in " + (int)((stop-start)/1e6f) + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (DuplicateLabelDefinitionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (CoreException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (IncludeFileNotFoundException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (RecursiveInclusionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (InvalidDefineFormatException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (RecursiveDefinitionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (OriginBacktrackException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (DirectiveExpressionEvaluationException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (TooManyRegistersInExpressionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UndefinedLabelException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (BadValueException e) {
+										} catch (AbstractAssemblyException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										} catch (UnknownFunctionException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										} catch (UnparsableExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (CoreException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										}
@@ -187,43 +151,16 @@ public class NavigatorCommandHandler implements IHandler {
 										} catch (IOException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
-										} catch (DuplicateLabelDefinitionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (CoreException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (IncludeFileNotFoundException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (RecursiveInclusionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (InvalidDefineFormatException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (RecursiveDefinitionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (OriginBacktrackException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (DirectiveExpressionEvaluationException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (TooManyRegistersInExpressionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UndefinedLabelException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (BadValueException e) {
+										} catch (AbstractAssemblyException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										} catch (UnknownFunctionException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										} catch (UnparsableExpressionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (CoreException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										}

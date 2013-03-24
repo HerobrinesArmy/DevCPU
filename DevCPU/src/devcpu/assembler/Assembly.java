@@ -12,14 +12,13 @@ import org.eclipse.core.runtime.CoreException;
 import de.congrace.exp4j.ExpressionBuilder;
 import de.congrace.exp4j.UnknownFunctionException;
 import de.congrace.exp4j.UnparsableExpressionException;
+import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
-import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
-import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
 import devcpu.assembler.exceptions.UndefinedLabelException;
 import devcpu.assembler.expression.Address;
@@ -65,7 +64,7 @@ public class Assembly {
 	private int shortened;
 	private long timer;
 
-	public Assembly(IFile file) throws IOException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
+	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
 		timerStart();
 		rootDocument = new AssemblyDocument(file, this, null);
 		System.out.println(timerEnd() + "ms in Line Loading");
@@ -73,7 +72,7 @@ public class Assembly {
 		//TODO: Evaluate what should really be in the constructor and what should wait until assemble
 	}
 	
-	public void assemble(DefaultControllableDCPU dcpu) throws OriginBacktrackException, DirectiveExpressionEvaluationException, TooManyRegistersInExpressionException, UndefinedLabelException, BadValueException, UnknownFunctionException, UnparsableExpressionException, DuplicateLabelDefinitionException {
+	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		timerStart();
 		preprocessAndSize();
 		System.out.println(timerReset() + "ms in Preprocessing");
@@ -85,7 +84,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms in Final Assembly");
 	}
 	
-	public void assemble(FloppyDisk disk) throws DuplicateLabelDefinitionException, DirectiveExpressionEvaluationException, OriginBacktrackException, UndefinedLabelException, TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+	public void assemble(FloppyDisk disk) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		timerStart();
 		preprocessAndSize();
 		System.out.println(timerReset() + "ms in Preprocessing");
@@ -97,7 +96,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms in Final Assembly");
 	}
 
-	private void preprocessAndSize() throws DuplicateLabelDefinitionException, DirectiveExpressionEvaluationException, OriginBacktrackException {
+	private void preprocessAndSize() throws AbstractAssemblyException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
 		int o = 0;
@@ -226,7 +225,7 @@ public class Assembly {
 		}
 	}
 
-	private void assembleToBuffer(char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+	private void assembleToBuffer(char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
 		int opCode;
 		int a;
@@ -312,7 +311,7 @@ public class Assembly {
 		return pc;
 	}
 
-	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
@@ -431,7 +430,7 @@ public class Assembly {
 		return 0;
 	}
 
-	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws TooManyRegistersInExpressionException, BadValueException, UnknownFunctionException, UnparsableExpressionException {
+	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;

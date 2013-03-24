@@ -4,15 +4,13 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-
 
 public class DASMSourceViewerConfiguration extends SourceViewerConfiguration {
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		DASMColorProvider provider = DASMColorProvider.get();
+//		DASMColorProvider provider = DASMColorProvider.get();
 		PresentationReconciler reconciler = new PresentationReconciler();
 			
 		DASMDamagerRepairer dr = new devcpu.editors.dasm.DASMDamagerRepairer(); //DefaultDamagerRepairer(DASMInsaneCodeScanner.get());

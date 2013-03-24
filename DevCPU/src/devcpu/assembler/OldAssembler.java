@@ -569,9 +569,7 @@ public class OldAssembler
     oldScope.inheritedScopes.add(this.currentScope);
     BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
     String line = "";
-    int lines = 0;
     while ((line = br.readLine()) != null) {
-      lines++;
       line = line.trim();
       for (String key : defines.keySet()) {
   			line = line.replaceAll(key, defines.get(key));
@@ -624,9 +622,7 @@ public class OldAssembler
     oldScope.inheritedScopes.add(this.currentScope);
     BufferedReader br = new BufferedReader(new InputStreamReader(input));
     String line = "";
-    int lines = 0;
     while ((line = br.readLine()) != null) {
-      lines++;
       line = line.trim();
       for (String key : defines.keySet()) {
   			line = line.replaceAll(key, defines.get(key));

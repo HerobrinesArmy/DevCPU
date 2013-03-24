@@ -18,7 +18,7 @@ import devcpu.lexer.tokens.UnaryOperatorToken;
 public class Group implements Operand {
 	private ArrayList<Value> values = new ArrayList<Value>();
 	
-	public Group (LexerToken[] tokens, int i, Class terminator) {
+	public Group (LexerToken[] tokens, int i, Class<? extends LexerToken> terminator) {
 		LexerToken token = null;
 		while (!terminator.isInstance(token = tokens[++i])) {
 			if (token instanceof GroupStartToken) {

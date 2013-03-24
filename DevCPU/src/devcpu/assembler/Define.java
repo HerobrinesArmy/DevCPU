@@ -3,6 +3,7 @@ package devcpu.assembler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import devcpu.assembler.exceptions.AbstractDirectiveException;
 import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.lexer.Lexer;
@@ -14,7 +15,7 @@ public class Define {
 	private String key;
 	private String value;
 
-	public Define(Directive directive) throws InvalidDefineFormatException, RecursiveDefinitionException {
+	public Define(Directive directive) throws AbstractDirectiveException {
 		this.directive = directive;
 		Matcher m = pattern.matcher(directive.getParametersToken().getText());
 		if (m.find() && m.start() == 0) {

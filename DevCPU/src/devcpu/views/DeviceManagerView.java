@@ -311,7 +311,7 @@ public class DeviceManagerView extends ViewPart {
 	    		
 	    		manager.add(new Action("Connect hardware...") {
         		public void run() {
-        			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getDefault().getShip().getHardwareManager(), new DeviceManagerContentProvider(), new DeviceManagerLabelProvider(), "Choose hardware to connect to "+dcpu.getID()+".");
+        			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getShip().getHardwareManager(), new DeviceManagerContentProvider(), new DeviceManagerLabelProvider(), "Choose hardware to connect to "+dcpu.getID()+".");
 							listDialog.setTitle("Connect Hardware");
 							int open = listDialog.open();
 							if (open == ListSelectionDialog.OK) {
@@ -328,7 +328,7 @@ public class DeviceManagerView extends ViewPart {
         } else if (o instanceof VirtualFloppyDrive) {
         	final VirtualFloppyDrive vfd = (VirtualFloppyDrive) o;
         	if (vfd.getDisk() == null) {
-        		final ArrayList<FloppyDisk> disks = Activator.getDefault().getShip().getFloppyManager().getAvailableDisks();
+        		final ArrayList<FloppyDisk> disks = Activator.getShip().getFloppyManager().getAvailableDisks();
         		if (disks.size() > 0)
         		{
 	        		MenuManager attachMenu = new MenuManager("Insert Floppy");

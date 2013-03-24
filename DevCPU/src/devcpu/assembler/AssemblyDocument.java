@@ -11,9 +11,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
-import devcpu.assembler.exceptions.InvalidDefineFormatException;
-import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.DirectiveParametersToken;
@@ -28,7 +27,7 @@ public class AssemblyDocument {
 	private ArrayList<Directive> directives = new ArrayList<Directive>();
 	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
 
-	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) throws IOException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
+	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) throws IOException, CoreException, AbstractAssemblyException {
 		this.file = file;
 		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release.
 		this.assembly = assembly;
@@ -37,7 +36,7 @@ public class AssemblyDocument {
 		readLines();
 	}
 
-	private void readLines() throws IOException, CoreException, IncludeFileNotFoundException, RecursiveInclusionException, InvalidDefineFormatException, RecursiveDefinitionException {
+	private void readLines() throws IOException, CoreException, AbstractAssemblyException {
 		//TODO prompt if unsync?
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
@@ -93,7 +92,7 @@ public class AssemblyDocument {
 		return parent;
 	}
 
-	private AssemblyDocument loadInclude(Include include) throws IncludeFileNotFoundException, RecursiveInclusionException, IOException, CoreException, InvalidDefineFormatException, RecursiveDefinitionException {
+	private AssemblyDocument loadInclude(Include include) throws AbstractAssemblyException, IOException, CoreException {
 		IFile includeFile = locate(include);
 		if (includeFile == null) {
 			throw new IncludeFileNotFoundException(include);

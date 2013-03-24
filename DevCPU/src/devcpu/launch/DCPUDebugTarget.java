@@ -12,9 +12,7 @@ import org.eclipse.debug.core.model.DebugElement;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
-import org.eclipse.debug.core.model.IMemoryBlockExtension;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
-import org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
@@ -226,6 +224,8 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		return new DCPUMemoryBlock(dcpu, this);
 	}
 
+	@Override
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		//XXX hit in debug perspective for IModelProxyFactory2, IModelProxyFactory, IElementLabelProvider, IDebugModelProvider, ILaunch, ISourceDisplay, IMemoryBlockRetrieval, IElementMememntoProvider, IElementContentProvider, IColumnPresentationFactory, IAddMemoryBlocksTarget, IViewerInputProvider, ITerminateHandler, IStepIntoHandler, IStepFiltersHandler, ISuspendHandler, IDropToFrameHandler, IRestartHandler, IStepReturnHandler, IStepOverHandler, IResumeHandler, IDisconnectHandler, IModelSelectionPolicyFactory, IViewActionProvider
 		if (adapter == ILaunch.class) {

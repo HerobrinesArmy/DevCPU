@@ -10,11 +10,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.MemoryByte;
-import org.eclipse.debug.internal.ui.elements.adapters.MemoryBlockContentAdapter;
-import org.eclipse.debug.internal.ui.memory.IPersistableDebugElement;
-import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory;
-import org.eclipse.debug.internal.ui.viewers.provisional.IAsynchronousContentAdapter;
-import org.eclipse.debug.internal.ui.viewers.update.DefaultModelProxyFactory;
 import org.eclipse.debug.ui.memory.IMemoryBlockTablePresentation;
 
 import devcpu.emulation.DefaultControllableDCPU;
@@ -216,20 +211,21 @@ public class DCPUMemoryBlock extends DebugElement implements IMemoryBlock {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		//XXX Asked for ILabelDecorator, IPersistableDebugElement, IModelProxyFactory, IAsynchronousContentAdapter, IMemoryBlockTablePresentation
-		if (adapter.equals(IAsynchronousContentAdapter.class)) {
-			return new MemoryBlockContentAdapter();
-		}
+//		if (adapter.equals(IAsynchronousContentAdapter.class)) {
+//			return new MemoryBlockContentAdapter();
+//		}
 		if (adapter.equals(IMemoryBlockTablePresentation.class)) {
 			return DCPUModelPresentation.getDCPUModelPresentation();
 		}
-		if (adapter.equals(IPersistableDebugElement.class)) {
-			
-		}
-		if (adapter.equals(IModelProxyFactory.class)) {
-			return new DefaultModelProxyFactory(); //TODO
-		}
+//		if (adapter.equals(IPersistableDebugElement.class)) {
+//			
+//		}
+//		if (adapter.equals(IModelProxyFactory.class)) {
+//			return new DefaultModelProxyFactory(); //TODO
+//		}
 		if (adapter.equals(IMemoryBlockRetrieval.class)) {
 			return getDebugTarget();
 		}

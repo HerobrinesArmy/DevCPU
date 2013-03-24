@@ -15,9 +15,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.PlatformUI;
 
 import devcpu.Activator;
 import devcpu.MappedView;
@@ -172,7 +170,7 @@ static public void appendHexString(StringBuilder buffer, short value) {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				attachSubmenu.removeAll();
-				for (final DefaultControllableDCPU d : Activator.getDefault().getShip().getDCPUManager().getDCPUs()) {
+				for (final DefaultControllableDCPU d : Activator.getShip().getDCPUManager().getDCPUs()) {
 					attachSubmenu.add(new Action(d.getID()) {
 						public void run() {
 							connect(d);
@@ -227,9 +225,6 @@ static public void appendHexString(StringBuilder buffer, short value) {
 		};
 		detachAction.setText("Detach Viewer");
 		detachAction.setToolTipText("Detach the viewer from the DCPU");
-		detachAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
 	}
 
 	@Override

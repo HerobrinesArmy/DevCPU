@@ -29,7 +29,7 @@ public class DeviceManagerContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object o) {
 		if (o instanceof Activator) {
-			return new Object[]{Activator.getDefault().getShip()};
+			return new Object[]{Activator.getShip()};
 		} else {
 			return getChildren(o);
 		}
@@ -76,7 +76,7 @@ public class DeviceManagerContentProvider implements ITreeContentProvider {
 			if (((DCPUHardware) o).isConnected()) {
 				return ((DCPUHardware) o).dcpu;
 			} else {
-				return Activator.getDefault().getShip().getHardwareManager();
+				return Activator.getShip().getHardwareManager();
 			}
 		}
 		return null;
