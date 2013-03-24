@@ -4,6 +4,8 @@ import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.part.ViewPart;
 
+import devcpu.Activator;
+
 public class HexView extends ViewPart {
 	
 	private IDataProvider idp;
@@ -11,13 +13,12 @@ public class HexView extends ViewPart {
 		
 	public HexView() {
 		super();
-		//idp = new FileDataProvider("C:\\Program Files\\Microsoft Visual Studio 8\\VSKnownIssues.htm");
-		idp = new FileDataProvider("C:\\python24\\py.ico");		
+		idp = new DCPUMemoryDataProvider(Activator.getShip().getDCPUManager().getDCPUs().get(0));
 	}
 			
 	/// creates all the widgets, and registers some events
 	public void createPartControl(Composite parent) {
-		hv = new HexViewer(parent,SWT.NONE,null,16);
+		hv = new HexViewer(parent,SWT.NONE,idp,8);
 	}
 
 	public void setFocus() {

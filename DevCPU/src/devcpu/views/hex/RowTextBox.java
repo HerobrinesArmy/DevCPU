@@ -8,7 +8,7 @@ public class RowTextBox extends BinaryTextBox {
 	protected void calcPositions() {
 		for (int i = 0; i < wordsPerRow; i++) {
 			beforePos[i] = 0;
-			afterPos[i] = 8;
+			afterPos[i] = 4;
 		}	
 		charsPerRow = afterPos[wordsPerRow - 1] + 1;		
 	}

@@ -1,34 +1,22 @@
 package devcpu.views.hex;
 
-public class DCPUMemoryDataProvider implements IDataProvider {
+import devcpu.emulation.DefaultControllableDCPU;
 
-	@Override
-	public void setWordsPerRow(int wpr) {
-		
+public class DCPUMemoryDataProvider extends AbstractDataProvider {
+	private DefaultControllableDCPU dcpu;
+
+	public DCPUMemoryDataProvider(DefaultControllableDCPU dcpu) {
+		this.dcpu = dcpu;
+		this.data = dcpu.ram;
+		this.size = 65536;
+		this.wordsPerRow = 8; 
 	}
 
-	@Override
-	public int getRowCount() {
-		// TODO Auto-generated method stub
-		return 0;
+	public DefaultControllableDCPU getDcpu() {
+		return dcpu;
 	}
 
-	@Override
-	public int getDataSize() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setDcpu(DefaultControllableDCPU dcpu) {
+		this.dcpu = dcpu;
 	}
-
-	@Override
-	public String getRowDescriptor(int rowNumber) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getData(Character[] arr, int rowNumber) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

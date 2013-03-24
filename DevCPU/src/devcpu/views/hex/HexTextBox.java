@@ -12,9 +12,9 @@ class HexTextBox extends BinaryTextBox {
 	public HexTextBox(HexViewer hex, int bpr) {
 		super(hex,bpr);
 		if (WORD_2_STR == null) {
-			WORD_2_STR = new String[256];
+			WORD_2_STR = new String[65536];
 			char[] arr = new char[4];
-			for (int i = 0; i < 256; i++) {
+			for (int i = 0; i < 65536; i++) {
 				arr[0] = HEX_VALS.charAt((i >> 12) & 0x0F);
 				arr[1] = HEX_VALS.charAt((i >> 8) & 0x0F);
 				arr[2] = HEX_VALS.charAt((i >> 4) & 0x0F);
@@ -28,12 +28,12 @@ class HexTextBox extends BinaryTextBox {
 		int pos = 0;
 		for (int i = 0; i < wordsPerRow; i++) {
 			beforePos[i] = pos;
-			pos += 2;
+			pos += 4;
 			afterPos[i] = pos;
 			pos++;
-			if (i % 8 == 7) {
-				pos += 2;
-			}
+//			if (i % 8 == 7) {
+//				pos += 4;
+//			}
 		}	
 		charsPerRow = afterPos[wordsPerRow - 1] + 1;
 	}
@@ -46,7 +46,6 @@ class HexTextBox extends BinaryTextBox {
 			if (w == null) {
 				styleRanges.add(new StyleRange(sbTemp.length(),2,null,red));
 				sbTemp.append("??");
-				
 			} else {
 				sbTemp.append(WORD_2_STR[w & 0xFFFF]);
 			}
@@ -56,13 +55,7 @@ class HexTextBox extends BinaryTextBox {
 					sbTemp.append('\n');
 				}
 			} else if (i != words - 1) {
-				if (i % 8 == 7) {
-					// add a dash every 8 chars where needed
-					sbTemp.append(" - ");
-				} else {
-					// add space otherwise
-					sbTemp.append(' ');
-				}
+				sbTemp.append(' ');
 			}
 		}	
 	}

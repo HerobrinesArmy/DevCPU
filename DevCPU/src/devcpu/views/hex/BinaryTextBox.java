@@ -31,7 +31,7 @@ abstract class BinaryTextBox {
 	protected ArrayList<StyleRange> styleRanges;
 	
 	static int CHAR_HEIGHT = 17; // the number of pixels a char actually takes
-	static int CHAR_WIDTH = 8; // the number of pixels a char actually takes
+	static int CHAR_WIDTH = 10; // the number of pixels a char actually takes
 	
 	public BinaryTextBox(final HexViewer hex, int bpr) {		
 		this.hex = hex;		
