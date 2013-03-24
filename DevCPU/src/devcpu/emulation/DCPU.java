@@ -379,11 +379,6 @@ public class DCPU
       char b = get(baddr);
 
       switch (cmd) {
-//      case 0:
-//      	if (this instanceof DefaultControllableDCPU) {
-//      		((DefaultControllableDCPU)this).stop();
-//      	}
-//      	break;
       case 1: //SET
         b = a;
         break;
