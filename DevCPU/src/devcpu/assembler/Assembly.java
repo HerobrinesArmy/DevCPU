@@ -147,7 +147,7 @@ public class Assembly {
 						lastDefinedGlobalLabel = labelDef.getLabelName();
 					}
 					if (labelDefs.containsKey(labelDef.getLabelName())) {
-						throw new DuplicateLabelDefinitionException(labelDefs.get(labelDef.getLabelName()),labelDef);
+						throw new DuplicateLabelDefinitionException(this, labelDefs.get(labelDef.getLabelName()),labelDef);
 					}
 					labelDefs.put(labelDef.getLabelName(), labelDef);
 				} else if (token instanceof LabelToken) {
@@ -271,8 +271,6 @@ public class Assembly {
 						a = getA(tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
 						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
 						ram[pc] = (char)(opCode | b << 5 | a << 10);
-					} else if (token instanceof DataToken) {
-						//TODO?
 					} else if (token instanceof DataValueStartToken) {
 						pc = assembleData(tokens, i+1, ram, pc);
 					}
@@ -336,32 +334,32 @@ public class Assembly {
 		List<Register> registers = value.getRegisters();
 		//Register validity checks
 		if (registers.size() > 1) {
-			throw new TooManyRegistersInExpressionException(registers, tokens, "b");
+			throw new TooManyRegistersInExpressionException(this, registers, tokens, "b");
 		} else if (registers.size() == 1) {
 			register = registers.get(0).getRegister();
 			if (register.equals("EX") || register.equals("PC")) {
 				if (isAddress || isExpression) {
-					throw new BadValueException(tokens, register + " used in an address or expression.");
+					throw new BadValueException(this, tokens, register + " used in an address or expression.");
 				}
 			}
 			if (!isAddress && isExpression) {
-				throw new BadValueException(tokens, register + " used in an expression outside of an address."); 
+				throw new BadValueException(this, tokens, register + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(tokens, register + " used in a unary operation.");
+				throw new BadValueException(this, tokens, register + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(tokens, register + " subtracted.");
+				throw new BadValueException(this, tokens, register + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(tokens, register + " used in disallowed operation.");
+				throw new BadValueException(this, tokens, register + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
 		//SSA validity checks
 		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
-			throw new BadValueException(tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
+			throw new BadValueException(this, tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
 		}
 		
 		if (hasNextWord) {
@@ -455,32 +453,32 @@ public class Assembly {
 		List<Register> registers = value.getRegisters();
 		//Register validity checks
 		if (registers.size() > 1) {
-			throw new TooManyRegistersInExpressionException(registers, tokens, "a");
+			throw new TooManyRegistersInExpressionException(this, registers, tokens, "a");
 		} else if (registers.size() == 1) {
 			register = registers.get(0).getRegister();
 			if (register.equals("EX") || register.equals("PC")) {
 				if (isAddress || isExpression) {
-					throw new BadValueException(tokens, register + " used in an address or expression.");
+					throw new BadValueException(this, tokens, register + " used in an address or expression.");
 				}
 			}
 			if (!isAddress && isExpression) {
-				throw new BadValueException(tokens, register + " used in an expression outside of an address."); 
+				throw new BadValueException(this, tokens, register + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(tokens, register + " used in a unary operation.");
+				throw new BadValueException(this, tokens, register + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(tokens, register + " subtracted.");
+				throw new BadValueException(this, tokens, register + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(tokens, register + " used in disallowed operation.");
+				throw new BadValueException(this, tokens, register + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
 		//SSA validity checks
 		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
-			throw new BadValueException(tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
+			throw new BadValueException(this, tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
 		}
 		
 		if (hasNextWord) {
@@ -562,7 +560,7 @@ public class Assembly {
 	private void assignLabelValues() throws UndefinedLabelException {
 		for (String label : labelUses.keySet()) {
 			if (!labelDefs.containsKey(label)) {
-				throw new UndefinedLabelException(label, labelUses.get(label));
+				throw new UndefinedLabelException(this, label, labelUses.get(label));
 			}
 			int o = labelDefs.get(label).getLine().getOffset();
 			for (LabelUse use : labelUses.get(label)) {
@@ -700,7 +698,6 @@ public class Assembly {
 							//TODO: Decide whether strings should default to packed or not (currently they are not, and non-ascii characters are allowed in the string)
 							size += ((StringToken)token).getString().length();
 						} else {
-							//TODO: Do individual conditions for each possible value type?
 							size++;
 						}
 						i++;
