@@ -84,6 +84,12 @@
             id="developmentnavigator"
             name="Development Navigator">
       </view>
+      <view
+            allowMultiple="false"
+            class="devcpu.views.hex.HexView"
+            id="HexView"
+            name="HexView">
+      </view>
 <!--      <view
             class="org.eclipse.ui.internal.console.ConsoleView"
             id="devcpu.console"
@@ -397,7 +403,7 @@
             extensions="dasm,dasm16"
             icon="icons/dasm.png"
             id="devcpu.dasmeditor"
-            name="New DASM Editor">
+            name="DASM Editor">
       </editor>
    </extension>
    <extension
