@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="DevCPU" uid="DevCPU" id="DevCPU.product" application="DevCPU.application" version="0.1.0" useFeatures="false" includeLaunchers="false">
-
+<product name="DevCPU" uid="DevCPU" id="DevCPU.product" application="DevCPU.application" version="0.1.0" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-Xms40m -Xmx512m -splash:splash.bmp</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="icons/alt_window_16.gif" i32="icons/alt_window_32.gif"/>
+   <windowImages/>
 
    <splash
       location="DevCPU" />
@@ -23,36 +21,27 @@
       </win>
    </launcher>
 
-
    <vm>
-      <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</windows>
    </vm>
+
+   <license>
+        <url>http://devcpu.com/meh.txt</url>
+        <text>
+   DevCPU Release 0 (v.0.1.0) is released under meh (http://devcpu.com/meh.txt), the intentionally ambiguious license.
+         </text>
+   </license>
 
    <plugins>
       <plugin id="DevCPU"/>
-      <plugin id="com.google.guava"/>
-      <plugin id="com.google.inject"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="de.itemis.xtext.antlr"/>
-      <plugin id="devcpu.DASM"/>
-      <plugin id="devcpu.DASM.ui"/>
+      <plugin id="com.jcraft.jsch"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.inject"/>
-      <plugin id="javax.servlet"/>
       <plugin id="javax.xml"/>
-      <plugin id="org.antlr.generator"/>
-      <plugin id="org.antlr.runtime"/>
-      <plugin id="org.apache.ant"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.util"/>
       <plugin id="org.apache.batik.util.gui"/>
-      <plugin id="org.apache.commons.cli"/>
-      <plugin id="org.apache.commons.lang"/>
-      <plugin id="org.apache.commons.logging"/>
-      <plugin id="org.apache.log4j"/>
       <plugin id="org.eclipse.ant.core"/>
-      <plugin id="org.eclipse.cdt.core"/>
-      <plugin id="org.eclipse.cdt.ui"/>
       <plugin id="org.eclipse.compare"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
@@ -63,9 +52,25 @@
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
+      <plugin id="org.eclipse.core.filesystem.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.aix.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.hpux.ia64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
+      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.resources"/>
+      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.resources.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
@@ -88,29 +93,35 @@
       <plugin id="org.eclipse.e4.ui.workbench"/>
       <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
       <plugin id="org.eclipse.e4.ui.workbench.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench3"/>
-      <plugin id="org.eclipse.emf.codegen"/>
-      <plugin id="org.eclipse.emf.codegen.ecore"/>
+      <plugin id="org.eclipse.egit.core"/>
+      <plugin id="org.eclipse.egit.ui"/>
       <plugin id="org.eclipse.emf.common"/>
-      <plugin id="org.eclipse.emf.common.ui"/>
       <plugin id="org.eclipse.emf.ecore"/>
       <plugin id="org.eclipse.emf.ecore.change"/>
-      <plugin id="org.eclipse.emf.ecore.edit"/>
-      <plugin id="org.eclipse.emf.ecore.editor"/>
       <plugin id="org.eclipse.emf.ecore.xmi"/>
-      <plugin id="org.eclipse.emf.edit"/>
-      <plugin id="org.eclipse.emf.edit.ui"/>
-      <plugin id="org.eclipse.emf.mwe.core"/>
-      <plugin id="org.eclipse.emf.mwe.utils"/>
-      <plugin id="org.eclipse.emf.mwe2.language"/>
-      <plugin id="org.eclipse.emf.mwe2.launch"/>
-      <plugin id="org.eclipse.emf.mwe2.lib"/>
-      <plugin id="org.eclipse.emf.mwe2.runtime"/>
       <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
       <plugin id="org.eclipse.equinox.ds"/>
       <plugin id="org.eclipse.equinox.event"/>
+      <plugin id="org.eclipse.equinox.launcher"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.hpux.ia64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390x" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.p2.core"/>
       <plugin id="org.eclipse.equinox.p2.engine"/>
       <plugin id="org.eclipse.equinox.p2.metadata"/>
@@ -119,25 +130,37 @@
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.util"/>
       <plugin id="org.eclipse.help"/>
-      <plugin id="org.eclipse.jdt.compiler.apt" fragment="true"/>
-      <plugin id="org.eclipse.jdt.compiler.tool" fragment="true"/>
-      <plugin id="org.eclipse.jdt.core"/>
-      <plugin id="org.eclipse.jdt.core.manipulation"/>
-      <plugin id="org.eclipse.jdt.debug"/>
-      <plugin id="org.eclipse.jdt.launching"/>
-      <plugin id="org.eclipse.jdt.ui"/>
       <plugin id="org.eclipse.jface"/>
       <plugin id="org.eclipse.jface.databinding"/>
       <plugin id="org.eclipse.jface.text"/>
+      <plugin id="org.eclipse.jgit"/>
+      <plugin id="org.eclipse.jsch.core"/>
+      <plugin id="org.eclipse.jsch.ui"/>
       <plugin id="org.eclipse.ltk.core.refactoring"/>
       <plugin id="org.eclipse.ltk.ui.refactoring"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.aix.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.hpux.ia64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390x" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.team.core"/>
       <plugin id="org.eclipse.team.ui"/>
@@ -147,6 +170,7 @@
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
+      <plugin id="org.eclipse.ui.ide.application"/>
       <plugin id="org.eclipse.ui.navigator"/>
       <plugin id="org.eclipse.ui.navigator.resources"/>
       <plugin id="org.eclipse.ui.trace"/>
@@ -155,27 +179,6 @@
       <plugin id="org.eclipse.ui.win32" fragment="true"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
-      <plugin id="org.eclipse.xpand"/>
-      <plugin id="org.eclipse.xtend"/>
-      <plugin id="org.eclipse.xtend.lib"/>
-      <plugin id="org.eclipse.xtend.typesystem.emf"/>
-      <plugin id="org.eclipse.xtext"/>
-      <plugin id="org.eclipse.xtext.builder"/>
-      <plugin id="org.eclipse.xtext.common.types"/>
-      <plugin id="org.eclipse.xtext.common.types.edit"/>
-      <plugin id="org.eclipse.xtext.common.types.ui"/>
-      <plugin id="org.eclipse.xtext.ecore"/>
-      <plugin id="org.eclipse.xtext.generator"/>
-      <plugin id="org.eclipse.xtext.logging" fragment="true"/>
-      <plugin id="org.eclipse.xtext.smap"/>
-      <plugin id="org.eclipse.xtext.ui"/>
-      <plugin id="org.eclipse.xtext.ui.codetemplates"/>
-      <plugin id="org.eclipse.xtext.ui.codetemplates.ui"/>
-      <plugin id="org.eclipse.xtext.ui.shared"/>
-      <plugin id="org.eclipse.xtext.util"/>
-      <plugin id="org.eclipse.xtext.xbase"/>
-      <plugin id="org.eclipse.xtext.xbase.lib"/>
-      <plugin id="org.objectweb.asm"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.w3c.dom.svg"/>
