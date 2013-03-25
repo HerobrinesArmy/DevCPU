@@ -1,23 +1,23 @@
 package com.mojang.spacegame.renderer;
 
-import com.mojang.spacegame.MemoryTracker;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+
 import org.lwjgl.opengl.ARBVertexBufferObject;
-import org.lwjgl.opengl.ContextCapabilities;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
+
 import util.GLX;
+
+import com.mojang.spacegame.MemoryTracker;
 
 public class Tesselator
 {
   private static boolean TRIANGLE_MODE = false;
   private static boolean USE_VBO = false;
-  private static final int MAX_MEMORY_USE = 16777216;
-  private static final int MAX_FLOATS = 2097152;
   private ByteBuffer buffer;
   private IntBuffer ib;
   private FloatBuffer fb;

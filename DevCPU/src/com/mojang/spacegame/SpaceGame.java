@@ -1,7 +1,5 @@
 package com.mojang.spacegame;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -15,13 +13,9 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import org.lwjgl.LWJGLException;
@@ -36,10 +30,8 @@ import util.GLX;
 import com.mojang.spacegame.renderer.Tesselator;
 import com.mojang.spacegame.renderer.Textures;
 
-import devcpu.assembler.OldAssembler;
 import devcpu.emulation.AWTKeyMapping;
 import devcpu.emulation.DCPU;
-import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.VirtualClock;
 import devcpu.emulation.VirtualFloppyDrive;
 import devcpu.emulation.VirtualKeyboard;
@@ -52,23 +44,23 @@ public class SpaceGame
   public static final String GAME_NAME = "SpaceGame";
   public static final String GAME_VERSION = "prototype";
   public static SpaceGame game;
-  private boolean stop = false;
   private int lists;
   private Shader shadowVolumeShader;
   private Shader lightShader;
   private Shader depthShader;
   private Shader fourLight;
-  private Shader distanceShader;
   private Shader displayShader;
   private int[] noiseTexture = new int[32];
   private int cubeMap;
   private DCPU cpu = new DCPU();
-  private VirtualClock clock = (VirtualClock) new VirtualClock().connectTo(cpu);
   private VirtualMonitor vmonitor = (VirtualMonitor) new VirtualMonitor().connectTo(cpu);//this.cpu.ram, 32768);
   private VirtualKeyboard vkeyboard = (VirtualKeyboard) new VirtualKeyboard(new AWTKeyMapping()).connectTo(cpu);//this.cpu.ram, 36864, new AWTKeyMapping());
   public VirtualFloppyDrive vfloppydrive = (VirtualFloppyDrive) new VirtualFloppyDrive().connectTo(cpu);
-  private VirtualSleepChamber vsleepchamber = (VirtualSleepChamber) new VirtualSleepChamber().connectTo(cpu);
-  private VirtualVectorDisplay vvectordisplay = (VirtualVectorDisplay) new VirtualVectorDisplay().connectTo(cpu);
+  {
+  	new VirtualClock().connectTo(cpu);
+  	new VirtualSleepChamber().connectTo(cpu);
+  	new VirtualVectorDisplay().connectTo(cpu);
+  }
   private int monitorTexture = 0;
 
   float time = 0.0F;
@@ -119,25 +111,8 @@ public SpaceGame(InputStream memoryStream)
     }
 }
 
-private static ByteBuffer loadIcon(URL url)
-    throws IOException
-  {
-    BufferedImage image = ImageIO.read(url);
-    int[] pixels = new int[image.getWidth() * image.getHeight()];
-    image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getHeight());
-    ByteBuffer bb = ByteBuffer.allocateDirect(image.getWidth() * image.getHeight() * 4);
-    bb.order(ByteOrder.nativeOrder());
-    bb.asIntBuffer().put(pixels);
-    return bb;
-  }
-
-  public void init() throws Exception {
+public void init() throws Exception {
 	//new Assembler(this.cpu.ram).assemble("os.asm");
-    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    int w = gd.getDisplayMode().getWidth() * 8 / 10;
-    int h = gd.getDisplayMode().getHeight() * 8 / 10;
-    int x = gd.getDisplayMode().getWidth() * 1 / 10;
-    int y = gd.getDisplayMode().getHeight() * 1 / 10 / 2;
 
 //    Display.setResizable(true);
 //    Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(w, h));
@@ -171,7 +146,7 @@ private static ByteBuffer loadIcon(URL url)
     this.lightShader = new Shader("test");
     this.depthShader = new Shader("depth");
     this.fourLight = new Shader("4light");
-    this.distanceShader = new Shader("dist");
+    new Shader("dist");
 
     this.shadowVolumeShader = new Shader("shadowVolume");
     this.displayShader = new Shader("display");
@@ -287,7 +262,7 @@ private static ByteBuffer loadIcon(URL url)
 
   public void renderMonitorShadow()
   {
-    if (this != null) return;
+//    if (this != null) return;
     double x = 0.0D;
     double y = 1.32D;
     double z = 3.9D;
@@ -532,42 +507,6 @@ private static ByteBuffer loadIcon(URL url)
 //      stop();
   }
 
-  private void ibox(double x0, double y0, double z0, double x1, double y1, double z1)
-  {
-    Tesselator t = Tesselator.instance;
-    t.begin(7);
-    t.vertex(x0, y0, z1);
-    t.vertex(x1, y0, z1);
-    t.vertex(x1, y0, z0);
-    t.vertex(x0, y0, z0);
-
-    t.vertex(x0, y1, z0);
-    t.vertex(x1, y1, z0);
-    t.vertex(x1, y1, z1);
-    t.vertex(x0, y1, z1);
-
-    t.vertex(x1, y0, z0);
-    t.vertex(x1, y0, z1);
-    t.vertex(x1, y1, z1);
-    t.vertex(x1, y1, z0);
-
-    t.vertex(x0, y0, z1);
-    t.vertex(x0, y0, z0);
-    t.vertex(x0, y1, z0);
-    t.vertex(x0, y1, z1);
-
-    t.vertex(x0, y1, z1);
-    t.vertex(x1, y1, z1);
-    t.vertex(x1, y0, z1);
-    t.vertex(x0, y0, z1);
-
-    t.vertex(x0, y0, z0);
-    t.vertex(x1, y0, z0);
-    t.vertex(x1, y1, z0);
-    t.vertex(x0, y1, z0);
-    t.end();
-  }
-
   private void box(double x0, double y0, double z0, double x1, double y1, double z1) {
     Tesselator t = Tesselator.instance;
     t.begin(7);
@@ -693,10 +632,6 @@ private static ByteBuffer loadIcon(URL url)
     t.vertex(x3, y3, z3);
   }
 
-  private void stop() {
-    this.stop = true;
-  }
-
   public void run() {
 //    try {
 //      init();
@@ -726,11 +661,6 @@ private static ByteBuffer loadIcon(URL url)
 //    }
   }
 
-  private void crash(String where, Exception e) {
-    System.out.println("Crash at " + where);
-    e.printStackTrace();
-  }
-
 	public VirtualKeyboard getVirtualKeyboard() {
 		return vkeyboard;		
 	}
@@ -743,13 +673,7 @@ private static ByteBuffer loadIcon(URL url)
 		}
 		else
 		{
-			game = new SpaceGame(SpaceGame.class.getResourceAsStream("/computer/testdump.dmp"));
-			try {
-				new OldAssembler(game.cpu.ram).assemble("crashtest.txt");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			game = new SpaceGame(SpaceGame.class.getResourceAsStream("/devcpu/emulation/testdump.dmp"));
 		}
 		try {
 			new GameFrame(game);
@@ -760,6 +684,7 @@ private static ByteBuffer loadIcon(URL url)
 }
 
 class GameFrame extends JFrame {
+	private static final long serialVersionUID = 1L;
 	public static GameCanvas canvas;
 
 	public GameFrame(SpaceGame game) throws LWJGLException {
@@ -779,6 +704,7 @@ class GameFrame extends JFrame {
 	}
 
 	public class GameCanvas extends AWTGLCanvas { 
+		private static final long serialVersionUID = 1L;
 		private SpaceGame game;
 
 		public GameCanvas(final SpaceGame game) throws LWJGLException {

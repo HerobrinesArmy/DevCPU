@@ -10,12 +10,13 @@ import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
 public class MemoryTracker
 {
-  private static List<Integer> lists = new ArrayList();
-  private static List<Integer> textures = new ArrayList();
+  private static List<Integer> lists = new ArrayList<Integer>();
+  private static List<Integer> textures = new ArrayList<Integer>();
 
   public static synchronized int genLists(int count)
   {

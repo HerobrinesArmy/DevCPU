@@ -1,21 +1,23 @@
 package com.mojang.spacegame.renderer;
 
-import com.mojang.spacegame.MemoryTracker;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Set;
+
 import javax.imageio.ImageIO;
+
 import org.lwjgl.opengl.GL11;
+
 import util.IntHashMap;
+
+import com.mojang.spacegame.MemoryTracker;
 
 public class Textures
 {
@@ -23,9 +25,9 @@ public class Textures
 
   public static boolean MIPMAP = false;
 
-  private HashMap<String, Integer> idMap = new HashMap();
-  private HashMap<String, int[]> pixelsMap = new HashMap();
-  private IntHashMap<BufferedImage> loadedImages = new IntHashMap();
+  private HashMap<String, Integer> idMap = new HashMap<String, Integer>();
+  private HashMap<String, int[]> pixelsMap = new HashMap<String, int[]>();
+  private IntHashMap<BufferedImage> loadedImages = new IntHashMap<BufferedImage>();
   private IntBuffer ib = MemoryTracker.createIntBuffer(1);
   private ByteBuffer pixels = MemoryTracker.createByteBuffer(16777216);
 
@@ -273,7 +275,8 @@ public class Textures
 
   public void tick()
   {
-    int i = -1;
+    @SuppressWarnings("unused")
+		int i = -1;
   }
 
   private int crispBlend(int paramInt1, int paramInt2)
@@ -306,7 +309,7 @@ public class Textures
   public void reloadAll() {
     Class<Textures> localTextures = Textures.class;
     BufferedImage localBufferedImage1;
-    for (Iterator localIterator = this.loadedImages.keySet().iterator(); localIterator.hasNext(); ) { int i = ((Integer)localIterator.next()).intValue();
+    for (Iterator<?> localIterator = this.loadedImages.keySet().iterator(); localIterator.hasNext(); ) { int i = ((Integer)localIterator.next()).intValue();
       localBufferedImage1 = (BufferedImage)this.loadedImages.get(i);
       loadTexture(localBufferedImage1, i);
     }

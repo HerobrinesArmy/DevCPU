@@ -2,16 +2,14 @@ package util;
 
 public class LongHashMap<V>
 {
-  private static final int DEFAULT_INITIAL_CAPACITY = 16;
-  private static final int MAXIMUM_CAPACITY = 1073741824;
-  private static final float DEFAULT_LOAD_FACTOR = 0.75F;
   private transient Entry<V>[] table;
   private transient int size;
   private int threshold;
   private final float loadFactor;
   private volatile transient int modCount;
 
-  public LongHashMap()
+  @SuppressWarnings("unchecked")
+	public LongHashMap()
   {
     this.loadFactor = 0.75F;
     this.threshold = 12;
@@ -41,8 +39,8 @@ public class LongHashMap<V>
 
   public V get(long key) {
     int hash = hash(key);
-    for (Entry e = this.table[indexFor(hash, this.table.length)]; e != null; e = e.next) {
-      if (e.key == key) return (V) e.value;
+    for (Entry<V> e = this.table[indexFor(hash, this.table.length)]; e != null; e = e.next) {
+      if (e.key == key) return e.value;
     }
     return null;
   }
@@ -53,7 +51,7 @@ public class LongHashMap<V>
 
   final Entry<V> getEntry(long key) {
     int hash = hash(key);
-    for (Entry e = this.table[indexFor(hash, this.table.length)]; e != null; e = e.next) {
+    for (Entry<V> e = this.table[indexFor(hash, this.table.length)]; e != null; e = e.next) {
       if (e.key == key) return e;
     }
     return null;
@@ -65,7 +63,7 @@ public class LongHashMap<V>
   public void put(long key, V value) {
     int hash = hash(key);
     int i = indexFor(hash, this.table.length);
-    for (Entry e = this.table[i]; e != null; e = e.next) {
+    for (Entry<V>e = this.table[i]; e != null; e = e.next) {
       if (e.key == key) {
         e.value = value;
       }
@@ -77,28 +75,29 @@ public class LongHashMap<V>
 
   private void resize(int newCapacity)
   {
-    Entry[] oldTable = this.table;
+    Entry<V>[] oldTable = this.table;
     int oldCapacity = oldTable.length;
     if (oldCapacity == 1073741824) {
       this.threshold = 2147483647;
       return;
     }
 
-    Entry[] newTable = new Entry[newCapacity];
+    @SuppressWarnings("unchecked")
+		Entry<V>[] newTable = new Entry[newCapacity];
     transfer(newTable);
     this.table = newTable;
     this.threshold = (int)(newCapacity * this.loadFactor);
   }
 
   private void transfer(Entry<V>[] newTable) {
-    Entry[] src = this.table;
+    Entry<V>[] src = this.table;
     int newCapacity = newTable.length;
     for (int j = 0; j < src.length; j++) {
-      Entry e = src[j];
+      Entry<V>e = src[j];
       if (e != null) {
         src[j] = null;
         do {
-          Entry next = e.next;
+          Entry<V>next = e.next;
           int i = indexFor(e.hash, newCapacity);
           e.next = newTable[i];
           newTable[i] = e;
@@ -109,18 +108,18 @@ public class LongHashMap<V>
   }
 
   public V remove(long key) {
-    Entry e = removeEntryForKey(key);
+    Entry<V>e = removeEntryForKey(key);
     return (V) (e == null ? null : e.value);
   }
 
   final Entry<V> removeEntryForKey(long key) {
     int hash = hash(key);
     int i = indexFor(hash, this.table.length);
-    Entry prev = this.table[i];
-    Entry e = prev;
+    Entry<V>prev = this.table[i];
+    Entry<V>e = prev;
 
     while (e != null) {
-      Entry next = e.next;
+      Entry<V>next = e.next;
       if (e.key == key) {
         this.modCount += 1;
         this.size -= 1;
@@ -137,7 +136,7 @@ public class LongHashMap<V>
 
   public void clear() {
     this.modCount += 1;
-    Entry[] tab = this.table;
+    Entry<V>[] tab = this.table;
     for (int i = 0; i < tab.length; i++)
       tab[i] = null;
     this.size = 0;
@@ -147,25 +146,25 @@ public class LongHashMap<V>
   {
     if (value == null) return containsNullValue();
 
-    Entry[] tab = this.table;
+    Entry<V>[] tab = this.table;
     for (int i = 0; i < tab.length; i++)
-      for (Entry e = tab[i]; e != null; e = e.next)
+      for (Entry<V> e = tab[i]; e != null; e = e.next)
         if (value.equals(e.value)) return true;
     return false;
   }
 
   private boolean containsNullValue() {
-    Entry[] tab = this.table;
+    Entry<V>[] tab = this.table;
     for (int i = 0; i < tab.length; i++)
-      for (Entry e = tab[i]; e != null; e = e.next)
+      for (Entry<V>e = tab[i]; e != null; e = e.next)
         if (e.value == null) return true;
     return false;
   }
 
   private void addEntry(int hash, long key, V value, int bucketIndex)
   {
-    Entry e = this.table[bucketIndex];
-    this.table[bucketIndex] = new Entry(hash, key, value, e);
+    Entry<V>e = this.table[bucketIndex];
+    this.table[bucketIndex] = new Entry<V>(hash, key, value, e);
     if (this.size++ >= this.threshold) resize(2 * this.table.length);
   }
 
@@ -195,7 +194,7 @@ public class LongHashMap<V>
     public final boolean equals(Object o)
     {
       if (!(o instanceof Entry)) return false;
-      Entry e = (Entry)o;
+      Entry<?> e = (Entry<?>)o;
       Object k1 = Long.valueOf(getKey());
       Object k2 = Long.valueOf(e.getKey());
       if ((k1 == k2) || ((k1 != null) && (k1.equals(k2)))) {

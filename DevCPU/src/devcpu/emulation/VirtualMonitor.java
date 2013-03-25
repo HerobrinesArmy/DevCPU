@@ -12,6 +12,8 @@ public class VirtualMonitor extends DCPUHardware
   public static final int HEIGHT_CHARS = 12;
   public static final int WIDTH_PIXELS = 128;
   public static final int HEIGHT_PIXELS = 96;
+  @SuppressWarnings("unused")
+  //TODO
   private static final int START_DURATION = 60;
   private int lightColor;
   private int[] palette = new int[16];
@@ -154,7 +156,9 @@ public class VirtualMonitor extends DCPUHardware
 			      else {
 			        for (int y = 0; y < 96; y++) {
 			          for (int x = 0; x < 128; x++) {
-			            int cc = loadImage[(x + y * 128)] & 0xFF;
+			            @SuppressWarnings("unused")
+			            //TODO
+									int cc = loadImage[(x + y * 128)] & 0xFF;
 			            int col = palette[1];
 			            pixels[(x + y * 128)] = col;
 			            reds += (col & 0xFF0000);

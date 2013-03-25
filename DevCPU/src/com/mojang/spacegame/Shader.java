@@ -64,7 +64,6 @@ public class Shader
       System.out.println("Fail reading vertex shading code");
       return 0;
     }
-    String line;
     ARBShaderObjects.glShaderSourceARB(vertShader, vertexCode);
     ARBShaderObjects.glCompileShaderARB(vertShader);
 
@@ -94,7 +93,6 @@ public class Shader
       System.out.println("Fail reading fragment shading code");
       return 0;
     }
-    String line;
     ARBShaderObjects.glShaderSourceARB(fragShader, fragCode);
     ARBShaderObjects.glCompileShaderARB(fragShader);
     if (ARBShaderObjects.glGetObjectParameteriARB(fragShader, 35713) == 0) {

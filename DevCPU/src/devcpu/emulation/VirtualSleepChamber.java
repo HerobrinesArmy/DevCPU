@@ -46,7 +46,11 @@ public class VirtualSleepChamber extends DCPUHardware
 	
 	private static final double MAX_ACCEPTABLE_ANGULAR_MOMENTUM = 1; //TODO: Replace with actual max
 	
+	@SuppressWarnings("unused")
+  //TODO
 	private long numberOfUnitsToSkip;
+	@SuppressWarnings("unused")
+  //TODO
 	private int unitToSkip;
 	private HardwareManager manager;
 	private String id;

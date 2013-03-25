@@ -13,10 +13,10 @@ import devcpu.emulation.DefaultControllableDCPU;
 public class DCPUEngine {
 	Random fRandom = new Random();
 	byte[] fMemory;
-	Hashtable memoryBlockTable;
-	Hashtable expressionAddressTable = new Hashtable();
-	Hashtable threadTable = new Hashtable();
-	Hashtable stackframeTable = new Hashtable();
+	Hashtable<BigInteger, DCPUMemoryUnit> memoryBlockTable;
+	Hashtable<String, BigInteger> expressionAddressTable = new Hashtable<String, BigInteger>();
+	Hashtable<DCPUDebugTarget, Object> threadTable = new Hashtable<DCPUDebugTarget, Object>();
+	Hashtable<Object, Object> stackframeTable = new Hashtable<Object, Object>();
 	
 	Random random = new Random();
 	private DefaultControllableDCPU dcpu;
@@ -37,7 +37,7 @@ public class DCPUEngine {
 		if (memoryBlockTable == null)
 		{		
 			// create new memoryBlock table
-			memoryBlockTable = new Hashtable();
+			memoryBlockTable = new Hashtable<BigInteger, DCPUMemoryUnit>();
 			byte[] bytes = new byte[(int)length*getAddressableSize()];
 			for(int i=0;i<length;i++) {
 			   bytes[i*2] = (byte) (dcpu.ram[address.intValue()+i] >> 8);
@@ -130,7 +130,7 @@ public class DCPUEngine {
 		if (memoryBlockTable == null)
 				return;
 		
-		Enumeration enumeration = memoryBlockTable.keys();
+		Enumeration<BigInteger> enumeration = memoryBlockTable.keys();
 		long randomChange = random.nextInt(37);
 		
 		while (randomChange <= 5)

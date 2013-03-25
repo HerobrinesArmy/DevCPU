@@ -23,7 +23,6 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.MemoryByte;
-import org.eclipse.debug.internal.ui.viewers.provisional.IAsynchronousContentAdapter;
 
 import devcpu.Activator;
 import devcpu.DCPUManager;
@@ -33,8 +32,9 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 	private boolean keepAlive;
 	private String id = "DCPU";
 	private DCPUManager manager;
-	private Hashtable memoryBlockTable;
+	private Hashtable<Integer, DCPUMemoryUnit> memoryBlockTable;
 	private String uid;
+	private ILaunch launch;
 //	private ArrayList<DCPUTickListener> tickListeners = new ArrayList<>();
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
@@ -50,7 +50,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
 			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
 			workingCopy.setAttribute("DCPU",uid);
-			ILaunch launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
+			this.launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
 //			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 //
 //		  if (page != null)
@@ -103,21 +103,14 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 		(new Thread() {
 			@Override
 			public void run() {
-				final DefaultControllableDCPU dcpu = DefaultControllableDCPU.this;
 //				opcounts = new int[64];
-				long ops = 0L;
 		    int hz = 1000 * khz;
 		    int cyclesPerFrame = hz / 60 + 1;
 
 		    long nsPerFrame = 16666666L;
 		    long nextTime = System.nanoTime();
 
-		    double tick = 0;
-		    double total = 0;
-
-		    long time = System.currentTimeMillis();
 		    while (keepAlive) {
-		      long a = System.nanoTime();
 		      while (System.nanoTime() < nextTime) {
 		        try {
 		          Thread.sleep(1L);
@@ -125,7 +118,6 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 		          e.printStackTrace();
 		        }
 		      }
-		      long b = System.nanoTime();
 		      while (cycles < cyclesPerFrame) {
 		        tick();
 //		        for (DCPUTickListener l : tickListeners) {
@@ -135,18 +127,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 		      tickHardware();
 		      cycles -= cyclesPerFrame;
-		      long c = System.nanoTime();
-		      ops += cyclesPerFrame;
 		      nextTime += nsPerFrame;
-
-		      tick += (c - b) / 1000000000.0;
-		      total += (c - a) / 1000000000.0;
-
-		      while (System.currentTimeMillis() > time) {
-		        time += 1000L;
-//		        System.out.println("1 DCPU at " + ops / 1000.0 + " khz, " + tick * 100.0 / total + "% cpu use");
-		        tick = total = ops = 0L;
-		      }
 		    }
 		    pc = 0;
 		    sp = 0;
@@ -250,10 +231,11 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 
 	@Override
 	public ILaunch getLaunch() {
-		System.out.println("DefaultControllableDCPU getLaunch");
-		return null;
+//		System.out.println("DefaultControllableDCPU getLaunch");
+		return launch;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 //		if (adapter.equals(org.eclipse.core.resources.IResource.class)) {
@@ -409,7 +391,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 		if (memoryBlockTable == null)
 		{		
 			// create new memoryBlock table
-			memoryBlockTable = new Hashtable();
+			memoryBlockTable = new Hashtable<Integer, DCPUMemoryUnit>();
 			byte[] bytes = new byte[length*2];
 			for(int i=0;i<length;i++) {
 			   bytes[i*2] = (byte) (ram[address+i] >> 8);
@@ -471,7 +453,6 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebu
 			else
 			{
 				MemoryByte[] bytes = temp.getBytes();
-				IAsynchronousContentAdapter a;
 				for (int j=0; j<bytes.length; j++)
 				{
 					MemoryByte oneByte = new MemoryByte(bytes[j].getValue(), bytes[j].getFlags());
