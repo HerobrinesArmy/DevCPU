@@ -35,9 +35,6 @@ Bundle-ClassPath: .,
  exp4j-0.3.10.jar
 Export-Package: com.apple.eawt,
  com.apple.eio,
- com.mojang.spacegame,
- com.mojang.spacegame.renderer,
- dcpu.hardware.lem,
  devcpu,
  devcpu.emulation,
  devcpu.views,
@@ -83,5 +80,4 @@ Export-Package: com.apple.eawt,
  org.objectweb.asm.tree,
  org.objectweb.asm.tree.analysis,
  org.objectweb.asm.util,
- org.objectweb.asm.xml,
- util
+ org.objectweb.asm.xml

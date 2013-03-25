@@ -38,7 +38,7 @@ public class VirtualMonitor extends DCPUHardware
     resetFont();
     
     try {
-			ImageIO.read(VirtualMonitor.class.getResource("/dcpu/hardware/lem/boot.png")).getRGB(0, 0, 128, 96, loadImage, 0, 128);
+			ImageIO.read(VirtualMonitor.class.getResource("/devcpu/emulation/boot.png")).getRGB(0, 0, 128, 96, loadImage, 0, 128);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,7 +47,7 @@ public class VirtualMonitor extends DCPUHardware
   private void resetFont() {
   	int[] pixels = new int[4096];
     try {
-      ImageIO.read(VirtualMonitor.class.getResource("/dcpu/hardware/lem/font.png")).getRGB(0, 0, 128, 32, pixels, 0, 128);
+      ImageIO.read(VirtualMonitor.class.getResource("/devcpu/emulation/font.png")).getRGB(0, 0, 128, 32, pixels, 0, 128);
     } catch (IOException e) {
       e.printStackTrace();
     }

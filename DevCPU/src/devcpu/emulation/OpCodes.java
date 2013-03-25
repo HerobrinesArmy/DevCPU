@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Set;
 
-import util.IntHashMap;
+import devcpu.util.IntHashMap;
 
 public class OpCodes
 {
