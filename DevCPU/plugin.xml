@@ -14,9 +14,10 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="DevCPU"
-            class="devcpu.Perspective"
-            id="DevCPU.perspective">
+            class="devcpu.perspectives.DCPUHybridPerspective"
+            icon="icons/dasm.png"
+            id="devcpu.perspectives.hybrid"
+            name="DevCPU Hybrid">
       </perspective>
    </extension>
    <extension
@@ -78,13 +79,6 @@
             restorable="true">
       </view>
       <view
-            category="devcpu.Development"
-            class="org.eclipse.ui.navigator.CommonNavigator"
-            icon="icons/dasm.png"
-            id="developmentnavigator"
-            name="Development Navigator">
-      </view>
-      <view
             allowMultiple="false"
             class="devcpu.views.hex.HexView"
             id="HexView"
@@ -101,10 +95,16 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="*">
+         <newWizardShortcut
+               id="devcpu.dasmfilewizard">
+         </newWizardShortcut>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="devcpu.perspectives.hybrid">
          <view
                id="org.eclipse.ui.navigator.ProjectExplorer"
                minimized="false"
-               ratio="0.5"
+               ratio="0.25"
                relationship="left"
                relative="org.eclipse.ui.editorss">
          </view>
@@ -115,15 +115,19 @@
                relationship="bottom"
                relative="org.eclipse.ui.navigator.ProjectExplorer">
          </view>
-         <newWizardShortcut
-               id="devcpu.dasmfilewizard">
-         </newWizardShortcut>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="DevCPU.perspective">
-         <newWizardShortcut
-               id="devcpu.dasmfilewizard">
-         </newWizardShortcut>
+         <view
+               id="org.eclipse.egit.ui.RepositoriesView"
+               minimized="false"
+               relationship="stack"
+               relative="devcpu.views.DeviceManagerView">
+         </view>
+         <view
+               id="org.eclipse.ui.console.ConsoleView"
+               minimized="false"
+               ratio="0.7"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss">
+         </view>
       </perspectiveExtension>
    </extension>
    <extension
@@ -263,34 +267,6 @@
             id="devcpu.open"
             name="Open View">
       </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerActionBinding
-            viewerId="developmentnavigator">
-         <includes>
-            <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
-            </actionExtension>
-         </includes>
-      </viewerActionBinding>
-      <viewerContentBinding
-            viewerId="developmentnavigator">
-         <includes>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resourceContent">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.filters.*">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.workingSets">
-            </contentExtension>
-         </includes>
-      </viewerContentBinding>
    </extension>
    <extension
          point="org.eclipse.ui.activities">

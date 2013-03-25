@@ -18,7 +18,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import devcpu.Activator;
-import devcpu.MappedView;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements DCPUTickListener*/ {

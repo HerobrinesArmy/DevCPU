@@ -25,8 +25,8 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.MemoryByte;
 
 import devcpu.Activator;
-import devcpu.DCPUManager;
 import devcpu.launch.DCPUMemoryUnit;
+import devcpu.managers.DCPUManager;
 
 public class DefaultControllableDCPU extends DCPU implements Identifiable, IDebugTarget {
 	private boolean keepAlive;

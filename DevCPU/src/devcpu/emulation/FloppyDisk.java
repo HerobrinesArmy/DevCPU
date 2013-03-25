@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import devcpu.FloppyManager;
+import devcpu.managers.FloppyManager;
 
 public class FloppyDisk implements Identifiable {
 	private String id;

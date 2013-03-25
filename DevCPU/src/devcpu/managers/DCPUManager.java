@@ -1,12 +1,14 @@
-package devcpu;
+package devcpu.managers;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
+import devcpu.ViewMapper;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.Ship;
+import devcpu.views.MappedView;
 
 public class DCPUManager {
 	private ArrayList<DefaultControllableDCPU> dcpus = new ArrayList<DefaultControllableDCPU>();

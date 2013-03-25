@@ -3,7 +3,7 @@ package devcpu.emulation;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import devcpu.HardwareManager;
+import devcpu.managers.HardwareManager;
 
 /**
  * Placeholder implementation of the SPC2000 Sleep Chamber

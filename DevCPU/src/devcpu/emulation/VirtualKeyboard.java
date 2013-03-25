@@ -1,6 +1,6 @@
 package devcpu.emulation;
 
-import devcpu.HardwareManager;
+import devcpu.managers.HardwareManager;
 
 public class VirtualKeyboard extends DCPUHardware
 {

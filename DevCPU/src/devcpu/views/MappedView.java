@@ -1,6 +1,8 @@
-package devcpu;
+package devcpu.views;
 
 import org.eclipse.ui.part.ViewPart;
+
+import devcpu.ViewMapper;
 
 public abstract class MappedView<T> extends ViewPart {
 	

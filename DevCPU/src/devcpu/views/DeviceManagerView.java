@@ -25,10 +25,6 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
-import devcpu.DCPUManager;
-import devcpu.FloppyManager;
-import devcpu.HardwareManager;
-import devcpu.MappedView;
 import devcpu.ViewMapper;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -40,6 +36,9 @@ import devcpu.emulation.VirtualKeyboard;
 import devcpu.emulation.VirtualMonitor;
 import devcpu.emulation.VirtualSleepChamber;
 import devcpu.emulation.VirtualVectorDisplay;
+import devcpu.managers.DCPUManager;
+import devcpu.managers.FloppyManager;
+import devcpu.managers.HardwareManager;
 
 public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";

@@ -1,8 +1,8 @@
 package devcpu.emulation;
 
-import devcpu.DCPUManager;
-import devcpu.FloppyManager;
-import devcpu.HardwareManager;
+import devcpu.managers.DCPUManager;
+import devcpu.managers.FloppyManager;
+import devcpu.managers.HardwareManager;
 
 public class Ship {
 	private String name = "Ship";

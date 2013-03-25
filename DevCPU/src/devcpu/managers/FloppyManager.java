@@ -1,10 +1,12 @@
-package devcpu;
+package devcpu.managers;
 
 import java.util.ArrayList;
 
+import devcpu.ViewMapper;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Ship;
 import devcpu.emulation.VirtualFloppyDrive;
+import devcpu.views.MappedView;
 
 public class FloppyManager {
 	private int id;

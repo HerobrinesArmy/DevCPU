@@ -4,14 +4,14 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import devcpu.Activator;
-import devcpu.DCPUManager;
-import devcpu.FloppyManager;
-import devcpu.HardwareManager;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Ship;
 import devcpu.emulation.VirtualFloppyDrive;
+import devcpu.managers.DCPUManager;
+import devcpu.managers.FloppyManager;
+import devcpu.managers.HardwareManager;
 
 public class DeviceManagerContentProvider implements ITreeContentProvider {
 	private static Object[] EMPTY_ARRAY = new Object[0];

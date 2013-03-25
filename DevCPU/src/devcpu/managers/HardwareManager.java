@@ -1,7 +1,8 @@
-package devcpu;
+package devcpu.managers;
 
 import java.util.ArrayList;
 
+import devcpu.ViewMapper;
 import devcpu.emulation.AWTKeyMapping;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.Ship;
@@ -11,6 +12,7 @@ import devcpu.emulation.VirtualKeyboard;
 import devcpu.emulation.VirtualMonitor;
 import devcpu.emulation.VirtualSleepChamber;
 import devcpu.emulation.VirtualVectorDisplay;
+import devcpu.views.MappedView;
 
 public class HardwareManager {
 	private ArrayList<DCPUHardware> devices = new ArrayList<DCPUHardware>();

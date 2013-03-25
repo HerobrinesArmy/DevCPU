@@ -3,7 +3,7 @@ package devcpu.emulation;
 import java.util.ArrayList;
 import java.util.List;
 
-import devcpu.HardwareManager;
+import devcpu.managers.HardwareManager;
 
 /**
  * Preliminary implementation of the SPED-3 3D Vector Display

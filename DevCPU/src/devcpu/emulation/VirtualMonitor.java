@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import devcpu.HardwareManager;
+import devcpu.managers.HardwareManager;
 
 public class VirtualMonitor extends DCPUHardware
 {

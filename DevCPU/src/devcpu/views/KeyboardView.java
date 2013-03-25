@@ -23,7 +23,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import devcpu.Activator;
-import devcpu.MappedView;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.VirtualKeyboard;
 
