@@ -16,11 +16,8 @@ import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
-import devcpu.assembler.exceptions.InvalidDefineFormatException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
-import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
-import devcpu.assembler.exceptions.UndefinedLabelException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
 import devcpu.assembler.expression.Register;
@@ -76,9 +73,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms in Line Loading");
 		preprocessAndSize(true);
 		System.out.println(timerReset() + "ms in Preprocessing");
-		//TODO More passes?
-		assignLabelValues();
-		System.out.println(timerReset() + "ms in Label Value Assignment");
+		//TODO More passes
 		zeroBuffer(dcpu.ram);
 		System.out.println(timerReset() + "ms to zero RAM");
 		assembleToBuffer(dcpu.ram);
@@ -90,10 +85,8 @@ public class Assembly {
 		rootDocument.readLines();
 		System.out.println(timerReset() + "ms in Line Loading");
 		preprocessAndSize(true);
-		//TODO More passes?
+		//TODO More passes
 		System.out.println(timerReset() + "ms in Preprocessing");
-		assignLabelValues();
-		System.out.println(timerReset() + "ms in Label Value Assignment");
 		zeroBuffer(disk.data);
 		System.out.println(timerReset() + "ms to zero disk data");
 		assembleToBuffer(disk.data);
@@ -151,6 +144,7 @@ public class Assembly {
 				for (LexerToken token : line.getProcessedTokens()) {
 					if (token instanceof LabelDefinitionToken) {
 						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+						((LabelDefinitionToken)token).labelDef = labelDef;
 						if (!labelDef.isLocal()) {
 							lastDefinedGlobalLabel = labelDef.getLabelName();
 						}
@@ -158,6 +152,16 @@ public class Assembly {
 							throw new DuplicateLabelDefinitionException(this, labelDefs.get(labelDef.getLabelName()),labelDef);
 						}
 						labelDefs.put(labelDef.getLabelName(), labelDef);
+						if (exact) {
+							if (labelUses.containsKey(labelDef.getLabelName())) {
+								for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
+									use.getToken().value = line.offset;
+									use.getToken().valueSet = true;
+									use.getLine().unvaluedLabelTokens--;
+								}
+								labelUses.remove(labelDef.getLabelName());
+							}
+						}
 					} else if (token instanceof LabelToken) {
 						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
 						((LabelToken) token).labelName = labelUse.getLabelName();
@@ -187,6 +191,18 @@ public class Assembly {
 									((LabelToken) token).valueSet = true;
 									line.unvaluedLabelTokens--;
 								}	
+							}
+						} else if (token instanceof LabelDefinitionToken) {
+							if (exact) {
+								LabelDefinition labelDef = ((LabelDefinitionToken) token).labelDef;
+								if (labelUses.containsKey(labelDef.getLabelName())) {
+									for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
+										use.getToken().value = line.offset;
+										use.getToken().valueSet = true;
+										use.getLine().unvaluedLabelTokens--;
+									}
+									labelUses.remove(labelDef.getLabelName());
+								}
 							}
 						}
 					}
@@ -277,11 +293,24 @@ public class Assembly {
 						if (token instanceof BasicOpCodeToken) {
 							size++; //1
 							//Check if the b Value is a simple stack accessor or register
-							if (tokens[(i+=2)] instanceof LiteralToken) {
+							if (line.bIsAddress) {
+								if (line.bRegister == null || line.bHasOperator) {
+									size++;
+									((BasicOpCodeToken)token).setBValueNextWord(true);
+								} else if ("SP".equals(line.bRegister)) {
+									size++;
+									((BasicOpCodeToken)token).setBValueNextWord(true);
+								}
+								i += 4;
+							} else if (tokens[(i+=2)] instanceof LiteralToken) {
+								if (!line.bHasOperator) {
+									line.literalB = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
+									line.literalBSet = true;
+								}
 								size++; //2
 								((BasicOpCodeToken)token).setBValueNextWord(true);
 							} else if (tokens[i] instanceof RegisterToken) {
-								if (!(tokens[i+1] instanceof BValueEndToken)) {
+								if (!(tokens[i+1] instanceof BValueEndToken)) { //Change to ++i?
 									size++;
 									((BasicOpCodeToken)token).setBValueNextWord(true);
 								}
@@ -296,17 +325,35 @@ public class Assembly {
 									((BasicOpCodeToken)token).setBValueNextWord(true);
 								}
 							} else if (tokens[i] instanceof SimpleStackAccessToken) {
+							} else if (tokens[i] instanceof LabelToken && !line.bHasOperator) {
+								if (((LabelToken)tokens[i]).valueSet) {
+									line.literalB = (char) ((LabelToken)tokens[i]).value;
+									line.literalBSet = true;
+								}
+								size++;
+								((BasicOpCodeToken)token).setAValueNextWord(true);
 							} else {
 								size++;
 								((BasicOpCodeToken)token).setBValueNextWord(true);
 							}
 							while (!(tokens[++i] instanceof AValueStartToken)) {}
 							//Check the a Value (can also be a non-expression non-label literal and meet short literal requirements)
-							if (tokens[++i] instanceof LiteralToken) {
+							if (line.aIsAddress) {
+								if (line.aRegister == null || line.aHasOperator) {
+									size++;
+									((BasicOpCodeToken)token).setAValueNextWord(true);
+								} else if ("SP".equals(line.aRegister)) {
+									size++;
+									((BasicOpCodeToken)token).setAValueNextWord(true);
+								}
+								i += 3;
+							} else if (tokens[++i] instanceof LiteralToken) {
 								if (tokens[i+1] instanceof AValueEndToken) {
 									char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
 									if (val >= 31 && val != 0xFFFF) {
 										size++;
+										line.literalA = val;
+										line.literalASet = true;
 										((BasicOpCodeToken)token).setAValueNextWord(true);
 									}
 								} else {
@@ -329,17 +376,41 @@ public class Assembly {
 									((BasicOpCodeToken)token).setAValueNextWord(true);
 								}
 							} else if (tokens[i] instanceof SimpleStackAccessToken) {
+							} else if (tokens[i] instanceof LabelToken && !line.aHasOperator) {
+								if (((LabelToken)tokens[i]).valueSet) {
+									char val = (char) ((LabelToken)tokens[i]).value;
+									if (val >= 31 && val != 0xFFFF) {
+										size++;
+										line.literalA = val;
+										line.literalASet = true;
+										((BasicOpCodeToken)token).setAValueNextWord(true);
+									}
+								} else {
+									size++;
+									((BasicOpCodeToken)token).setAValueNextWord(true);
+								}
 							} else {
 								size++;
 								((BasicOpCodeToken)token).setAValueNextWord(true);
 							}
 						} else if (token instanceof SpecialOpCodeToken) {
 							size++;
-							if (tokens[(i+=2)] instanceof LiteralToken) {
+							if (line.aIsAddress) {
+								if (line.aRegister == null || line.aHasOperator) {
+									size++;
+									((SpecialOpCodeToken)token).setAValueNextWord(true);
+								} else if ("SP".equals(line.aRegister)) {
+									size++;
+									((SpecialOpCodeToken)token).setAValueNextWord(true);
+								}
+								i += 4;
+							} else if (tokens[(i+=2)] instanceof LiteralToken) {
 								if (tokens[i+1] instanceof AValueEndToken) {
 									char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
 									if (val >= 31 && val != 0xFFFF) {
 										size++;
+										line.literalA = val;
+										line.literalASet = true;
 										((SpecialOpCodeToken)token).setAValueNextWord(true);
 									}
 								} else {
@@ -362,6 +433,19 @@ public class Assembly {
 									((SpecialOpCodeToken)token).setAValueNextWord(true);
 								}
 							} else if (tokens[i] instanceof SimpleStackAccessToken) {
+							} else if (tokens[i] instanceof LabelToken && !line.aHasOperator) {
+								if (((LabelToken)tokens[i]).valueSet) {
+									char val = (char) ((LabelToken)tokens[i]).value;
+									if (val >= 31 && val != 0xFFFF) {
+										size++;
+										line.literalA = val;
+										line.literalASet = true;
+										((SpecialOpCodeToken)token).setAValueNextWord(true);
+									}
+								} else { //What else?
+									size++;
+									((SpecialOpCodeToken)token).setAValueNextWord(true);
+								}
 							} else {
 								size++;
 								((SpecialOpCodeToken)token).setAValueNextWord(true);
@@ -386,7 +470,8 @@ public class Assembly {
 							}
 						}
 					}
-					line.size = size;
+					line.size = size;//TODO
+					line.sized = true;
 					oMin += line.size;
 					oMax += line.size;
 					
@@ -731,19 +816,6 @@ public class Assembly {
 		}
 	}
 
-	private void assignLabelValues() throws UndefinedLabelException {
-		for (String label : labelUses.keySet()) {
-			if (!labelDefs.containsKey(label)) {
-				throw new UndefinedLabelException(this, label, labelUses.get(label));
-			}
-			int o = labelDefs.get(label).getLine().offset;
-			for (LabelUse use : labelUses.get(label)) {
-				use.getToken().value = o;
-				use.getToken().valueSet = true;
-			}
-		}
-	}
-
 	private String decimalize(String text) {
 		//TODO Document that character literals (i.e. 1+'a' <--) are not allowed in directive parameter expressions
 		String[] s = text.split("\\b");
@@ -759,130 +831,6 @@ public class Assembly {
 			}
 		}
 		return Util.join(s, ' ');
-	}
-
-	private int sizeLine(AssemblyLine line) {
-		//TODO Note: Rule for now is: Use of labels or expressions disables short form literal optimization
-		//TODO: Handle the -1 case (unary operator token) if you're not already
-		//Also, after looking over how you've done sizing here, you might want to check yourself into hospital for evaluation
-		int size = 0;
-		LexerToken[] tokens = line.getProcessedTokens();
-		for (int i = 0; i < tokens.length; i++) {
-			LexerToken token = tokens[i];
-			if (token instanceof BasicOpCodeToken) {
-				size++;
-				//Check if the b Value is a simple stack accessor or register
-				if (tokens[(i+=2)] instanceof LiteralToken) {
-					size++;
-					((BasicOpCodeToken)token).setBValueNextWord(true);
-				} else if (tokens[i] instanceof RegisterToken) {
-					if (!(tokens[i+1] instanceof BValueEndToken)) {
-						size++;
-						((BasicOpCodeToken)token).setBValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof AddressStartToken) {
-					if (tokens[++i] instanceof RegisterToken) {
-						if (!(tokens[++i] instanceof AddressEndToken)) {
-							size++;
-							((BasicOpCodeToken)token).setBValueNextWord(true);
-						}
-					} else {
-						size++;
-						((BasicOpCodeToken)token).setBValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof SimpleStackAccessToken) {
-				} else {
-					size++;
-					((BasicOpCodeToken)token).setBValueNextWord(true);
-				}
-				while (!(tokens[++i] instanceof AValueStartToken)) {}
-				//Check the a Value (can also be a non-expression non-label literal and meet short literal requirements)
-				if (tokens[++i] instanceof LiteralToken) {
-					if (tokens[i+1] instanceof AValueEndToken) {
-						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-						if (val >= 31 && val != 0xFFFF) {
-							size++;
-							((BasicOpCodeToken)token).setAValueNextWord(true);
-						}
-					} else {
-						size++;
-						((BasicOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof RegisterToken) {
-					if (!(tokens[i+1] instanceof AValueEndToken)) {
-						size++;
-						((BasicOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof AddressStartToken) {
-					if (tokens[++i] instanceof RegisterToken) {
-						if (!(tokens[++i] instanceof AddressEndToken)) {
-							size++;
-							((BasicOpCodeToken)token).setAValueNextWord(true);
-						}
-					} else {
-						size++;
-						((BasicOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof SimpleStackAccessToken) {
-				} else {
-					size++;
-					((BasicOpCodeToken)token).setAValueNextWord(true);
-				}
-			} else if (token instanceof SpecialOpCodeToken) {
-				size++;
-				if (tokens[(i+=2)] instanceof LiteralToken) {
-					if (tokens[i+1] instanceof AValueEndToken) {
-						char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-						if (val >= 31 && val != 0xFFFF) {
-							size++;
-							((SpecialOpCodeToken)token).setAValueNextWord(true);
-						}
-					} else {
-						size++;
-						((SpecialOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof RegisterToken) {
-					if (!(tokens[i+1] instanceof AValueEndToken)) {
-						size++;
-						((SpecialOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof AddressStartToken) {
-					if (tokens[++i] instanceof RegisterToken) {
-						if (!(tokens[++i] instanceof AddressEndToken)) {
-							size++;
-							((SpecialOpCodeToken)token).setAValueNextWord(true);
-						}
-					} else {
-						size++;
-						((SpecialOpCodeToken)token).setAValueNextWord(true);
-					}
-				} else if (tokens[i] instanceof SimpleStackAccessToken) {
-				} else {
-					size++;
-					((SpecialOpCodeToken)token).setAValueNextWord(true);
-				}
-			} else if (token instanceof DataToken) {
-				i++;
-				while (i < tokens.length && tokens[i] instanceof DataValueStartToken) {
-					token = tokens[++i];
-					if (!(tokens[i+1] instanceof DataValueEndToken)) {
-						size++;
-						while (!(tokens[++i] instanceof DataValueEndToken)) {}
-					} else {
-						if (token instanceof StringToken) {
-							//TODO: Decide whether strings should default to packed or not (currently they are not, and non-ascii characters are allowed in the string)
-							size += ((StringToken)token).getString().length();
-						} else {
-							size++;
-						}
-						i++;
-					}
-					i++;
-				}
-			}
-		}
-		line.size = size;
-		return size;
 	}
 
 	public int getFileCount() {
@@ -926,8 +874,8 @@ public class Assembly {
 		return labelsCaseSensitive;
 	}
 
-	public void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
-		this.labelsCaseSensitive = labelsCaseSensitive;
+	public static void setLabelsCaseSensitive(boolean labelsCaseSensitive) {
+		Assembly.labelsCaseSensitive = labelsCaseSensitive;
 	}
 
 	private int timerEnd() {

@@ -1,18 +1,13 @@
 package devcpu.assembler;
 
-import devcpu.lexer.tokens.AValueEndToken;
-import devcpu.lexer.tokens.AValueStartToken;
 import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
-import devcpu.lexer.tokens.BValueStartToken;
-import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.OperatorToken;
 import devcpu.lexer.tokens.RegisterToken;
-import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.UnaryOperatorToken;
 
 public class AssemblyLine {
@@ -47,6 +42,8 @@ public class AssemblyLine {
 	public boolean bHasRegisterToken;
 	public boolean aIsAddress;
 	public boolean bIsAddress;
+	public boolean aHasOperator;
+	public boolean bHasOperator;
 	public boolean aHasNonAddition;
 	public boolean bHasNonAddition;
 	//Set on Calculation
@@ -112,17 +109,23 @@ public class AssemblyLine {
 					unvaluedLabelTokens++;
 				}
 			} else if (t instanceof OperatorToken) {
-				if (!"+".equals(t.getText())) {
-					if (inA) {
+				if (inA) {
+					aHasOperator = true;
+					if (!"+".equals(t.getText())) {
 						aHasNonAddition = true;
-					} else {
+					}
+				} else {
+					bHasOperator = true;
+					if (!"+".equals(t.getText())) {
 						bHasNonAddition = true;
 					}
 				}
 			} else if (t instanceof UnaryOperatorToken) {
 				if (inA) {
+					aHasOperator = true;
 					aHasNonAddition = true;
 				} else {
+					bHasOperator = true;
 					bHasNonAddition = true;
 				}
 			}
