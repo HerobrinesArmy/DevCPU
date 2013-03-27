@@ -27,7 +27,8 @@ public class Group implements Operand {
 			} else if (token instanceof PickValueStartToken) {
 				values.add(new PickValue(tokens, i, PickValueEndToken.class));
 			} else if (token instanceof LabelToken) {
-				values.add(new Literal(token,((LabelToken)token).getValue()));
+				//TODO Account for unset values if this gets used in uncertain phases
+				values.add(new Literal(token,((LabelToken)token).value));
 			} else if (token instanceof RegisterToken) {
 				values.add(new Register((RegisterToken)token));
 			} else if (token instanceof LiteralToken) {

@@ -8,9 +8,11 @@ import devcpu.editors.dasm.DASMColorProvider;
 public class RegisterToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(196, 128, 0));;
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
+	private String register;
 
 	public RegisterToken(String text, int start, int end) {
 		super(text, start, end);
+		register = this.text.toUpperCase();
 	}
 
 	@Override
@@ -41,5 +43,9 @@ public class RegisterToken extends TrimmedLexerToken{
 	@Override
 	public Object getData() {
 		return null;
+	}
+	
+	public String getRegister() {
+		return register;
 	}
 }
