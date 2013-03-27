@@ -105,13 +105,6 @@ public class NavigatorCommandHandler implements IHandler {
 								};
 								job.setUser(true);
 								job.schedule();
-//								OldAssembler a = new OldAssembler(((FloppyDisk) o).data);
-//								try {
-//									a.assemble(file.getContents(true));
-//								} catch (Exception e) {
-//									// TODO Error message; get rid of any catches in Assembler.
-//									e.printStackTrace();
-//								}
 							}
 						}
 					}
@@ -258,5 +251,4 @@ public class NavigatorCommandHandler implements IHandler {
 	public void removeHandlerListener(IHandlerListener listener) {
 		listeners.remove(listener);
 	}
-
 }
