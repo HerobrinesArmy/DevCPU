@@ -65,15 +65,15 @@ public class Assembly {
 	private long timer;
 
 	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
-		timerStart();
 		rootDocument = new AssemblyDocument(file, this, null);
-		System.out.println(timerEnd() + "ms in Line Loading");
 		documents.add(rootDocument);
-		//TODO: Evaluate what should really be in the constructor and what should wait until assemble
 	}
 	
-	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+	//TODO Add Error handling delegate of some sort; Also, these non-AAEs should be caught where they're generated and be handled or throw AAEs
+	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
+		rootDocument.readLines();
+		System.out.println(timerReset() + "ms in Line Loading");
 		preprocessAndSize();
 		System.out.println(timerReset() + "ms in Preprocessing");
 		assignLabelValues();
@@ -81,11 +81,13 @@ public class Assembly {
 		zeroBuffer(dcpu.ram);
 		System.out.println(timerReset() + "ms to zero RAM");
 		assembleToBuffer(dcpu.ram);
-		System.out.println(timerReset() + "ms in Final Assembly");
+		System.out.println(timerEnd() + "ms in Final Assembly");
 	}
 	
-	public void assemble(FloppyDisk disk) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+	public void assemble(FloppyDisk disk) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
+		rootDocument.readLines();
+		System.out.println(timerReset() + "ms in Line Loading");
 		preprocessAndSize();
 		System.out.println(timerReset() + "ms in Preprocessing");
 		assignLabelValues();
@@ -93,7 +95,7 @@ public class Assembly {
 		zeroBuffer(disk.data);
 		System.out.println(timerReset() + "ms to zero disk data");
 		assembleToBuffer(disk.data);
-		System.out.println(timerReset() + "ms in Final Assembly");
+		System.out.println(timerEnd() + "ms in Final Assembly");
 	}
 
 	private void preprocessAndSize() throws AbstractAssemblyException {

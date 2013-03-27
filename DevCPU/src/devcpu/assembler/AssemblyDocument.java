@@ -27,16 +27,14 @@ public class AssemblyDocument {
 	private ArrayList<Directive> directives = new ArrayList<Directive>();
 	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
 
-	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) throws IOException, CoreException, AbstractAssemblyException {
+	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) {
 		this.file = file;
 		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release.
 		this.assembly = assembly;
 		this.parent = parent;
-		//TODO Move this out of the constructor (but don't forget to call it!)
-		readLines();
 	}
 
-	private void readLines() throws IOException, CoreException, AbstractAssemblyException {
+	public void readLines() throws IOException, CoreException, AbstractAssemblyException {
 		//TODO prompt if unsync?
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
@@ -52,7 +50,9 @@ public class AssemblyDocument {
 					directives.add(directive);
 					line.setDirective(directive);
 					if (directive.isInclude()) {
-						children.put(directive,loadInclude(new Include(directive)));
+						AssemblyDocument doc = loadInclude(new Include(directive));
+						children.put(directive,doc);
+						doc.readLines();
 					} else if (directive.isDefine()) {
 						Define define = new Define(directive);
 						assembly.defines.put(define.getKey(), define);
