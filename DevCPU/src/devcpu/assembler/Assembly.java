@@ -1,7 +1,5 @@
 package devcpu.assembler;
 
-import static devcpu.assembler.AssemblyLine.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,7 +32,6 @@ import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
 import devcpu.lexer.tokens.BValueStartToken;
 import devcpu.lexer.tokens.BasicOpCodeToken;
-import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.DataValueEndToken;
 import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.ErrorToken;
@@ -42,8 +39,6 @@ import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
-import devcpu.lexer.tokens.RegisterToken;
-import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
 import devcpu.util.Util;
@@ -493,18 +488,22 @@ public class Assembly {
 	}
 
 	private int getB(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
-		if (line.bSet) {
-			switch (line.bClass) {
-			case VALUE_REGISTER:
-			case VALUE_REGISTER_MEMORY:
-			case VALUE_SIMPLE_STACK:
-				return line.bVal;
-			case VALUE_LITERAL_ADDRESS:
-			case VALUE_OFFSET_STACK:
-			case VALUE_REGISTER_OFFSET_MEMORY:
-			case VALUE_LITERAL:
-			}
-		}
+//		if (line.bSet) {
+//			switch (line.bClass) {
+//			case VALUE_REGISTER:
+//			case VALUE_REGISTER_MEMORY:
+//			case VALUE_SIMPLE_STACK:
+//				return line.bVal;
+//			case VALUE_LITERAL_ADDRESS:
+//			case VALUE_OFFSET_STACK:
+//			case VALUE_REGISTER_OFFSET_MEMORY:
+//			case VALUE_LITERAL:
+//				if (line.literalBSet) {
+//					ram[offset] = line.bVal;
+//					return line.bVal;
+//				}
+//			}
+//		}
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
@@ -624,6 +623,22 @@ public class Assembly {
 	}
 
 	private int getA(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+//		if (line.aSet) {
+//			switch (line.aClass) {
+//			case VALUE_REGISTER:
+//			case VALUE_REGISTER_MEMORY:
+//			case VALUE_SIMPLE_STACK:
+//				return line.aVal;
+//			case VALUE_LITERAL_ADDRESS:
+//			case VALUE_OFFSET_STACK:
+//			case VALUE_REGISTER_OFFSET_MEMORY:
+//			case VALUE_LITERAL:
+//				if (line.literalASet) {
+//					ram[offset] = line.aVal;
+//					return line.aVal;
+//				}
+//			}
+//		}
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;

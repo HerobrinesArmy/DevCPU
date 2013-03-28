@@ -10,6 +10,7 @@ import devcpu.lexer.tokens.GroupStartToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.OffsetStackAccessToken;
+import devcpu.lexer.tokens.OpCodeToken;
 import devcpu.lexer.tokens.OperatorToken;
 import devcpu.lexer.tokens.RegisterToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
@@ -55,7 +56,7 @@ public class AssemblyLine {
 	public boolean isSpecial;
 	public boolean isBasic;
 //	public String mnemonic;
-	public LexerToken opCodeToken;
+	public OpCodeToken opCodeToken;
 	public String aRegister;
 	public String bRegister;
 	public String aAccessor;
@@ -124,13 +125,13 @@ public class AssemblyLine {
 //				mnemonic = ((SpecialOpCodeToken) t).mnemonic;
 				inA = true;
 				aStart = i + 2;
-				opCodeToken = t;
+				opCodeToken = (OpCodeToken) t;
 			} else if (t instanceof BasicOpCodeToken) {
 				isBasic = true;
 				inA = false;
 //				mnemonic = ((BasicOpCodeToken) t).mnemonic;
 				bStart = i + 2;
-				opCodeToken = t;
+				opCodeToken = (OpCodeToken) t;
 			} else if (t instanceof DataToken) {
 				isDat = true;
 				dataStart = i + 1;
@@ -224,6 +225,7 @@ public class AssemblyLine {
 					if (idx == -1) {
 						if ("SP".equals(aRegister)) {
 							aClass = VALUE_OFFSET_STACK;
+							opCodeToken.setAValueNextWord(true);
 							aVal = 0x1a;
 						} else {
 							//TODO Exception (PC/EX)
@@ -231,6 +233,7 @@ public class AssemblyLine {
 						}
 					} else {
 						aClass = VALUE_REGISTER_OFFSET_MEMORY;
+						opCodeToken.setAValueNextWord(true);
 						aVal = (char) (0x10 + idx);
 					}
 				} else {
@@ -252,10 +255,12 @@ public class AssemblyLine {
 				aSet = true;
 			} else if (aHasOffsetStack) {
 				aClass = VALUE_OFFSET_STACK;
+				opCodeToken.setAValueNextWord(true);
 				aVal = 0x1a;
 				aSet = true;
 			} else if (aIsAddress) {
 				aClass = VALUE_LITERAL_ADDRESS;
+				opCodeToken.setAValueNextWord(true);
 				aVal = 0x1e;
 				aSet = true;
 			} else if (!aIsAddress && !aHasSimpleStack && !aHasOffsetStack && !aHasRegister) {
@@ -302,6 +307,7 @@ public class AssemblyLine {
 						if (idx == -1) {
 							if ("SP".equals(bRegister)) {
 								bClass = VALUE_OFFSET_STACK;
+								opCodeToken.setBValueNextWord(true);
 								bVal = 0x1a;
 							} else {
 								//TODO Exception (PC/EX)
@@ -309,6 +315,7 @@ public class AssemblyLine {
 							}
 						} else {
 							bClass = VALUE_REGISTER_OFFSET_MEMORY;
+							opCodeToken.setBValueNextWord(true);
 							bVal = (char) (0x10 + idx);
 						}
 					} else {
@@ -330,14 +337,17 @@ public class AssemblyLine {
 					bSet = true;
 				} else if (bHasOffsetStack) {
 					bClass = VALUE_OFFSET_STACK;
+					opCodeToken.setBValueNextWord(true);
 					bVal = 0x1a;
 					bSet = true;
 				} else if (bIsAddress) {
 					bClass = VALUE_LITERAL_ADDRESS;
+					opCodeToken.setBValueNextWord(true);
 					bVal = 0x1e;
 					bSet = true;
 				} else {
 					bClass = VALUE_LITERAL;
+					opCodeToken.setBValueNextWord(true);
 					bVal = 0x1f;
 					bSet = true;
 				}

@@ -5,7 +5,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import devcpu.editors.dasm.DASMColorProvider;
 
-public class SpecialOpCodeToken extends TrimmedLexerToken{
+public class SpecialOpCodeToken extends TrimmedLexerToken implements OpCodeToken {
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(127, 0, 85));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	private boolean nextWordA;
@@ -46,11 +46,22 @@ public class SpecialOpCodeToken extends TrimmedLexerToken{
 		return null;
 	}
 
+	@Override
 	public void setAValueNextWord(boolean nextWord) {
 		this.nextWordA = nextWord;
 	}
 	
+	@Override
 	public boolean isNextWordA() {
 		return nextWordA;
+	}
+
+	@Override
+	public void setBValueNextWord(boolean nextWord) {
+	}
+
+	@Override
+	public boolean isNextWordB() {
+		return false;
 	}
 }
