@@ -98,7 +98,7 @@ public class Assembly {
 		System.out.println(timerEnd() + "ms in Final Assembly");
 	}
 
-	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException {
+	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
 //		System.out.println("********************************************************************");
@@ -229,7 +229,7 @@ public class Assembly {
 					}
 				}
 			}
-			if (!line.sized) {// || !line.located) {
+			if (!line.sized) {
 				if (line.isDirective()) {
 					Directive directive = line.getDirective();
 					if (directive.isOrigin()) {
@@ -323,7 +323,7 @@ public class Assembly {
 						oMax += size;
 					} else {
 						if (tokens[line.aStart] instanceof LiteralToken) {
-							if (tokens[line.aStart + 1] instanceof AValueEndToken) {
+							if (!line.aHasOperator) {
 								char val = (char) (((LiteralToken)tokens[line.aStart]).getValue() & 0xFFFF);
 								if (val >= 31 && val != 0xFFFF) {
 									line.literalA = val;
@@ -341,13 +341,16 @@ public class Assembly {
 									line.opCodeToken.setAValueNextWord(false);
 								}
 							} else {
-								//TODO Expression
-								line.size = 2 + line.bSize;
-								line.sized = true;
-								line.opCodeToken.setAValueNextWord(true);
+								if (sizeExpressionA(line)) {
+									//TODO?
+								} else {
+									oMin += 1+line.bSize;
+									oMax += 2+line.bSize;
+									line.opCodeToken.setAValueNextWord(true);
+								}
 							}
 						} else if (tokens[line.aStart] instanceof LabelToken) {
-							if (tokens[line.aStart + 1] instanceof AValueEndToken) {
+							if (!line.aHasOperator) {
 								if (((LabelToken)tokens[line.aStart]).valueSet) {
 									char val = (char) (((LabelToken)tokens[line.aStart]).value & 0xFFFF);
 									if (val >= 31 && val != 0xFFFF) {
@@ -396,16 +399,22 @@ public class Assembly {
 									}
 								}
 							} else {
-								//TODO Expression
-								line.size = 2 + line.bSize;
-								line.sized = true;
-								line.opCodeToken.setAValueNextWord(true);
+								if (sizeExpressionA(line)) {
+									//TODO?
+								} else {
+									oMin += 1+line.bSize;
+									oMax += 2+line.bSize;
+									line.opCodeToken.setAValueNextWord(true);
+								}
 							}
 						} else {
-							//TODO Expression
-							line.size = 2 + line.bSize;
-							line.sized = true;
-							line.opCodeToken.setAValueNextWord(true);
+							if (sizeExpressionA(line)) {
+								//TODO?
+							} else {
+								oMin += 1+line.bSize;
+								oMax += 2+line.bSize;
+								line.opCodeToken.setAValueNextWord(true);
+							}
 						}
 						oMin += line.size;
 						oMax += line.size;
@@ -424,12 +433,34 @@ public class Assembly {
 		return accomplishedSomething;// && !finished;
 	}
 
+	private boolean sizeExpressionA(AssemblyLine line) throws UnknownFunctionException, UnparsableExpressionException {
+		Group value = new Group(line.getProcessedTokens(),line.aStart-1,AValueEndToken.class);
+		if (value.unresolvableLabel) {
+			//TODO Do some smart stuff in the single unresolved label case?
+			//In that case, you can fetch the minOffset and maxOffset of the lineRef and check to
+			//see if it must or can't qualify for short literal, even without knowing its exact value.
+			return false;
+		}
+		char val = (char) (int) new ExpressionBuilder(value.getExpression()).build().calculate();
+		if (val >= 31 && val != 0xFFFF) {
+			line.size = 2+line.bSize;
+		} else {
+			line.size = 1+line.bSize;
+		}
+		line.sized = true;
+		return true;
+	}
+
 	private void assembleToBuffer(char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
 		int a;
 		int b;
 		for (AssemblyLine line : lines) {
-			pc = line.offset;
+			if (line.sized) {
+				pc = line.offset;
+			} else {
+				pc = line.maxOffset;
+			}
 			if (line.isDirective()) {
 				Directive directive = line.getDirective();
 				if (directive.isAlign()) {

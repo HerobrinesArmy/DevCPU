@@ -17,17 +17,26 @@ import devcpu.lexer.tokens.UnaryOperatorToken;
 
 public class Group implements Operand {
 	private ArrayList<Value> values = new ArrayList<Value>();
+	public boolean unresolvableLabel; //Only for use by Assembly.sizeExpressionA()
 	
 	public Group (LexerToken[] tokens, int i, Class<? extends LexerToken> terminator) {
 		LexerToken token = null;
 		while (!terminator.isInstance(token = tokens[++i])) {
 			if (token instanceof GroupStartToken) {
-				values.add(new Group(tokens,i,GroupEndToken.class));
+				Group group = new Group(tokens,i,GroupEndToken.class);
+				if (group.unresolvableLabel) {
+					this.unresolvableLabel = true;
+					return;
+				}
+				values.add(group);
 				while (!(tokens[++i] instanceof GroupEndToken)) {}
 			} else if (token instanceof PickValueStartToken) {
 				values.add(new PickValue(tokens, i, PickValueEndToken.class));
 			} else if (token instanceof LabelToken) {
-				//TODO Account for unset values if this gets used in uncertain phases
+				if (!((LabelToken) token).valueSet) {
+					this.unresolvableLabel = true;
+					return;
+				}
 				values.add(new Literal(token,((LabelToken)token).value));
 			} else if (token instanceof RegisterToken) {
 				values.add(new Register((RegisterToken)token));
