@@ -60,7 +60,6 @@ public class Assembly {
 	private int shortened;
 	private long timer;
 	private int passes;
-	private LinkedHashMap<Pattern, Define> patterns;
 
 	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
 		rootDocument = new AssemblyDocument(file, this, null);
@@ -107,6 +106,7 @@ public class Assembly {
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
+		LinkedHashMap<Pattern, Define> patterns = null;
 		if (preprocess) {
 			patterns = new LinkedHashMap<Pattern, Define>();
 			for (String key : defines.keySet()) {
@@ -329,21 +329,17 @@ public class Assembly {
 									line.literalA = val;
 									line.literalASet = true;
 									line.aVal = 0x1f;
-									line.aSet = true;
 									line.size = 2 + line.bSize;
-									line.sized = true;
 									line.opCodeToken.setAValueNextWord(true);
 								} else {
 									line.aVal = (char) (0x21 + val);
-									line.aSet = true;
 									line.size = 1 + line.bSize;
-									line.sized = true;
 									line.opCodeToken.setAValueNextWord(false);
 								}
+								line.aSet = true;
+								line.sized = true;
 							} else {
-								if (sizeExpressionA(line)) {
-									//TODO?
-								} else {
+								if (!sizeExpressionA(line)) {
 									oMin += 1+line.bSize;
 									oMax += 2+line.bSize;
 									line.opCodeToken.setAValueNextWord(true);
@@ -357,17 +353,15 @@ public class Assembly {
 										line.literalA = val;
 										line.literalASet = true;
 										line.aVal = 0x1f;
-										line.aSet = true;
 										line.size = 2 + line.bSize;
-										line.sized = true;
 										line.opCodeToken.setAValueNextWord(true);
 									} else {
 										line.aVal = (char) (0x21 + val);
-										line.aSet = true;
 										line.size = 1 + line.bSize;
-										line.sized = true;
 										line.opCodeToken.setAValueNextWord(false);
 									}
+									line.aSet = true;
+									line.sized = true;
 								} else {
 									AssemblyLine lRef = ((LabelToken) tokens[line.aStart]).lineRef;
 									if (lRef == null) {
@@ -399,18 +393,14 @@ public class Assembly {
 									}
 								}
 							} else {
-								if (sizeExpressionA(line)) {
-									//TODO?
-								} else {
+								if (!sizeExpressionA(line)) {
 									oMin += 1+line.bSize;
 									oMax += 2+line.bSize;
 									line.opCodeToken.setAValueNextWord(true);
 								}
 							}
 						} else {
-							if (sizeExpressionA(line)) {
-								//TODO?
-							} else {
+							if (!sizeExpressionA(line)) {
 								oMin += 1+line.bSize;
 								oMax += 2+line.bSize;
 								line.opCodeToken.setAValueNextWord(true);
@@ -427,26 +417,35 @@ public class Assembly {
 				oMax += line.size;
 			}
 			exact = oMin == oMax;
-//			if (!line.sized) { System.out.println(line.getText());}
+		//			if (!line.sized) { System.out.println(line.getText());}
 //			finished &= exact;
 		}
 		return accomplishedSomething;// && !finished;
 	}
 
 	private boolean sizeExpressionA(AssemblyLine line) throws UnknownFunctionException, UnparsableExpressionException {
+		//This is only for use in resolving literal expressions
 		Group value = new Group(line.getProcessedTokens(),line.aStart-1,AValueEndToken.class);
 		if (value.unresolvableLabel) {
 			//TODO Do some smart stuff in the single unresolved label case?
-			//In that case, you can fetch the minOffset and maxOffset of the lineRef and check to
-			//see if it must or can't qualify for short literal, even without knowing its exact value.
+			//In that case, you can fetch the minOffset and maxOffset, if they are set, of the
+			//lineRef, if it exists, and check to see if it must or can't qualify for short 
+			//literal, even without knowing its exact value.
 			return false;
 		}
 		char val = (char) (int) new ExpressionBuilder(value.getExpression()).build().calculate();
 		if (val >= 31 && val != 0xFFFF) {
+			line.literalA = (char) val;
+			line.literalASet = true;
+			line.aVal = 0x1f;
 			line.size = 2+line.bSize;
+			line.opCodeToken.setAValueNextWord(true);
 		} else {
+			line.aVal = (char) (0x21 + val);
 			line.size = 1+line.bSize;
+			line.opCodeToken.setAValueNextWord(false);
 		}
+		line.aSet = true;
 		line.sized = true;
 		return true;
 	}
@@ -553,9 +552,10 @@ public class Assembly {
 //			case VALUE_LITERAL:
 			}
 		}
+		//TODO Look through here and see what you can remove now that we've changed the assembly process
+		
 		boolean hasNextWord = offset > 0;
 		
-//		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
 		Group value = null;
 		if (line.bIsAddress) {
 			value = new Address(tokens,line.bStart,AddressEndToken.class);
@@ -563,9 +563,6 @@ public class Assembly {
 			value = new Group(tokens,line.bStart-1,BValueEndToken.class);	
 		}
 		
-//		isExpression = value.isExpression();
-//		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
-//		List<Register> registers = value.getRegisters();
 		//Register validity checks
 		if (line.bHasRegister) {
 			if (line.bRegister.equals("EX") || line.bRegister.equals("PC")) {
@@ -657,7 +654,7 @@ public class Assembly {
 		return 0;
 	}
 
-	private int getA(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+	private int getA(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] buf) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		if (line.aSet) {
 			switch (line.aClass) {
 			case VALUE_REGISTER:
@@ -667,16 +664,27 @@ public class Assembly {
 			case VALUE_LITERAL_ADDRESS:
 			case VALUE_OFFSET_STACK:
 			case VALUE_REGISTER_OFFSET_MEMORY:
-			case VALUE_LITERAL:
 				if (line.literalASet) {
-					ram[offset] = line.literalA;
+					buf[offset] = line.literalA;
 					return line.aVal;
 				}
+				break;
+			case VALUE_LITERAL:
+				if (line.literalASet) {
+					if (line.literalA < 31 || line.literalA == 0xFFFF) {
+						missed++;
+					}
+					buf[offset] = line.literalA;
+				} else {
+					shortened++;
+				}
+				return line.aVal;
 			}
 		}
+		//TODO Look through here and see what you can remove now that we've changed the assembly process
+		
 		boolean hasNextWord = offset > 0;
 		
-//		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
 		Group value = null;
 		if (line.aIsAddress) {
 			value = new Address(tokens,line.aStart,AddressEndToken.class);
@@ -706,7 +714,7 @@ public class Assembly {
 		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
 		if (hasNextWord) {
-			ram[offset] = (char) literal;
+			buf[offset] = (char) literal;
 			if (line.aIsAddress) {
 				if (line.aHasRegister) {
 					if (line.aRegister.equals("SP")) { //0x1a | [SP + next word] / PICK n
@@ -720,7 +728,7 @@ public class Assembly {
 			} else if (value.hasPickValue()) { //0x1a | [SP + next word] / PICK n
 				return 0x1a;
 			} else {//0x1f | next word (literal)
-				if (ram[offset] < 31 || ram[offset] == 0xFFFF) {
+				if (buf[offset] < 31 || buf[offset] == 0xFFFF) {
 					missed++;
 				}
 				return 0x1f;
