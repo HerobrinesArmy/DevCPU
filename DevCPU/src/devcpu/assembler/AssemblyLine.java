@@ -406,6 +406,7 @@ public class AssemblyLine {
 				}
 			}
 		} else if (!isDat) {
+			size = 0;
 			sized = true;
 		}
 	}

@@ -4,6 +4,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 import devcpu.assembler.Assembly;
+import devcpu.assembler.AssemblyLine;
 import devcpu.editors.dasm.DASMColorProvider;
 
 public class LabelToken extends TrimmedLexerToken{
@@ -13,6 +14,7 @@ public class LabelToken extends TrimmedLexerToken{
 	public String labelName;
 	public int value;
 	public boolean valueSet;
+	public AssemblyLine lineRef;
 
 	public LabelToken(String text, int start, int end) {
 		super(text, start, end);

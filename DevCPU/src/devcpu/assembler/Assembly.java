@@ -1,5 +1,13 @@
 package devcpu.assembler;
 
+import static devcpu.assembler.AssemblyLine.VALUE_LITERAL;
+import static devcpu.assembler.AssemblyLine.VALUE_LITERAL_ADDRESS;
+import static devcpu.assembler.AssemblyLine.VALUE_OFFSET_STACK;
+import static devcpu.assembler.AssemblyLine.VALUE_REGISTER;
+import static devcpu.assembler.AssemblyLine.VALUE_REGISTER_MEMORY;
+import static devcpu.assembler.AssemblyLine.VALUE_REGISTER_OFFSET_MEMORY;
+import static devcpu.assembler.AssemblyLine.VALUE_SIMPLE_STACK;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -71,7 +79,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms in Line Loading");
 		boolean preprocess = true;
 		int passes = 1;
-		while (!preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		while (preprocessAndSize(preprocess)){preprocess = false; passes++;}
 		this.passes = passes;
 		System.out.println(timerReset() + "ms in Preprocessing");
 		zeroBuffer(dcpu.ram);
@@ -86,7 +94,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms in Line Loading");
 		boolean preprocess = true;
 		int passes = 1;
-		while (!preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		while (preprocessAndSize(preprocess)){preprocess = false; passes++;}
 		this.passes = passes;
 		System.out.println(timerReset() + "ms in Preprocessing");
 		zeroBuffer(disk.data);
@@ -98,6 +106,8 @@ public class Assembly {
 	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
+		System.out.println("********************************************************************");
+		boolean accomplishedSomething = false;
 		boolean finished = true;
 		int oMin = 0;
 		int oMax = 0;
@@ -114,6 +124,7 @@ public class Assembly {
 			} else {
 				line.minOffset = oMin;
 				line.maxOffset = oMax;
+				line.offset = oMax;
 			}
 			if (preprocess) {
 				String pass = "";
@@ -158,20 +169,30 @@ public class Assembly {
 						if (exact) {
 							if (labelUses.containsKey(labelDef.getLabelName())) {
 								for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
+									use.getToken().lineRef = labelDef.getLine();
 									use.getToken().value = line.offset;
 									use.getToken().valueSet = true;
 									use.getLine().unvaluedLabelTokens--;
 								}
 								labelUses.remove(labelDef.getLabelName());
 							}
+						} else {
+							if (labelUses.containsKey(labelDef.getLabelName())) {
+								for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
+									use.getToken().lineRef = labelDef.getLine();
+								}
+							}
 						}
 					} else if (token instanceof LabelToken) {
 						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
 						((LabelToken) token).labelName = labelUse.getLabelName();
-						if (labelDefs.containsKey(labelUse.getLabelName()) && labelDefs.get(labelUse.getLabelName()).getLine().located) {
-							((LabelToken) token).value = labelDefs.get(labelUse.getLabelName()).getLine().offset; //Setting it early
-							((LabelToken) token).valueSet = true;
-							line.unvaluedLabelTokens--;
+						if (labelDefs.containsKey(labelUse.getLabelName())) {
+							labelUse.getToken().lineRef = labelDefs.get(labelUse.getLabelName()).getLine();
+							if (labelDefs.get(labelUse.getLabelName()).getLine().located) {
+								((LabelToken) token).value = labelDefs.get(labelUse.getLabelName()).getLine().offset; //Setting it early
+								((LabelToken) token).valueSet = true;
+								line.unvaluedLabelTokens--;
+							}
 						} else {
 							if (!labelUses.containsKey(labelUse.getLabelName())) {
 								labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
@@ -316,25 +337,18 @@ public class Assembly {
 									line.aSet = true;
 									line.size = 2 + line.bSize;
 									line.sized = true;
-									if (line.isSpecial) {
-										((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-									} else {
-										((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-									}
+									line.opCodeToken.setAValueNextWord(true);
 								} else {
 									line.aVal = (char) (0x21 + val);
 									line.aSet = true;
 									line.size = 1 + line.bSize;
 									line.sized = true;
+									line.opCodeToken.setAValueNextWord(false);
 								}
 							} else {
 								line.size = 2 + line.bSize;
 								line.sized = true;
-								if (line.isSpecial) {
-									((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-								} else {
-									((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-								}
+								line.opCodeToken.setAValueNextWord(true);
 							}
 						} else if (tokens[line.aStart] instanceof LabelToken) {
 							if (tokens[line.aStart + 1] instanceof AValueEndToken) {
@@ -347,58 +361,71 @@ public class Assembly {
 										line.aSet = true;
 										line.size = 2 + line.bSize;
 										line.sized = true;
-										if (line.isSpecial) {
-											((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-										} else {
-											((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-										}
+										line.opCodeToken.setAValueNextWord(true);
 									} else {
 										line.aVal = (char) (0x21 + val);
 										line.aSet = true;
 										line.size = 1 + line.bSize;
 										line.sized = true;
+										line.opCodeToken.setAValueNextWord(false);
 									}
 								} else {
-									line.size = 2 + line.bSize;
-									line.sized = true;
-									if (line.isSpecial) {
-										((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+									AssemblyLine lRef = ((LabelToken) tokens[line.aStart]).lineRef;
+									if (lRef == null) {
+										oMin += 1+line.bSize;
+										oMax += 2+line.bSize;
+										line.opCodeToken.setAValueNextWord(true);
 									} else {
-										((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+										if (lRef.minOffset > 0) {
+											if (lRef.minOffset > 30 && lRef.maxOffset < 0xFFFF) {
+												line.size = 2+line.bSize;
+												line.sized = true;
+												line.opCodeToken.setAValueNextWord(true);
+											} else {
+												if (lRef.maxOffset < 31) {
+													line.size = 1 + line.bSize;
+													line.sized = true;
+													line.opCodeToken.setAValueNextWord(false);
+												} else {
+													oMin += 1+line.bSize;
+													oMax += 2+line.bSize;
+													line.opCodeToken.setAValueNextWord(true);
+												}
+											}
+										} else {
+											oMin += 1+line.bSize;
+											oMax += 2+line.bSize;
+											line.opCodeToken.setAValueNextWord(true);
+										}
 									}
 								}
 							} else {
+								//TODO Expression
 								line.size = 2 + line.bSize;
 								line.sized = true;
-								if (line.isSpecial) {
-									((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-								} else {
-									((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-								}
+								line.opCodeToken.setAValueNextWord(true);
 							}
 						} else {
 							System.out.println(tokens[line.aStart].getClass().getCanonicalName());
 							line.size = 2 + line.bSize;
 							line.sized = true;
-							if (line.isSpecial) {
-								((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-							} else {
-								((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
-							}
+							line.opCodeToken.setAValueNextWord(true);
 						}
 						oMin += line.size;
 						oMax += line.size;
 					}
 //					System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 				}
+				if (line.sized) {accomplishedSomething = true;}
 			} else {
 				oMin += line.size;
 				oMax += line.size;
 			}
 			exact = oMin == oMax;
+			if (!line.sized) { System.out.println(line.getText());}
 			finished &= exact;
 		}
-		return finished;
+		return accomplishedSomething && !finished;
 	}
 
 	private void assembleToBuffer(char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
@@ -454,16 +481,16 @@ public class Assembly {
 		}
 	}
 
-	private int assembleData(LexerToken[] tokens, int i, char[] ram, int pc) throws UnknownFunctionException, UnparsableExpressionException {
+	private int assembleData(LexerToken[] tokens, int i, char[] buf, int pc) throws UnknownFunctionException, UnparsableExpressionException {
 		LexerToken token = tokens[i];
 		if (token instanceof StringToken) {
-			return assembleString(((StringToken) token).getString(), ram, pc);
+			return assembleString(((StringToken) token).getString(), buf, pc);
 		} else {
-			return assembleExpression(tokens, i, ram, pc);
+			return assembleExpression(tokens, i, buf, pc);
 		}
 	}
 
-	private int assembleExpression(LexerToken[] tokens, int i, char[] ram, int pc) throws UnknownFunctionException, UnparsableExpressionException {
+	private int assembleExpression(LexerToken[] tokens, int i, char[] buf, int pc) throws UnknownFunctionException, UnparsableExpressionException {
 		String expression = "";
 		while (!(tokens[i] instanceof DataValueEndToken)) {
 			LexerToken token = tokens[i++];
@@ -476,7 +503,7 @@ public class Assembly {
 			}
 		}
 		int val = (int) new ExpressionBuilder(expression).build().calculate();
-		ram[pc++] = (char) val;
+		buf[pc++] = (char) val;
 		return pc;
 	}
 
@@ -487,23 +514,23 @@ public class Assembly {
 		return pc;
 	}
 
-	private int getB(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
-//		if (line.bSet) {
-//			switch (line.bClass) {
-//			case VALUE_REGISTER:
-//			case VALUE_REGISTER_MEMORY:
-//			case VALUE_SIMPLE_STACK:
-//				return line.bVal;
-//			case VALUE_LITERAL_ADDRESS:
-//			case VALUE_OFFSET_STACK:
-//			case VALUE_REGISTER_OFFSET_MEMORY:
-//			case VALUE_LITERAL:
-//				if (line.literalBSet) {
-//					ram[offset] = line.bVal;
-//					return line.bVal;
-//				}
-//			}
-//		}
+	private int getB(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] buf) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+		if (line.bSet) {
+			switch (line.bClass) {
+			case VALUE_REGISTER:
+			case VALUE_REGISTER_MEMORY:
+			case VALUE_SIMPLE_STACK:
+				return line.bVal;
+			case VALUE_LITERAL_ADDRESS:
+			case VALUE_OFFSET_STACK:
+			case VALUE_REGISTER_OFFSET_MEMORY:
+			case VALUE_LITERAL:
+				if (line.literalBSet) {
+					buf[offset] = line.literalB;
+					return line.bVal;
+				}
+			}
+		}
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
@@ -554,7 +581,7 @@ public class Assembly {
 		}
 		
 		if (hasNextWord) {
-			ram[offset] = (char) literal;
+			buf[offset] = (char) literal;
 			if (isAddress) {
 				if (registers.size() == 1) {
 					if (register.equals("SP")) { //0x1a | [SP + next word] / PICK n
@@ -623,22 +650,22 @@ public class Assembly {
 	}
 
 	private int getA(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
-//		if (line.aSet) {
-//			switch (line.aClass) {
-//			case VALUE_REGISTER:
-//			case VALUE_REGISTER_MEMORY:
-//			case VALUE_SIMPLE_STACK:
-//				return line.aVal;
-//			case VALUE_LITERAL_ADDRESS:
-//			case VALUE_OFFSET_STACK:
-//			case VALUE_REGISTER_OFFSET_MEMORY:
-//			case VALUE_LITERAL:
-//				if (line.literalASet) {
-//					ram[offset] = line.aVal;
-//					return line.aVal;
-//				}
-//			}
-//		}
+		if (line.aSet) {
+			switch (line.aClass) {
+			case VALUE_REGISTER:
+			case VALUE_REGISTER_MEMORY:
+			case VALUE_SIMPLE_STACK:
+				return line.aVal;
+			case VALUE_LITERAL_ADDRESS:
+			case VALUE_OFFSET_STACK:
+			case VALUE_REGISTER_OFFSET_MEMORY:
+			case VALUE_LITERAL:
+				if (line.literalASet) {
+					ram[offset] = line.literalA;
+					return line.aVal;
+				}
+			}
+		}
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
