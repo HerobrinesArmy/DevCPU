@@ -1,5 +1,7 @@
 package devcpu.assembler;
 
+import static devcpu.assembler.AssemblyLine.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -60,6 +62,7 @@ public class Assembly {
 	private int missed;
 	private int shortened;
 	private long timer;
+	private int passes;
 
 	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
 		rootDocument = new AssemblyDocument(file, this, null);
@@ -71,9 +74,11 @@ public class Assembly {
 		timerStart();
 		rootDocument.readLines();
 		System.out.println(timerReset() + "ms in Line Loading");
-		preprocessAndSize(true);
+		boolean preprocess = true;
+		int passes = 1;
+		while (!preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		this.passes = passes;
 		System.out.println(timerReset() + "ms in Preprocessing");
-		//TODO More passes
 		zeroBuffer(dcpu.ram);
 		System.out.println(timerReset() + "ms to zero RAM");
 		assembleToBuffer(dcpu.ram);
@@ -84,8 +89,10 @@ public class Assembly {
 		timerStart();
 		rootDocument.readLines();
 		System.out.println(timerReset() + "ms in Line Loading");
-		preprocessAndSize(true);
-		//TODO More passes
+		boolean preprocess = true;
+		int passes = 1;
+		while (!preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		this.passes = passes;
 		System.out.println(timerReset() + "ms in Preprocessing");
 		zeroBuffer(disk.data);
 		System.out.println(timerReset() + "ms to zero disk data");
@@ -93,9 +100,10 @@ public class Assembly {
 		System.out.println(timerEnd() + "ms in Final Assembly");
 	}
 
-	private void preprocessAndSize(boolean preprocess) throws AbstractAssemblyException {
+	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
+		boolean finished = true;
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
@@ -212,277 +220,190 @@ public class Assembly {
 				if (line.isDirective()) {
 					Directive directive = line.getDirective();
 					if (directive.isOrigin()) {
-//						if (!line.sized) {
-							if (line.nextOffset == 0) {
-								try {
-									line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-								} catch (Exception e) {
-									throw new DirectiveExpressionEvaluationException(directive);
-								}
+						if (line.nextOffset == 0) {
+							try {
+								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+							} catch (Exception e) {
+								throw new DirectiveExpressionEvaluationException(directive);
 							}
-							if (exact) {
-								if (line.nextOffset < oMin) {
-									throw new OriginBacktrackException(directive);
-								}
-								line.size = line.nextOffset - oMin;
-								line.sized = true;
+						}
+						if (exact) {
+							if (line.nextOffset < oMin) {
+								throw new OriginBacktrackException(directive);
 							}
-//						}
+							line.size = line.nextOffset - oMin;
+							line.sized = true;
+						}
 						oMin = line.nextOffset;
 						oMax = line.nextOffset;
 					} else if (directive.isAlign()) {
-//						if (!line.sized) {
-							if (line.nextOffset == 0) {
-								try {
-									line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-								} catch (Exception e) {
-									throw new DirectiveExpressionEvaluationException(directive);
-								}
+						if (line.nextOffset == 0) {
+							try {
+								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+							} catch (Exception e) {
+								throw new DirectiveExpressionEvaluationException(directive);
 							}
-							if (exact) {
-								if (line.nextOffset < oMin) {
-									throw new OriginBacktrackException(directive);
-								}
-								line.size = line.nextOffset - oMin;
-								line.sized = true;
+						}
+						if (exact) {
+							if (line.nextOffset < oMin) {
+								throw new OriginBacktrackException(directive);
 							}
-//						}
+							line.size = line.nextOffset - oMin;
+							line.sized = true;
+						}
 						oMin = line.nextOffset;
 						oMax = line.nextOffset;
 					} else if (directive.isFill()) {
-//						if (!line.sized) {
-							try {
-								LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
-								String spanText = "";
-								int i = 0;
-								while (!(paramTokens[++i] instanceof BValueStartToken)) {}
-								while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
-								line.size = (int) new ExpressionBuilder(decimalize(spanText)).build().calculate();
-								line.sized = true;
-							} catch (Exception e) {
-								throw new DirectiveExpressionEvaluationException(directive);
-							}
-							if (line.size < 0) {
-								throw new OriginBacktrackException(directive);
-							}
-//						}
+						try {
+							LexerToken[] paramTokens = Lexer.get().generateTokens("SET " + directive.getParametersToken().getText(), true);
+							String spanText = "";
+							int i = 0;
+							while (!(paramTokens[++i] instanceof BValueStartToken)) {}
+							while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
+							line.size = (int) new ExpressionBuilder(decimalize(spanText)).build().calculate();
+							line.sized = true;
+						} catch (Exception e) {
+							throw new DirectiveExpressionEvaluationException(directive);
+						}
+						if (line.size < 0) {
+							throw new OriginBacktrackException(directive);
+						}
 						oMin += line.size;
 						oMax += line.size;
 					} else if (directive.isReserve()) {
-//						if (!line.sized) {
-							try {
-								line.size = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
-								line.sized = true;
-							} catch (Exception e) {
-								throw new DirectiveExpressionEvaluationException(directive);
-							}
-							if (line.size < 0) {
-								throw new OriginBacktrackException(directive);
-							}
-//						}
+						try {
+							line.size = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).build().calculate();
+							line.sized = true;
+						} catch (Exception e) {
+							throw new DirectiveExpressionEvaluationException(directive);
+						}
+						if (line.size < 0) {
+							throw new OriginBacktrackException(directive);
+						}
 						oMin += line.size;
 						oMax += line.size;
 					}
 				} else {
 					
 					//TODO START HERE ******************
-					int size = 0;
 					LexerToken[] tokens = line.getProcessedTokens();
-					for (int i = 0; i < tokens.length; i++) {
-						LexerToken token = tokens[i];
-						if (token instanceof BasicOpCodeToken) {
-							size++; //1
-							//Check if the b Value is a simple stack accessor or register
-							if (line.bIsAddress) {
-								if (line.bRegister == null || line.bHasOperator) {
-									size++;
-									((BasicOpCodeToken)token).setBValueNextWord(true);
-								} else if ("SP".equals(line.bRegister)) {
-									size++;
-									((BasicOpCodeToken)token).setBValueNextWord(true);
-								}
-								i += 4;
-							} else if (tokens[(i+=2)] instanceof LiteralToken) {
-								if (!line.bHasOperator) {
-									line.literalB = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-									line.literalBSet = true;
-								}
-								size++; //2
-								((BasicOpCodeToken)token).setBValueNextWord(true);
-							} else if (tokens[i] instanceof RegisterToken) {
-								if (!(tokens[i+1] instanceof BValueEndToken)) { //Change to ++i?
-									size++;
-									((BasicOpCodeToken)token).setBValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof AddressStartToken) {
-								if (tokens[++i] instanceof RegisterToken) {
-									if (!(tokens[++i] instanceof AddressEndToken)) {
-										size++;
-										((BasicOpCodeToken)token).setBValueNextWord(true);
-									}
-								} else {
-									size++;
-									((BasicOpCodeToken)token).setBValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof SimpleStackAccessToken) {
-							} else if (tokens[i] instanceof LabelToken && !line.bHasOperator) {
-								if (((LabelToken)tokens[i]).valueSet) {
-									line.literalB = (char) ((LabelToken)tokens[i]).value;
-									line.literalBSet = true;
-								}
+					if (line.isDat) {
+						int i = line.dataStart;
+						int size = 0;
+						while (i < tokens.length && tokens[i] instanceof DataValueStartToken) {
+							LexerToken token = tokens[++i];
+							if (!(tokens[i+1] instanceof DataValueEndToken)) {
 								size++;
-								((BasicOpCodeToken)token).setAValueNextWord(true);
+								while (!(tokens[++i] instanceof DataValueEndToken)) {}
 							} else {
-								size++;
-								((BasicOpCodeToken)token).setBValueNextWord(true);
-							}
-							while (!(tokens[++i] instanceof AValueStartToken)) {}
-							//Check the a Value (can also be a non-expression non-label literal and meet short literal requirements)
-							if (line.aIsAddress) {
-								if (line.aRegister == null || line.aHasOperator) {
-									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								} else if ("SP".equals(line.aRegister)) {
-									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								}
-								i += 3;
-							} else if (tokens[++i] instanceof LiteralToken) {
-								if (tokens[i+1] instanceof AValueEndToken) {
-									char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-									if (val >= 31 && val != 0xFFFF) {
-										size++;
-										line.literalA = val;
-										line.literalASet = true;
-										((BasicOpCodeToken)token).setAValueNextWord(true);
-									}
+								if (token instanceof StringToken) {
+									//TODO: Decide whether strings should default to packed or not (currently they are not, and non-ascii characters are allowed in the string)
+									size += ((StringToken)token).getString().length();
 								} else {
 									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof RegisterToken) {
-								if (!(tokens[i+1] instanceof AValueEndToken)) {
-									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof AddressStartToken) {
-								if (tokens[++i] instanceof RegisterToken) {
-									if (!(tokens[++i] instanceof AddressEndToken)) {
-										size++;
-										((BasicOpCodeToken)token).setAValueNextWord(true);
-									}
-								} else {
-									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof SimpleStackAccessToken) {
-							} else if (tokens[i] instanceof LabelToken && !line.aHasOperator) {
-								if (((LabelToken)tokens[i]).valueSet) {
-									char val = (char) ((LabelToken)tokens[i]).value;
-									if (val >= 31 && val != 0xFFFF) {
-										size++;
-										line.literalA = val;
-										line.literalASet = true;
-										((BasicOpCodeToken)token).setAValueNextWord(true);
-									}
-								} else {
-									size++;
-									((BasicOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else {
-								size++;
-								((BasicOpCodeToken)token).setAValueNextWord(true);
-							}
-						} else if (token instanceof SpecialOpCodeToken) {
-							size++;
-							if (line.aIsAddress) {
-								if (line.aRegister == null || line.aHasOperator) {
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								} else if ("SP".equals(line.aRegister)) {
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								}
-								i += 4;
-							} else if (tokens[(i+=2)] instanceof LiteralToken) {
-								if (tokens[i+1] instanceof AValueEndToken) {
-									char val = (char) (((LiteralToken)tokens[i]).getValue() & 0xFFFF);
-									if (val >= 31 && val != 0xFFFF) {
-										size++;
-										line.literalA = val;
-										line.literalASet = true;
-										((SpecialOpCodeToken)token).setAValueNextWord(true);
-									}
-								} else {
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof RegisterToken) {
-								if (!(tokens[i+1] instanceof AValueEndToken)) {
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof AddressStartToken) {
-								if (tokens[++i] instanceof RegisterToken) {
-									if (!(tokens[++i] instanceof AddressEndToken)) {
-										size++;
-										((SpecialOpCodeToken)token).setAValueNextWord(true);
-									}
-								} else {
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else if (tokens[i] instanceof SimpleStackAccessToken) {
-							} else if (tokens[i] instanceof LabelToken && !line.aHasOperator) {
-								if (((LabelToken)tokens[i]).valueSet) {
-									char val = (char) ((LabelToken)tokens[i]).value;
-									if (val >= 31 && val != 0xFFFF) {
-										size++;
-										line.literalA = val;
-										line.literalASet = true;
-										((SpecialOpCodeToken)token).setAValueNextWord(true);
-									}
-								} else { //What else?
-									size++;
-									((SpecialOpCodeToken)token).setAValueNextWord(true);
-								}
-							} else {
-								size++;
-								((SpecialOpCodeToken)token).setAValueNextWord(true);
-							}
-						} else if (token instanceof DataToken) {
-							i++;
-							while (i < tokens.length && tokens[i] instanceof DataValueStartToken) {
-								token = tokens[++i];
-								if (!(tokens[i+1] instanceof DataValueEndToken)) {
-									size++;
-									while (!(tokens[++i] instanceof DataValueEndToken)) {}
-								} else {
-									if (token instanceof StringToken) {
-										//TODO: Decide whether strings should default to packed or not (currently they are not, and non-ascii characters are allowed in the string)
-										size += ((StringToken)token).getString().length();
-									} else {
-										size++;
-									}
-									i++;
 								}
 								i++;
 							}
+							i++;
 						}
+						line.size = size;
+						line.sized = true;
+						oMin += size;
+						oMax += size;
+					} else {
+						if (tokens[line.aStart] instanceof LiteralToken) {
+							if (tokens[line.aStart + 1] instanceof AValueEndToken) {
+								char val = (char) (((LiteralToken)tokens[line.aStart]).getValue() & 0xFFFF);
+								if (val >= 31 && val != 0xFFFF) {
+									line.literalA = val;
+									line.literalASet = true;
+									line.aVal = 0x1f;
+									line.aSet = true;
+									line.size = 2 + line.bSize;
+									line.sized = true;
+									if (line.isSpecial) {
+										((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+									} else {
+										((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+									}
+								} else {
+									line.aVal = (char) (0x21 + val);
+									line.aSet = true;
+									line.size = 1 + line.bSize;
+									line.sized = true;
+								}
+							} else {
+								line.size = 2 + line.bSize;
+								line.sized = true;
+								if (line.isSpecial) {
+									((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+								} else {
+									((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+								}
+							}
+						} else if (tokens[line.aStart] instanceof LabelToken) {
+							if (tokens[line.aStart + 1] instanceof AValueEndToken) {
+								if (((LabelToken)tokens[line.aStart]).valueSet) {
+									char val = (char) (((LabelToken)tokens[line.aStart]).value & 0xFFFF);
+									if (val >= 31 && val != 0xFFFF) {
+										line.literalA = val;
+										line.literalASet = true;
+										line.aVal = 0x1f;
+										line.aSet = true;
+										line.size = 2 + line.bSize;
+										line.sized = true;
+										if (line.isSpecial) {
+											((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+										} else {
+											((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+										}
+									} else {
+										line.aVal = (char) (0x21 + val);
+										line.aSet = true;
+										line.size = 1 + line.bSize;
+										line.sized = true;
+									}
+								} else {
+									line.size = 2 + line.bSize;
+									line.sized = true;
+									if (line.isSpecial) {
+										((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+									} else {
+										((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+									}
+								}
+							} else {
+								line.size = 2 + line.bSize;
+								line.sized = true;
+								if (line.isSpecial) {
+									((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+								} else {
+									((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+								}
+							}
+						} else {
+							System.out.println(tokens[line.aStart].getClass().getCanonicalName());
+							line.size = 2 + line.bSize;
+							line.sized = true;
+							if (line.isSpecial) {
+								((SpecialOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+							} else {
+								((BasicOpCodeToken)line.opCodeToken).setAValueNextWord(true);
+							}
+						}
+						oMin += line.size;
+						oMax += line.size;
 					}
-					line.size = size;//TODO
-					line.sized = true;
-					oMin += line.size;
-					oMax += line.size;
-					
-	//					System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
+//					System.out.println(line.getOffset() + ": (" + line.getSize() + ") " + line.getText());
 				}
 			} else {
 				oMin += line.size;
 				oMax += line.size;
 			}
 			exact = oMin == oMax;
+			finished &= exact;
 		}
+		return finished;
 	}
 
 	private void assembleToBuffer(char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
@@ -523,12 +444,12 @@ public class Assembly {
 					LexerToken token = tokens[i];
 					if (token instanceof SpecialOpCodeToken) {
 						opCode = OpCodes.special.getId(token.getText().toUpperCase());
-						a = getA(tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
+						a = getA(line, tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
 						ram[pc] = (char)(opCode << 5 | a << 10);
 					} else if (token instanceof BasicOpCodeToken) {
 						opCode = OpCodes.basic.getId(token.getText().toUpperCase());
-						a = getA(tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
-						b = getB(tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
+						a = getA(line, tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
+						b = getB(line, tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
 						ram[pc] = (char)(opCode | b << 5 | a << 10);
 					} else if (token instanceof DataValueStartToken) {
 						pc = assembleData(tokens, i+1, ram, pc);
@@ -571,7 +492,19 @@ public class Assembly {
 		return pc;
 	}
 
-	private int getB(LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+	private int getB(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+		if (line.bSet) {
+			switch (line.bClass) {
+			case VALUE_REGISTER:
+			case VALUE_REGISTER_MEMORY:
+			case VALUE_SIMPLE_STACK:
+				return line.bVal;
+			case VALUE_LITERAL_ADDRESS:
+			case VALUE_OFFSET_STACK:
+			case VALUE_REGISTER_OFFSET_MEMORY:
+			case VALUE_LITERAL:
+			}
+		}
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
@@ -690,7 +623,7 @@ public class Assembly {
 		return 0;
 	}
 
-	private int getA(LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
+	private int getA(AssemblyLine line, LexerToken[] tokens, int i, int offset, char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		boolean isAddress;
 		boolean isExpression;
 		boolean hasSimpleStackAccessor;
@@ -847,6 +780,10 @@ public class Assembly {
 
 	public int getLineCount() {
 		return lines.size();
+	}
+
+	public int getPasses() {
+		return passes;
 	}
 
 	public int getSize() {

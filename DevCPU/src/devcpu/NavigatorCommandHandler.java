@@ -140,7 +140,7 @@ public class NavigatorCommandHandler implements IHandler {
 											Assembly a = new Assembly(file);
 											a.assemble(dcpu);
 											long stop = System.nanoTime();
-											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
+											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " assembly passes. Assembled size is " + a.getSize() + " words. Assembly reports a minimum of " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of estimated total).\n");
 										} catch (IOException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();

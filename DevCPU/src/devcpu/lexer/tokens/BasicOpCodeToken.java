@@ -10,9 +10,11 @@ public class BasicOpCodeToken extends TrimmedLexerToken{
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	private boolean nextWordB;
 	private boolean nextWordA;
+	public String mnemonic;
 
 	public BasicOpCodeToken(String text, int start, int end) {
 		super(text, start, end);
+		mnemonic = this.text.toUpperCase();
 	}
 
 	@Override

@@ -9,9 +9,11 @@ public class SpecialOpCodeToken extends TrimmedLexerToken{
 	public static final Color FOREGROUND = DASMColorProvider.get().getColor(new RGB(127, 0, 85));
 	public static final Color BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	private boolean nextWordA;
+	public String mnemonic;
 
 	public SpecialOpCodeToken(String text, int start, int end) {
 		super(text, start, end);
+		mnemonic = this.text.toUpperCase();
 	}
 
 	@Override

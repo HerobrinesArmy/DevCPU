@@ -25,7 +25,7 @@ public class Activator extends AbstractUIPlugin {
 		
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {console});  
 	}
-	
+
 	// The shared instance
 	private static Activator plugin;
 	
