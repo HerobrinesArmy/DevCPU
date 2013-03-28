@@ -25,21 +25,16 @@ import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
-import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
-import devcpu.assembler.expression.Register;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
-import devcpu.emulation.OpCodes;
 import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.AValueEndToken;
 import devcpu.lexer.tokens.AValueStartToken;
 import devcpu.lexer.tokens.AddressEndToken;
-import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
 import devcpu.lexer.tokens.BValueStartToken;
-import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataValueEndToken;
 import devcpu.lexer.tokens.DataValueStartToken;
 import devcpu.lexer.tokens.ErrorToken;
@@ -47,7 +42,6 @@ import devcpu.lexer.tokens.LabelDefinitionToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
-import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
 import devcpu.util.Util;
 
@@ -66,6 +60,7 @@ public class Assembly {
 	private int shortened;
 	private long timer;
 	private int passes;
+	private LinkedHashMap<Pattern, Define> patterns;
 
 	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
 		rootDocument = new AssemblyDocument(file, this, null);
@@ -106,15 +101,17 @@ public class Assembly {
 	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException {
 		//Note: Label collection can be done here now, but directives added later could necessitate
 		//moving this until after all preprocessing is done.
-		System.out.println("********************************************************************");
+//		System.out.println("********************************************************************");
 		boolean accomplishedSomething = false;
-		boolean finished = true;
+//		boolean finished = true;
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
-		LinkedHashMap<Pattern,Define> patterns = new LinkedHashMap<Pattern, Define>();
-		for (String key : defines.keySet()) {
-			patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
+		if (preprocess) {
+			patterns = new LinkedHashMap<Pattern, Define>();
+			for (String key : defines.keySet()) {
+				patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
+			}
 		}
 		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
@@ -300,8 +297,6 @@ public class Assembly {
 						oMax += line.size;
 					}
 				} else {
-					
-					//TODO START HERE ******************
 					LexerToken[] tokens = line.getProcessedTokens();
 					if (line.isDat) {
 						int i = line.dataStart;
@@ -346,6 +341,7 @@ public class Assembly {
 									line.opCodeToken.setAValueNextWord(false);
 								}
 							} else {
+								//TODO Expression
 								line.size = 2 + line.bSize;
 								line.sized = true;
 								line.opCodeToken.setAValueNextWord(true);
@@ -406,7 +402,7 @@ public class Assembly {
 								line.opCodeToken.setAValueNextWord(true);
 							}
 						} else {
-							System.out.println(tokens[line.aStart].getClass().getCanonicalName());
+							//TODO Expression
 							line.size = 2 + line.bSize;
 							line.sized = true;
 							line.opCodeToken.setAValueNextWord(true);
@@ -422,15 +418,14 @@ public class Assembly {
 				oMax += line.size;
 			}
 			exact = oMin == oMax;
-			if (!line.sized) { System.out.println(line.getText());}
-			finished &= exact;
+//			if (!line.sized) { System.out.println(line.getText());}
+//			finished &= exact;
 		}
-		return accomplishedSomething && !finished;
+		return accomplishedSomething;// && !finished;
 	}
 
 	private void assembleToBuffer(char[] ram) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		int pc = 0;
-		int opCode;
 		int a;
 		int b;
 		for (AssemblyLine line : lines) {
@@ -462,19 +457,19 @@ public class Assembly {
 				}
 			} else {
 				LexerToken[] tokens = line.getProcessedTokens();
-				for (int i = 0; i < tokens.length; i++) {
-					LexerToken token = tokens[i];
-					if (token instanceof SpecialOpCodeToken) {
-						opCode = OpCodes.special.getId(token.getText().toUpperCase());
-						a = getA(line, tokens,i+1,((SpecialOpCodeToken)token).isNextWordA()?pc+1:0,ram);
-						ram[pc] = (char)(opCode << 5 | a << 10);
-					} else if (token instanceof BasicOpCodeToken) {
-						opCode = OpCodes.basic.getId(token.getText().toUpperCase());
-						a = getA(line, tokens,i+1,((BasicOpCodeToken)token).isNextWordA()?pc+1:0,ram);
-						b = getB(line, tokens,i+1,((BasicOpCodeToken)token).isNextWordB()?((BasicOpCodeToken)token).isNextWordA()?pc+2:pc+1:0,ram);
-						ram[pc] = (char)(opCode | b << 5 | a << 10);
-					} else if (token instanceof DataValueStartToken) {
-						pc = assembleData(tokens, i+1, ram, pc);
+				if (line.isBasic) {
+					a = getA(line, tokens,line.aStart,line.opCodeToken.isNextWordA()?pc+1:0,ram);
+					b = getB(line, tokens,line.bStart,line.opCodeToken.isNextWordB()?line.opCodeToken.isNextWordA()?pc+2:pc+1:0,ram);
+					ram[pc] = (char)(line.opCode | b << 5 | a << 10);
+				} else if (line.isSpecial) {
+					a = getA(line, tokens,line.aStart,line.opCodeToken.isNextWordA()?pc+1:0,ram);
+					ram[pc] = (char)(line.opCode << 5 | a << 10);
+				} else if (line.isDat) {
+					for (int i = 0; i < tokens.length; i++) {
+						LexerToken token = tokens[i];
+						if (token instanceof DataValueStartToken) {
+							pc = assembleData(tokens, i+1, ram, pc);
+						}
 					}
 				}
 			}
@@ -521,73 +516,55 @@ public class Assembly {
 			case VALUE_REGISTER_MEMORY:
 			case VALUE_SIMPLE_STACK:
 				return line.bVal;
-			case VALUE_LITERAL_ADDRESS:
-			case VALUE_OFFSET_STACK:
-			case VALUE_REGISTER_OFFSET_MEMORY:
-			case VALUE_LITERAL:
-				if (line.literalBSet) {
-					buf[offset] = line.literalB;
-					return line.bVal;
-				}
+//			case VALUE_LITERAL_ADDRESS:
+//			case VALUE_OFFSET_STACK:
+//			case VALUE_REGISTER_OFFSET_MEMORY:
+//			case VALUE_LITERAL:
 			}
 		}
-		boolean isAddress;
-		boolean isExpression;
-		boolean hasSimpleStackAccessor;
-		String register = "";
 		boolean hasNextWord = offset > 0;
 		
-		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
+//		while (!(tokens[i] instanceof BValueStartToken)) {i++;}
 		Group value = null;
-		if (tokens[i+1] instanceof AddressStartToken) {
-			value = new Address(tokens,i+1,AddressEndToken.class);
-			isAddress = true;
+		if (line.bIsAddress) {
+			value = new Address(tokens,line.bStart,AddressEndToken.class);
 		} else {
-			value = new Group(tokens,i,BValueEndToken.class);	
-			isAddress = false;
+			value = new Group(tokens,line.bStart-1,BValueEndToken.class);	
 		}
 		
-		isExpression = value.isExpression();
-		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
-		List<Register> registers = value.getRegisters();
+//		isExpression = value.isExpression();
+//		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
+//		List<Register> registers = value.getRegisters();
 		//Register validity checks
-		if (registers.size() > 1) {
-			throw new TooManyRegistersInExpressionException(this, registers, tokens, "b");
-		} else if (registers.size() == 1) {
-			register = registers.get(0).getRegister();
-			if (register.equals("EX") || register.equals("PC")) {
-				if (isAddress || isExpression) {
-					throw new BadValueException(this, tokens, register + " used in an address or expression.");
+		if (line.bHasRegister) {
+			if (line.bRegister.equals("EX") || line.bRegister.equals("PC")) {
+				if (line.bIsAddress || line.bHasOperator) {
+					throw new BadValueException(this, tokens, line.bRegister + " used in an address or expression.");
 				}
 			}
-			if (!isAddress && isExpression) {
-				throw new BadValueException(this, tokens, register + " used in an expression outside of an address."); 
+			if (!line.bIsAddress && line.bHasOperator) {
+				throw new BadValueException(this, tokens, line.bRegister + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(this, tokens, register + " used in a unary operation.");
+				throw new BadValueException(this, tokens, line.bRegister + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(this, tokens, register + " subtracted.");
+				throw new BadValueException(this, tokens, line.bRegister + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(this, tokens, register + " used in disallowed operation.");
+				throw new BadValueException(this, tokens, line.bRegister + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
-		//SSA validity checks
-		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
-			throw new BadValueException(this, tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
-		}
-		
 		if (hasNextWord) {
 			buf[offset] = (char) literal;
-			if (isAddress) {
-				if (registers.size() == 1) {
-					if (register.equals("SP")) { //0x1a | [SP + next word] / PICK n
+			if (line.bIsAddress) {
+				if (line.bHasRegister) {
+					if (line.bRegister.equals("SP")) { //0x1a | [SP + next word] / PICK n
 						return 0x1a;
 					} else { //0x10-0x17 | [register + next word]
-						return 0x10 + REGISTERS.indexOf(register);
+						return 0x10 + REGISTERS.indexOf(line.bRegister);
 					}
 				} else { //0x1e | [next word]
 					return 0x1e;
@@ -598,26 +575,26 @@ public class Assembly {
 				return 0x1f;
 			}
 		} else { //Not next word
-			if (isAddress) {
+			if (line.bIsAddress) {
 //				if (register.equals("SP")) { //0x19 | [SP] / PEEK
 //					return 0x19; //TODO FIXME I think this is actually guaranteed to be a simple stack accessor
 //				} else { //0x08-0x0f | [register]
-				return 0x08 + REGISTERS.indexOf(register);
+				return 0x08 + REGISTERS.indexOf(line.bRegister);
 //				}
 			} else {
-				if (registers.size() == 1) {
-					if (register.equals("SP")) { //0x1b | SP
+				if (line.bHasRegister) {
+					if (line.bRegister.equals("SP")) { //0x1b | SP
 						return 0x1b;
 					}
-					if (register.equals("PC")) { //0x1c | PC
+					if (line.bRegister.equals("PC")) { //0x1c | PC
 						return 0x1c;
 					}
-					if (register.equals("EX")) { //0x1d | EX
+					if (line.bRegister.equals("EX")) { //0x1d | EX
 						return 0x1d;
 					}
 					//0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
-					return REGISTERS.indexOf(register);
-				} else if (hasSimpleStackAccessor) {
+					return REGISTERS.indexOf(line.bRegister);
+				} else if (line.bHasSimpleStack) {
 					String accessor = value.getSimpleStackAccessor().getAccessor();
 					if (accessor.equals("PUSH") || accessor.equals("[--SP]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
 						return 0x18;
@@ -666,63 +643,45 @@ public class Assembly {
 				}
 			}
 		}
-		boolean isAddress;
-		boolean isExpression;
-		boolean hasSimpleStackAccessor;
-		String register = "";
 		boolean hasNextWord = offset > 0;
 		
-		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
+//		while (!(tokens[i] instanceof AValueStartToken)) {i++;}
 		Group value = null;
-		if (tokens[i+1] instanceof AddressStartToken) {
-			value = new Address(tokens,i+1,AddressEndToken.class);
-			isAddress = true;
+		if (line.aIsAddress) {
+			value = new Address(tokens,line.aStart,AddressEndToken.class);
 		} else {
-			value = new Group(tokens,i,AValueEndToken.class);	
-			isAddress = false;
+			value = new Group(tokens,line.aStart-1,AValueEndToken.class);	
 		}
 		
-		isExpression = value.isExpression();
-		hasSimpleStackAccessor = value.hasSimpleStackAccessor();
-		List<Register> registers = value.getRegisters();
-		//Register validity checks
-		if (registers.size() > 1) {
-			throw new TooManyRegistersInExpressionException(this, registers, tokens, "a");
-		} else if (registers.size() == 1) {
-			register = registers.get(0).getRegister();
-			if (register.equals("EX") || register.equals("PC")) {
-				if (isAddress || isExpression) {
-					throw new BadValueException(this, tokens, register + " used in an address or expression.");
+		if (line.aHasRegister) {
+			if (line.aRegister.equals("EX") || line.aRegister.equals("PC")) {
+				if (line.aIsAddress || line.aHasOperator) {
+					throw new BadValueException(this, tokens, line.aRegister + " used in an address or expression.");
 				}
 			}
-			if (!isAddress && isExpression) {
-				throw new BadValueException(this, tokens, register + " used in an expression outside of an address."); 
+			if (!line.aIsAddress && line.aHasOperator) {
+				throw new BadValueException(this, tokens, line.aRegister + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(this, tokens, register + " used in a unary operation.");
+				throw new BadValueException(this, tokens, line.aRegister + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(this, tokens, register + " subtracted.");
+				throw new BadValueException(this, tokens, line.aRegister + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(this, tokens, register + " used in disallowed operation.");
+				throw new BadValueException(this, tokens, line.aRegister + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).build().calculate(); 
 		
-		//SSA validity checks
-		if (hasSimpleStackAccessor && (isAddress || isExpression)) {
-			throw new BadValueException(this, tokens, value.getSimpleStackAccessor().getAccessor() + " used in an address or expression.");
-		}
-		
 		if (hasNextWord) {
 			ram[offset] = (char) literal;
-			if (isAddress) {
-				if (registers.size() == 1) {
-					if (register.equals("SP")) { //0x1a | [SP + next word] / PICK n
+			if (line.aIsAddress) {
+				if (line.aHasRegister) {
+					if (line.aRegister.equals("SP")) { //0x1a | [SP + next word] / PICK n
 						return 0x1a;
 					} else { //0x10-0x17 | [register + next word]
-						return 0x10 + REGISTERS.indexOf(register);
+						return 0x10 + REGISTERS.indexOf(line.aRegister);
 					}
 				} else { //0x1e | [next word]
 					return 0x1e;
@@ -736,21 +695,21 @@ public class Assembly {
 				return 0x1f;
 			}
 		} else { //Not next word
-			if (isAddress) {
-				return 0x08 + REGISTERS.indexOf(register);
+			if (line.aIsAddress) {
+				return 0x08 + REGISTERS.indexOf(line.aRegister);
 			} else {
-				if (registers.size() == 1) {
-					if (register.equals("SP")) { //0x1b | SP
+				if (line.aHasRegister) {
+					if (line.aRegister.equals("SP")) { //0x1b | SP
 						return 0x1b;
 					}
-					if (register.equals("PC")) { //0x1c | PC
+					if (line.aRegister.equals("PC")) { //0x1c | PC
 						return 0x1c;
 					}
-					if (register.equals("EX")) { //0x1d | EX
+					if (line.aRegister.equals("EX")) { //0x1d | EX
 						return 0x1d;
 					}
-					return REGISTERS.indexOf(register); //0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
-				} else if (hasSimpleStackAccessor) {
+					return REGISTERS.indexOf(line.aRegister); //0x00-0x07 | register (A, B, C, X, Y, Z, I or J, in that order)
+				} else if (line.aHasSimpleStack) {
 					String accessor = value.getSimpleStackAccessor().getAccessor();
 					if (accessor.equals("POP") || accessor.equals("[SP++]")) { //0x18 | (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
 						return 0x18;

@@ -24,7 +24,7 @@ public class AssemblyDocument {
 	private Assembly assembly;
 	private AssemblyDocument parent;
 	private ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
-	private ArrayList<Directive> directives = new ArrayList<Directive>();
+//	private ArrayList<Directive> directives = new ArrayList<Directive>();
 	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
 
 	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) {
@@ -36,6 +36,7 @@ public class AssemblyDocument {
 
 	public void readLines() throws IOException, CoreException, AbstractAssemblyException {
 		//TODO prompt if unsync?
+		//TODO Don't tokenize until preprocess; just read in and check for includes and defines
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
 		int n = 0;
@@ -47,7 +48,7 @@ public class AssemblyDocument {
 					directive = new Directive(line, (DirectiveToken) token);
 				} else if (token instanceof DirectiveParametersToken) {
 					directive.setParameters((DirectiveParametersToken)token);
-					directives.add(directive);
+//					directives.add(directive);
 					line.setDirective(directive);
 					if (directive.isInclude()) {
 						AssemblyDocument doc = loadInclude(new Include(directive));
@@ -72,9 +73,9 @@ public class AssemblyDocument {
 		return lines;
 	}
 
-	public ArrayList<Directive> getDirectives() {
-		return directives;
-	}
+//	public ArrayList<Directive> getDirectives() {
+//		return directives;
+//	}
 
 	public Assembly getAssembly() {
 		return assembly;

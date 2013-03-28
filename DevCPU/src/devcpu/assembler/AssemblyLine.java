@@ -1,5 +1,6 @@
 package devcpu.assembler;
 
+import devcpu.assembler.exceptions.BadValueException;
 import devcpu.emulation.OpCodes;
 import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
@@ -46,8 +47,8 @@ public class AssemblyLine {
 	public char bVal;
 	public boolean aSet;
 	public boolean bSet;
-	public boolean opCodeSet;//Needed?
-	public boolean assembled;//Unused?
+//	public boolean opCodeSet;//Needed?
+//	public boolean assembled;//Unused?
 	public boolean sized;
 	public boolean located;
 	//Set by Preprocess
@@ -56,23 +57,21 @@ public class AssemblyLine {
 	public boolean isSpecial;
 	public boolean isBasic;
 //	public String mnemonic;
+	public boolean aHasRegister;
+	public boolean aIsAddress;
+	public boolean aHasOperator;
+	public boolean aHasSimpleStack;
+	public boolean aHasOffsetStack;
+	public String bRegister;
+	public 	String bAccessor;
+	public boolean bHasRegister;
+	public boolean bIsAddress;
+	public boolean bHasOperator;
+	public boolean bHasSimpleStack;
+	public boolean bHasOffsetStack;
 	public OpCodeToken opCodeToken;
 	public String aRegister;
-	public String bRegister;
 	public String aAccessor;
-	public String bAccessor;
-	public boolean aHasRegister;
-	public boolean bHasRegister;
-	public boolean aIsAddress;
-	public boolean bIsAddress;
-	public boolean aHasOperator;
-	public boolean bHasOperator;
-	public boolean aHasNonAddition;
-	public boolean bHasNonAddition;
-	public boolean aHasSimpleStack;
-	public boolean bHasSimpleStack;
-	public boolean aHasOffsetStack;
-	public boolean bHasOffsetStack;
 	public int bSize;
 	public int aStart;
 	public int bStart;
@@ -82,9 +81,9 @@ public class AssemblyLine {
 	public int bClass;
 	//Set on Calculation
 	public char literalA;
-	public char literalB;
+//	public char literalB;
 	public boolean literalASet;
-	public boolean literalBSet;
+//	public boolean literalBSet;
 
 	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens) {
 		this.document = document;
@@ -116,7 +115,10 @@ public class AssemblyLine {
 		}
 	}
 	
-	public void preprocess() {
+	public void preprocess() throws BadValueException {
+//	boolean aHasNonAddition = false;		
+//	boolean bHasNonAddition = false;
+		
 		boolean inA = false;
 		int i = 0;
 		for (LexerToken t : processedTokens) {
@@ -181,22 +183,22 @@ public class AssemblyLine {
 			} else if (t instanceof OperatorToken || t instanceof GroupStartToken) {
 				if (inA) {
 					aHasOperator = true;
-					if (!"+".equals(t.getText())) {
-						aHasNonAddition = true;
-					}
+//					if (!"+".equals(t.getText())) {
+//						aHasNonAddition = true;
+//					}
 				} else {
 					bHasOperator = true;
-					if (!"+".equals(t.getText())) {
-						bHasNonAddition = true;
-					}
+//					if (!"+".equals(t.getText())) {
+//						bHasNonAddition = true;
+//					}
 				}
 			} else if (t instanceof UnaryOperatorToken) {
 				if (inA) {
 					aHasOperator = true;
-					aHasNonAddition = true;
+//					aHasNonAddition = true;
 				} else {
 					bHasOperator = true;
-					bHasNonAddition = true;
+//					bHasNonAddition = true;
 				}
 			}
 			i++;
@@ -247,6 +249,9 @@ public class AssemblyLine {
 				aSet = true;
 			} else if (aHasSimpleStack) {
 				aClass = VALUE_SIMPLE_STACK;
+				if (aIsAddress || aHasOperator) {
+					throw new BadValueException(this.document.getAssembly(), processedTokens, aAccessor + " used in an address or expression.");
+				}
 				if ("POP".equals(aAccessor) || "[SP++]".equals(aAccessor)) {
 					aVal = 0x18;
 				} else { //[SP]/PEEK
@@ -329,6 +334,10 @@ public class AssemblyLine {
 					bSet = true;
 				} else if (bHasSimpleStack) {
 					bClass = VALUE_SIMPLE_STACK;
+					//SSA validity check
+					if (bIsAddress || bHasOperator) {
+						throw new BadValueException(this.document.getAssembly(), processedTokens, bAccessor + " used in an address or expression.");
+					}
 					if ("PUSH".equals(bAccessor) || "[--SP]".equals(bAccessor)) {
 						bVal = 0x18;
 					} else { //[SP]/PEEK
