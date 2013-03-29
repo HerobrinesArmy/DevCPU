@@ -8,6 +8,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
@@ -18,6 +19,7 @@ import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.LEM1802Viewer;
 import devcpu.emulation.VirtualMonitor;
+import devcpu.util.Util;
 
 public class LEM1802View extends MappedView<VirtualMonitor> {
 
@@ -58,7 +60,7 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		final MenuManager attachSubmenu = new MenuManager("Attach LEM1802");
+		final MenuManager attachSubmenu = new MenuManager("Attach LEM1802",Util.getImageDescriptor("icons/lem.png"),null);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
@@ -67,7 +69,11 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 				for (DCPUHardware h : Activator.getShip().getHardwareManager().getDevices(VirtualMonitor.class)) {
 					final VirtualMonitor vm = ((VirtualMonitor)h);
 					attachSubmenu.add(new Action(vm.getID()) {
-						public void run() {
+						@Override
+  	    		public ImageDescriptor getImageDescriptor() {
+  	    			return Util.getImageDescriptor("icons/lem.png");
+  	    		}
+  	    		public void run() {
 							synchronized (lv) {
 								map(vm);
 							}

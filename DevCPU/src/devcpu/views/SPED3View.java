@@ -8,6 +8,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
@@ -18,6 +19,7 @@ import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.SPED3Viewer;
 import devcpu.emulation.VirtualVectorDisplay;
+import devcpu.util.Util;
 
 public class SPED3View extends MappedView<VirtualVectorDisplay> {
 
@@ -75,7 +77,7 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		final MenuManager attachSubmenu = new MenuManager("Attach SPED-3");
+		final MenuManager attachSubmenu = new MenuManager("Attach SPED-3", Util.getImageDescriptor("icons/sped.png"), null);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
@@ -84,7 +86,11 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 				for (DCPUHardware h : Activator.getShip().getHardwareManager().getDevices(VirtualVectorDisplay.class)) {
 					final VirtualVectorDisplay vvd = ((VirtualVectorDisplay)h);
 					attachSubmenu.add(new Action(vvd.getID()) {
-						public void run() {
+						@Override
+  	    		public ImageDescriptor getImageDescriptor() {
+  	    			return Util.getImageDescriptor("icons/sped.png");
+  	    		}
+  	    		public void run() {
 							synchronized (s3v) {
 								map(vvd);
 							}

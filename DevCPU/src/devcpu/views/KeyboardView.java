@@ -16,6 +16,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
@@ -25,6 +26,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.VirtualKeyboard;
+import devcpu.util.Util;
 
 public class KeyboardView extends MappedView<VirtualKeyboard> {
 
@@ -107,7 +109,7 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		final MenuManager attachSubmenu = new MenuManager("Attach Generic Keyboard");
+		final MenuManager attachSubmenu = new MenuManager("Attach Generic Keyboard",Util.getImageDescriptor("icons/keyboard.png"),null);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
@@ -116,7 +118,11 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 				for (DCPUHardware h : Activator.getShip().getHardwareManager().getDevices(VirtualKeyboard.class)) {
 					final VirtualKeyboard vm = ((VirtualKeyboard)h);
 					attachSubmenu.add(new Action(vm.getID()) {
-						public void run() {
+						@Override
+  	    		public ImageDescriptor getImageDescriptor() {
+  	    			return Util.getImageDescriptor("icons/keyboard.png");
+  	    		}
+  	    		public void run() {
 							map(vm);
 						}
 					});

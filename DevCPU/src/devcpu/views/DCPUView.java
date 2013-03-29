@@ -6,6 +6,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -19,6 +20,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 
 import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
+import devcpu.util.Util;
 
 public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements DCPUTickListener*/ {
 
@@ -151,7 +153,7 @@ static public void appendHexString(StringBuilder buffer, short value) {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				DCPUView.this.fillContextMenu(manager);
+				fillContextMenu(manager);
 			}
 		});
 	}
@@ -163,7 +165,7 @@ static public void appendHexString(StringBuilder buffer, short value) {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		final MenuManager attachSubmenu = new MenuManager("Attach DCPU");
+		final MenuManager attachSubmenu = new MenuManager("Attach DCPU",Util.getImageDescriptor("icons/dcpu.png"),null);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
@@ -171,7 +173,11 @@ static public void appendHexString(StringBuilder buffer, short value) {
 				attachSubmenu.removeAll();
 				for (final DefaultControllableDCPU d : Activator.getShip().getDCPUManager().getDCPUs()) {
 					attachSubmenu.add(new Action(d.getID()) {
-						public void run() {
+						@Override
+  	    		public ImageDescriptor getImageDescriptor() {
+  	    			return Util.getImageDescriptor("icons/dcpu.png");
+  	    		}
+  	    		public void run() {
 							connect(d);
 						}
 					});
