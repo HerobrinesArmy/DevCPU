@@ -62,7 +62,8 @@ public class AssemblyDocument {
 			}
 			lines.add(line);
 			assembly.lines.add(line);
-		}		
+		}
+		isr.close();
 	}
 
 	public IFile getFile() {
