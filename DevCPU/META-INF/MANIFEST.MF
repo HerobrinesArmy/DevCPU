@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DevCPU
 Bundle-SymbolicName: DevCPU;singleton:=true
-Bundle-Version: 0.1.0
+Bundle-Version: 0.0.0
 Bundle-Activator: devcpu.Activator
 Bundle-Vendor: Herobrine
 Require-Bundle: org.eclipse.ui,
@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.egit.ui,
  org.eclipse.mylyn.github.ui;resolution:=optional,
  org.eclipse.ui.ide.application,
- org.eclipse.debug.ui
+ org.eclipse.debug.ui,
+ org.eclipse.ui.intro
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
  JavaSE-1.6
 Bundle-ActivationPolicy: lazy
