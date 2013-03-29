@@ -141,6 +141,7 @@
          </separator>
          <command
                commandId="AssembleToDCPU"
+               icon="icons/dcpu.png"
                label="Assemble to DCPU..."
                style="push">
             <visibleWhen>
@@ -167,6 +168,7 @@
          </command>
          <command
                commandId="AssembleToFloppy"
+               icon="icons/disk.png"
                label="Assemble to floppy..."
                style="push">
             <visibleWhen>
@@ -193,6 +195,7 @@
          </command>
          <command
                commandId="WriteToDCPU"
+               icon="icons/dcpu.png"
                label="Write to DCPU..."
                style="push">
             <visibleWhen>
@@ -209,6 +212,7 @@
          </command>
          <command
                commandId="WriteToFloppy"
+               icon="icons/disk.png"
                label="Write to floppy..."
                style="push">
             <visibleWhen>
