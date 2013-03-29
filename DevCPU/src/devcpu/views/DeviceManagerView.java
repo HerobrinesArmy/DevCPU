@@ -10,6 +10,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -39,6 +40,7 @@ import devcpu.emulation.VirtualVectorDisplay;
 import devcpu.managers.DCPUManager;
 import devcpu.managers.FloppyManager;
 import devcpu.managers.HardwareManager;
+import devcpu.util.Util;
 
 public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
@@ -129,7 +131,11 @@ public class DeviceManagerView extends ViewPart {
 	        if (o instanceof DCPUManager) {
 	        	final DCPUManager dcpuManager = (DCPUManager) o;
 	        	manager.add(new Action("Add DCPU") {
-	        		public void run() {
+	        		@Override
+    	    		public ImageDescriptor getImageDescriptor() {
+    	    			return Util.getImageDescriptor("icons/dcpu.png");
+    	    		}
+    	    		public void run() {
 	        			DefaultControllableDCPU dcpu = dcpuManager.createDCPU();
 	        			treeViewer.expandToLevel(dcpu, 0);
 	        			contentProvider.update();
@@ -138,7 +144,11 @@ public class DeviceManagerView extends ViewPart {
 	        } else if (o instanceof FloppyManager) {
 	        	final FloppyManager floppyManager = (FloppyManager) o;
 	        	manager.add(new Action("Add Floppy") {
-	        		public void run() {
+	        		@Override
+    	    		public ImageDescriptor getImageDescriptor() {
+    	    			return Util.getImageDescriptor("icons/disk.png");
+    	    		}
+    	    		public void run() {
 	        			FloppyDisk disk = floppyManager.createFloppyDisk();
 	        			treeViewer.expandToLevel(disk, 0);
 	        			contentProvider.update();
@@ -202,11 +212,15 @@ public class DeviceManagerView extends ViewPart {
 	        	}
 	        } else if (o instanceof HardwareManager) {
         	final HardwareManager hardwareManager = (HardwareManager) o;
-        	MenuManager hardwareMenu = new MenuManager("Add Hardware");
+        	MenuManager hardwareMenu = new MenuManager("Add Hardware", Util.getImageDescriptor("icons/hw.png"),null);
       	  hardwareMenu.addMenuListener(new IMenuListener() {
       	    @Override
       	    public void menuAboutToShow(IMenuManager manager) {
       	    	manager.add(new Action("Generic Clock") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/clock.png");
+      	    		}
       	    		public void run() {
       	    			VirtualClock vc = hardwareManager.createVirtualClock();
       	    			treeViewer.expandToLevel(vc, 0);
@@ -214,6 +228,10 @@ public class DeviceManagerView extends ViewPart {
       	    		};
       	    	});
       	    	manager.add(new Action("Generic Keyboard") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/keyboard.png");
+      	    		}
       	    		public void run() {
       	    			VirtualKeyboard vk = hardwareManager.createVirtualKeyboard();
       	    			treeViewer.expandToLevel(vk, 0);
@@ -221,6 +239,10 @@ public class DeviceManagerView extends ViewPart {
       	    		};
       	    	});
       	    	manager.add(new Action("LEM1802") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/lem.png");
+      	    		}
       	    		public void run() {
       	    			VirtualMonitor vm = hardwareManager.createVirtualMonitor();
       	    			treeViewer.expandToLevel(vm, 0);
@@ -228,6 +250,10 @@ public class DeviceManagerView extends ViewPart {
       	    		};
       	    	});
       	    	manager.add(new Action("M35FD") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/fd.png");
+      	    		}
       	    		public void run() {
       	    			VirtualFloppyDrive vfd = hardwareManager.createVirtualFloppyDrive();
       	    			treeViewer.expandToLevel(vfd, 0);
@@ -235,6 +261,10 @@ public class DeviceManagerView extends ViewPart {
       	    		};
       	    	});
       	    	manager.add(new Action("SPC2000") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/spc.png");
+      	    		}
       	    		public void run() {
       	    			VirtualSleepChamber vsc = hardwareManager.createVirtualSleepChamber();
       	    			treeViewer.expandToLevel(vsc, 0);
@@ -242,6 +272,10 @@ public class DeviceManagerView extends ViewPart {
       	    		};
       	    	});
       	    	manager.add(new Action("SPED-3") {
+      	    		@Override
+      	    		public ImageDescriptor getImageDescriptor() {
+      	    			return Util.getImageDescriptor("icons/sped.png");
+      	    		}
       	    		public void run() {
       	    			VirtualVectorDisplay vvd = hardwareManager.createVirtualVectorDisplay();
       	    			treeViewer.expandToLevel(vvd, 0);
@@ -256,6 +290,10 @@ public class DeviceManagerView extends ViewPart {
         	final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
 	    		if (dcpu.isRunning()) {
 	    			manager.add(new Action("Stop") {
+	    				@Override
+    	    		public ImageDescriptor getImageDescriptor() {
+    	    			return Util.getImageDescriptor("icons/stop.png");
+    	    		}
     	    		public void run() {
     	    			dcpu.stop();
     	    			contentProvider.update();
@@ -263,6 +301,10 @@ public class DeviceManagerView extends ViewPart {
     	    	});
 	    		} else {
 	 	    		manager.add(new Action("Start") {
+	 	    			@Override
+    	    		public ImageDescriptor getImageDescriptor() {
+    	    			return Util.getImageDescriptor("icons/play.png");
+    	    		}
     	    		public void run() {
     	    			dcpu.run();
     	    			contentProvider.update();
@@ -309,7 +351,11 @@ public class DeviceManagerView extends ViewPart {
 					});
 	    		
 	    		manager.add(new Action("Connect hardware...") {
-        		public void run() {
+	    			@Override
+  	    		public ImageDescriptor getImageDescriptor() {
+  	    			return Util.getImageDescriptor("icons/hw.png");
+  	    		}
+  	    		public void run() {
         			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getShip().getHardwareManager(), new DeviceManagerContentProvider(), new DeviceManagerLabelProvider(), "Choose hardware to connect to "+dcpu.getID()+".");
 							listDialog.setTitle("Connect Hardware");
 							int open = listDialog.open();
@@ -330,13 +376,21 @@ public class DeviceManagerView extends ViewPart {
         		final ArrayList<FloppyDisk> disks = Activator.getShip().getFloppyManager().getAvailableDisks();
         		if (disks.size() > 0)
         		{
-	        		MenuManager attachMenu = new MenuManager("Insert Floppy");
+	        		MenuManager attachMenu = new MenuManager("Insert Floppy",Util.getImageDescriptor("icons/disk.png"),null);
 		      	  attachMenu.addMenuListener(new IMenuListener() {
 		      	    @Override
 		      	    public void menuAboutToShow(IMenuManager manager) {
 		      	    	for (final FloppyDisk fd : disks)
 		      	    	{
 		      	    		manager.add(new Action(fd.getID()) {
+		      	    			@Override
+		        	    		public ImageDescriptor getImageDescriptor() {
+		      	    				if (fd.isWriteProtected()) {
+		      	    					return Util.getImageDescriptor("icons/protecteddisk.png");
+		      	    				} else {
+		      	    					return Util.getImageDescriptor("icons/disk.png");
+		      	    				}
+		        	    		}
 		        	    		public void run() {
 		        	    			vfd.insert(fd);
 		        	    			contentProvider.update();
@@ -350,6 +404,14 @@ public class DeviceManagerView extends ViewPart {
         		}  
         	} else {
         		menuMgr.add(new Action("Eject " + vfd.getDisk().getID()) {
+        			@Override
+    	    		public ImageDescriptor getImageDescriptor() {
+        				if (vfd.getDisk().isWriteProtected()) {
+        					return Util.getImageDescriptor("icons/protecteddisk.png");
+        				} else {
+        					return Util.getImageDescriptor("icons/disk.png");
+        				}
+    	    		}
     	    		public void run() {
     	    			vfd.eject();
     	    			contentProvider.update();

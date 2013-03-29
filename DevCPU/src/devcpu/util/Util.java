@@ -1,5 +1,15 @@
 package devcpu.util;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.internal.util.BundleUtility;
+import org.osgi.framework.Bundle;
+
+import devcpu.Activator;
+
+@SuppressWarnings("restriction")
 public class Util {
 	public static int parseValue(String text) {
 		int val = 0;
@@ -37,5 +47,11 @@ public class Util {
 			}
 		}
 		return buf.toString();
+	}
+
+	public static ImageDescriptor getImageDescriptor(String path) {
+		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+		URL fullPathString = BundleUtility.find(bundle, path);
+		return ImageDescriptor.createFromURL(fullPathString);
 	}
 }
