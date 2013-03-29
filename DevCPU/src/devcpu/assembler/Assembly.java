@@ -102,17 +102,19 @@ public class Assembly {
 		//moving this until after all preprocessing is done.
 //		System.out.println("********************************************************************");
 		boolean accomplishedSomething = false;
-//		boolean finished = true;
+		boolean finished = true;
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
 		LinkedHashMap<Pattern, Define> patterns = null;
 		if (preprocess) {
+			accomplishedSomething = true;
 			patterns = new LinkedHashMap<Pattern, Define>();
 			for (String key : defines.keySet()) {
 				patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
 			}
 		}
+//		int nextOffset = 0; //Only used if non-zero (set by some directives)
 		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
 			if (exact) {
@@ -208,6 +210,7 @@ public class Assembly {
 						if (token instanceof LabelToken) {
 							if (!((LabelToken) token).valueSet) {
 								if (labelDefs.get(((LabelToken) token).labelName).getLine().located) {
+									accomplishedSomething = true;
 									((LabelToken) token).value = labelDefs.get(((LabelToken) token).labelName).getLine().offset; //Setting it early
 									((LabelToken) token).valueSet = true;
 									line.unvaluedLabelTokens--;
@@ -223,6 +226,7 @@ public class Assembly {
 										use.getLine().unvaluedLabelTokens--;
 									}
 									labelUses.remove(labelDef.getLabelName());
+									accomplishedSomething = true;
 								}
 							}
 						}
@@ -380,9 +384,15 @@ public class Assembly {
 													line.sized = true;
 													line.opCodeToken.setAValueNextWord(false);
 												} else {
-													oMin += 1+line.bSize;
-													oMax += 2+line.bSize;
-													line.opCodeToken.setAValueNextWord(true);
+													if ((line.located && lRef.maxOffset == 31 && lRef.maxOffset > line.offset) || (line.maxOffset > 0 && lRef.maxOffset == 31 && lRef.maxOffset > line.maxOffset)) {
+														line.size = 1 + line.bSize;
+														line.sized = true;
+														line.opCodeToken.setAValueNextWord(false);
+													} else {
+														oMin += 1+line.bSize;
+														oMax += 2+line.bSize;
+														line.opCodeToken.setAValueNextWord(true);
+													}
 												}
 											}
 										} else {
@@ -416,11 +426,15 @@ public class Assembly {
 				oMin += line.size;
 				oMax += line.size;
 			}
+			if (line.nextOffset > 0) {
+				oMin = line.nextOffset;
+				oMax = line.nextOffset;
+			}
 			exact = oMin == oMax;
 		//			if (!line.sized) { System.out.println(line.getText());}
-//			finished &= exact;
+			finished = finished && exact;
 		}
-		return accomplishedSomething;// && !finished;
+		return accomplishedSomething || !finished;
 	}
 
 	private boolean sizeExpressionA(AssemblyLine line) throws UnknownFunctionException, UnparsableExpressionException {

@@ -41,7 +41,7 @@ public class Directive {
 	}
 
 	public boolean isDefine() {
-		return "DEFINE".equals(directiveName);
+		return "DEFINE".equals(directiveName) || "EQU".equals(directiveName);
 	}
 	
 	public boolean isOrigin() {
