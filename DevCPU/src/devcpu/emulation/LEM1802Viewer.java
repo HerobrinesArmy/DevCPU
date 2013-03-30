@@ -8,30 +8,18 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 public class LEM1802Viewer {
-//	private static final int SCALE = 3;
-	
 	public Canvas canvas = new Canvas();
 	public VirtualMonitor vm;
-  BufferedImage img2 = new BufferedImage(160, 128, 2);
-  BufferedImage img = new BufferedImage(128, 128, 2);
+  BufferedImage img2 = new BufferedImage(144, 112, 2);
+  BufferedImage img = new BufferedImage(128, 112, 2);
 	int[] pixels = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
 	protected boolean keepAlive = true;
 	
 	public LEM1802Viewer() {
-		canvas.setPreferredSize(new Dimension(160,128));// * SCALE, 128 * SCALE));
-		canvas.setMinimumSize(new Dimension(160,128));// * SCALE, 128 * SCALE));
-		canvas.setMaximumSize(new Dimension(160,128));// * SCALE, 128 * SCALE));
+		canvas.setPreferredSize(new Dimension(144,112));
+		canvas.setMinimumSize(new Dimension(144,112));
+		canvas.setMaximumSize(new Dimension(144,112));
 		canvas.setFocusable(true);
-//		canvas.addComponentListener(new ComponentListener() {
-//			@Override public void componentShown(ComponentEvent arg0) {}
-//			@Override public void componentResized(ComponentEvent arg0) {
-//				synchronized (LEM1802Viewer.this) {
-////					img
-//				}
-//			}
-//			@Override public void componentMoved(ComponentEvent arg0) {}
-//			@Override public void componentHidden(ComponentEvent arg0) {}
-//		});
 		Thread t = new Thread() {
       public void run() {
         try {
@@ -39,27 +27,24 @@ public class LEM1802Viewer {
           while (keepAlive) {
           	if (canvas.isDisplayable()) {
           		if (vm != null) {
-//          			System.out.println("render");
           			vm.setPixels(pixels);
 		            vm.render();
 		            Graphics2D g = (Graphics2D) img2.getGraphics();
 		            if (g != null) {
 		            	g.setColor(new Color(pixels[0x3000]));
-		            	g.fillRect(0, 0, 160, 128);
-		            	g.drawImage(img, 16, 16, 128, 128, null);
+		            	g.fillRect(0, 0, 144, 112);
+		            	g.drawImage(img, 8, 8, 128, 112, null);
 		            	g.dispose();
 		            }
-//		            System.out.println(pixels[0x3000]);
 		            g = (Graphics2D) canvas.getGraphics();
 		            if (g != null) {
 		            	float scale;
-		            	if ((float)canvas.getWidth() / (float)canvas.getHeight() > 160f/128f) {
-		            		scale = (float)canvas.getHeight() / 128f;
+		            	if ((float)canvas.getWidth() / (float)canvas.getHeight() > 144f/112f) {
+		            		scale = (float)canvas.getHeight() / 112f;
 		            	} else {
-		            		scale = (float)canvas.getWidth() / 160f;
+		            		scale = (float)canvas.getWidth() / 144f;
 		            	}
-//		            	System.out.println(scale);
-		            	g.drawImage(img2, 0, 0, (int)(160 * scale), (int)(128 * scale), null);		            	
+		            	g.drawImage(img2, 0, 0, (int)(144 * scale), (int)(112 * scale), null);		            	
 		            	g.dispose();
 		            }
           		}
@@ -68,6 +53,12 @@ public class LEM1802Viewer {
           }
         } catch (Exception e) {
           e.printStackTrace();
+          try {
+						Thread.sleep(1L);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
         }
       }
     };

@@ -36,7 +36,7 @@ public class DCPUManager {
 
 	public void destroyDCPU(DefaultControllableDCPU dcpu) {
 		dcpu.stop();
-		for (DCPUHardware hardware : new ArrayList<DCPUHardware>(dcpu.hardware)){
+		for (DCPUHardware hardware : dcpu.getHardware()){
 			hardware.disconnect();
 		}
 		for (MappedView<DefaultControllableDCPU> view : ViewMapper.getAllViews(dcpu)) {

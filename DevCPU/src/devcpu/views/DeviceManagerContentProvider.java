@@ -47,7 +47,7 @@ public class DeviceManagerContentProvider implements ITreeContentProvider {
 		} else if (o instanceof FloppyManager) {
 			return ((FloppyManager)o).getAvailableDisks().toArray();
 		} else if (o instanceof DefaultControllableDCPU) {
-			return ((DefaultControllableDCPU)o).hardware.toArray();
+			return ((DefaultControllableDCPU)o).getHardware().toArray();
 		} else if (o instanceof VirtualFloppyDrive) {
 			if (((VirtualFloppyDrive)o).getDisk() != null) {
 				return new Object[]{((VirtualFloppyDrive)o).getDisk()};
@@ -93,7 +93,7 @@ public class DeviceManagerContentProvider implements ITreeContentProvider {
 		} else if (o instanceof FloppyManager) {
 			return (((FloppyManager) o).getAvailableDisks().size() > 0);
 		} else if (o instanceof DefaultControllableDCPU) {
-			return ((DefaultControllableDCPU) o).hardware.size() > 0;
+			return ((DefaultControllableDCPU) o).getHardware().size() > 0;
 		} else if (o instanceof VirtualFloppyDrive) {
 			return ((VirtualFloppyDrive) o).getDisk() != null;
 		}

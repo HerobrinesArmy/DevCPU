@@ -24,12 +24,12 @@ public abstract class DCPUHardware implements Identifiable
 
   public DCPUHardware connectTo(DCPU dcpu) {
     this.dcpu = dcpu;
-    dcpu.hardware.add(this);
+    dcpu.addHardware(this);
     return this;
   }
   
   public DCPUHardware disconnect() {
-    dcpu.hardware.remove(this);
+    dcpu.removeHardware(this);
     dcpu = null;
     return this;
   }

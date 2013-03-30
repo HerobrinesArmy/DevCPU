@@ -96,6 +96,9 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		(new Thread() {
 			@Override
 			public void run() {
+				for (DCPUHardware hw : hardware) {
+		    	hw.powerOn();
+		    }
 //				opcounts = new int[64];
 		    int hz = 1000 * khz;
 		    int cyclesPerFrame = hz / 60 + 1;
@@ -202,6 +205,24 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 			dos.close();
 		}
 	}
+	
+	@Override
+	public boolean addHardware(DCPUHardware hw) {
+		boolean ret = super.addHardware(hw);
+		if (ret && keepAlive) {
+			hw.powerOn();
+		}
+		return ret;
+	}
+	
+	@Override
+	public boolean removeHardware(DCPUHardware hw) {
+		synchronized (hardware) {
+			hw.powerOff();
+			return hardware.remove(hw);
+		}
+	}
+	
 //	public void addTickListener(DCPUTickListener listener) {
 //		tickListeners.add(listener);
 //	}

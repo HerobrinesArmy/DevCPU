@@ -7,13 +7,11 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IWorkbenchActionConstants;
 
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
@@ -36,22 +34,22 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 		frame = SWT_AWT.new_Frame(composite);
 		frame.add(lv.canvas);
 		makeActions();
-		hookContextMenu();
+//		hookContextMenu();
 		contributeToActionBars();
 	}
 
 	public void setFocus() {
 	}
 
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				LEM1802View.this.fillContextMenu(manager);
-			}
-		});
-	}
+//	private void hookContextMenu() {
+//		MenuManager menuMgr = new MenuManager("#PopupMenu");
+//		menuMgr.setRemoveAllWhenShown(true);
+//		menuMgr.addMenuListener(new IMenuListener() {
+//			public void menuAboutToShow(IMenuManager manager) {
+//				LEM1802View.this.fillContextMenu(manager);
+//			}
+//		});
+//	}
 
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
@@ -86,11 +84,11 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 		manager.add(detachAction);
 	}
 
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(detachAction);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
+//	private void fillContextMenu(IMenuManager manager) {
+//		manager.add(detachAction);
+//		// Other plug-ins can contribute there actions here
+//		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+//	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
 //		final MenuManager attachSubmenu = new MenuManager("Attach LEM1802");

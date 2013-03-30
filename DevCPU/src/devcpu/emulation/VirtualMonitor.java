@@ -12,37 +12,38 @@ public class VirtualMonitor extends DCPUHardware
   public static final int HEIGHT_CHARS = 12;
   public static final int WIDTH_PIXELS = 128;
   public static final int HEIGHT_PIXELS = 96;
-  @SuppressWarnings("unused")
-  //TODO
   private static final int START_DURATION = 60;
   private int lightColor;
   private int[] palette = new int[16];
   private char[] font = new char[256];
-  public int[] pixels = new int[16384];
+  public int[] pixels = new int[12289];
   private int screenMemMap;
   private int fontMemMap;
   private int paletteMemMap;
-  private int[] loadImage = new int[12288];
-
   private int borderColor = 0;
   private int startDelay = 0;
   
   private String id = "LEM1802";
 	private HardwareManager manager;
-
-  public VirtualMonitor(String id, HardwareManager manager) {
-    super(0x7349f615, 0x1802, 0x1c6c8b36);
-    this.manager = manager;
-    this.id = id;
-    resetPalette();
-    resetFont();
-    
-    try {
+	
+  private static final int[] loadImage = new int[12288];
+  static {
+  	try {
 			ImageIO.read(VirtualMonitor.class.getResource("/devcpu/emulation/boot.png")).getRGB(0, 0, 128, 96, loadImage, 0, 128);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
   }
+
+  public VirtualMonitor(String id, HardwareManager manager) {
+    super(0x7349f615, 0x1802, 0x1c6c8b36);
+    this.manager = manager;
+    this.id = id;
+  }
+  
+	public VirtualMonitor() {
+  	this("LEM1802", null);
+	}
 
   private void resetFont() {
   	int[] pixels = new int[4096];
@@ -66,10 +67,6 @@ public class VirtualMonitor extends DCPUHardware
     }
 	}
 
-	public VirtualMonitor() {
-  	this("LEM1802", null);
-	}
-
 	private void resetPalette() {
     for (int i = 0; i < 16; i++) {
       int b = (i >> 0 & 0x1) * 170;
@@ -85,6 +82,12 @@ public class VirtualMonitor extends DCPUHardware
       palette[i] = (0xFF000000 | r << 16 | g << 8 | b);
     }
   }
+	
+	private void resetPixels() {
+		for (int i = 0; i < 12289; i++) {
+			pixels[i] = 0;
+		}
+	}
 
   private void loadPalette(char[] ram, int offset) {
     for (int i = 0; i < 16; i++) {
@@ -100,7 +103,7 @@ public class VirtualMonitor extends DCPUHardware
     int a = dcpu.registers[0];
     if (a == 0) {
       if ((screenMemMap == 0) && (dcpu.registers[1] != 0)) {
-        startDelay = 60;
+        startDelay = START_DURATION;
       }
       screenMemMap = dcpu.registers[1];
     } else if (a == 1) {
@@ -157,7 +160,7 @@ public class VirtualMonitor extends DCPUHardware
 			      else {
 			        for (int y = 0; y < 96; y++) {
 			          for (int x = 0; x < 128; x++) {
-			            int col = startDelay == 0 ? palette[1] : loadImage[(x + y * 128)];
+			            int col = startDelay == 0 ? palette[0] : loadImage[(x + y * 128)];
 			            pixels[(x + y * 128)] = col;
 			            reds += (col & 0xFF0000);
 			            greens += (col & 0xFF00);
@@ -172,11 +175,11 @@ public class VirtualMonitor extends DCPUHardware
 			      }
 			      if (bgColor < 0) bgColor = 0;
 			      int color = palette[bgColor];
-			      for (int y = 96; y < 128; y++) {
-			        for (int x = 0; x < 128; x++) {
-			          pixels[(x + y * 128)] = color;
-			        }
-			      }
+//			      for (int y = 96; y < 128; y++) {
+//			        for (int x = 0; x < 128; x++) {
+			          pixels[12288] = color;
+//			        }
+//			      }
 			
 			      int borderPixels = 100;
 			      reds += (color & 0xFF0000) * borderPixels;
@@ -232,11 +235,11 @@ public class VirtualMonitor extends DCPUHardware
 			      }
 			
 			      int color = palette[borderColor];
-			      for (int y = 96; y < 128; y++) {
-			        for (int x = 0; x < 128; x++) {
-			          pixels[(x + y * 128)] = color;
-			        }
-			      }
+//			      for (int y = 96; y < 128; y++) {
+//			        for (int x = 0; x < 128; x++) {
+			          pixels[12288] = color;
+//			        }
+//			      }
 			
 			      int borderPixels = 100;
 			      reds += (color & 0xFF0000) * borderPixels;
@@ -284,13 +287,21 @@ public class VirtualMonitor extends DCPUHardware
 	
 	@Override
 	public void powerOff() {
-    resetPalette();
-    resetFont();
-    lightColor = 0;
+		lightColor = 0;
     screenMemMap = 0;
     fontMemMap = 0;
     paletteMemMap = 0;
     borderColor = 0;
-    startDelay = 0;   
+    startDelay = 0;
+    resetPalette();
+    resetFont();
+    resetPixels();
+	}
+	
+	@Override
+	public void powerOn() {
+    resetPalette();
+    resetFont();
+    resetPixels();
 	}
 }

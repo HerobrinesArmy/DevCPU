@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Experimental 1.7 update to Notch's 1.4 emulator
@@ -21,7 +22,7 @@ public class DCPU
   public char ia;
   public char[] registers = new char[8];
   public int cycles;
-  public ArrayList<DCPUHardware> hardware = new ArrayList<DCPUHardware>();
+  protected ArrayList<DCPUHardware> hardware = new ArrayList<DCPUHardware>();
 
   protected static volatile boolean stop = false;
   protected static final int khz = 100;
@@ -348,13 +349,19 @@ public class DCPU
           break;
         case 17: //HWQ
           cycles += 3;
-          if ((a >= 0) && (a < hardware.size()))
-          	((DCPUHardware)hardware.get(a)).query();
+          synchronized (hardware) {
+	          if ((a >= 0) && (a < hardware.size())) {
+	          	((DCPUHardware)hardware.get(a)).query();
+	          }
+          }
           break;
         case 18: //HWI
           cycles += 3;
-          if ((a >= 0) && (a < hardware.size()))
-          	((DCPUHardware)hardware.get(a)).interrupt();
+          synchronized (hardware) {
+          	if ((a >= 0) && (a < hardware.size())) {
+          		((DCPUHardware)hardware.get(a)).interrupt();
+          	}
+          }
           break;
         case 2:
         case 3:
@@ -567,8 +574,11 @@ public class DCPU
   }
 
   public void tickHardware() {
-    for (int i = 0; i < hardware.size(); i++)
-      ((DCPUHardware)hardware.get(i)).tick60hz();
+  	synchronized (hardware) {
+  		for (int i = 0; i < hardware.size(); i++) {
+  			((DCPUHardware)hardware.get(i)).tick60hz();
+  		}
+  	}
   }
 
   public void dumpRegisters()
@@ -621,4 +631,23 @@ public class DCPU
       System.out.println();
     }
   }
+
+	public boolean addHardware(DCPUHardware hw) {
+		synchronized (hardware) {
+			return hardware.add(hw);
+		}
+	}
+	
+	public boolean removeHardware(DCPUHardware hw) {
+		synchronized (hardware) {
+			return hardware.remove(hw);
+		}
+	}
+	
+	public List<DCPUHardware> getHardware() {
+		//TODO sync elsewhere
+		synchronized (hardware) {
+			return new ArrayList<DCPUHardware>(hardware);
+		}
+	}
 }
