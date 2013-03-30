@@ -144,7 +144,7 @@ public class VirtualMonitor extends DCPUHardware
 			      int blues = 0;
 			
 			      if ((startDelay > 0) && (startDelay < 10)) {
-			        for (int y = 0; y < 96; y++)
+			        for (int y = 0; y < 96; y++) {
 			          for (int x = 0; x < 128; x++) {
 			            int col = palette[0];
 			            pixels[(x + y * 128)] = col;
@@ -152,14 +152,12 @@ public class VirtualMonitor extends DCPUHardware
 			            greens += (col & 0xFF00);
 			            blues += (col & 0xFF);
 			          }
+			        }
 			      }
 			      else {
 			        for (int y = 0; y < 96; y++) {
 			          for (int x = 0; x < 128; x++) {
-			            @SuppressWarnings("unused")
-			            //TODO
-									int cc = loadImage[(x + y * 128)] & 0xFF;
-			            int col = palette[1];
+			            int col = startDelay == 0 ? palette[1] : loadImage[(x + y * 128)];
 			            pixels[(x + y * 128)] = col;
 			            reds += (col & 0xFF0000);
 			            greens += (col & 0xFF00);

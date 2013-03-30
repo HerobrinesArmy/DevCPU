@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="DevCPU" uid="DevCPU" id="DevCPU.product" application="DevCPU.application" version="0.0.0" useFeatures="false" includeLaunchers="true">
-
+<product name="DevCPU" uid="DevCPU Product" id="DevCPU.product" application="DevCPU.application" version="0.0.0" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -14,7 +13,8 @@
    <windowImages/>
 
    <splash
-      location="DevCPU" />
+      location="DevCPU"
+      startupProgressRect="5,275,445,15" />
    <launcher name="DevCPU">
       <solaris/>
       <win useIco="false">
