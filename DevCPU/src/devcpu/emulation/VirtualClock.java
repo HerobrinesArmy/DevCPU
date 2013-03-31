@@ -14,7 +14,7 @@ public class VirtualClock extends DCPUHardware
 
   public VirtualClock(String id, HardwareManager manager)
   {
-    super(315667458, 32776, 515079825);
+    super(0x12d0b402, 0x0001, 0x00000000);
     this.id = id;
     this.manager = manager;
   }

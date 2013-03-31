@@ -27,7 +27,7 @@ public class VirtualKeyboard extends DCPUHardware
 
   public VirtualKeyboard(String id, HardwareManager manager, KeyMapping keyMapping)
   {
-    super(0x30cf7406, 0x1337, 0x1EB37E91);
+    super(0x30cf7406, 0x0001, 0x00000000);
     this.keyMapping = keyMapping;
     this.id = id;
     this.manager = manager;
