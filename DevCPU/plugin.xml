@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
@@ -10,6 +9,16 @@
                class="devcpu.Application">
          </run>
       </application>
+   </extension>
+   <extension point="org.eclipse.ui.intro"> 
+   <intro
+            class="org.eclipse.ui.intro.HelloWorldIntroPart"
+            id="org.eclipse.ui.intro.examples.basic001_introId"
+            icon="some_icon.jpg"/>
+      <introProductBinding
+            introId="org.eclipse.ui.intro.HelloWorld_introId"
+            productId="org.eclipse.ui.intro.HelloWorld_product">
+      </introProductBinding>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -246,6 +255,18 @@
          <property
                name="startupProgressRect"
                value="5,520,950,15">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/about.png">
+         </property>
+         <property
+               name="aboutText"
+               value="You are using DevCPU v.0.0.0 (Release 0). DevCPU is an integrated DCPU-16 development and emulation environment, created by Herobrine. This version is unsupported and API stability, at this point, is nonexistent.">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/icon_16.png,icons/icon_32.png,icons/icon_48.png,icons/icon_64.png,icons/icon_128.png">
          </property>
       </product>
    </extension>

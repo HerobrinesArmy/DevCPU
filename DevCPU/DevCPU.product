@@ -3,6 +3,13 @@
 
 <product name="DevCPU" uid="DevCPU Product" id="DevCPU.product" application="DevCPU.application" version="0.0.0" useFeatures="false" includeLaunchers="true">
 
+   <aboutInfo>
+      <image path="/DevCPU/icons/about.png"/>
+      <text>
+         You are using DevCPU v.0.0.0 (Release 0). DevCPU is an integrated DCPU-16 development and emulation environment, created by Herobrine. This version is unsupported and API stability, at this point, is nonexistent.
+      </text>
+   </aboutInfo>
+
    <configIni use="default">
    </configIni>
 
@@ -10,14 +17,17 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages/>
+   <windowImages i16="/DevCPU/icons/icon_16.png" i32="/DevCPU/icons/icon_32.png" i48="/DevCPU/icons/icon_48.png" i64="/DevCPU/icons/icon_64.png" i128="/DevCPU/icons/icon_128.png"/>
 
    <splash
       location="DevCPU"
-      startupProgressRect="5,275,445,15" />
+      startupProgressRect="5,520,950,15" />
    <launcher name="DevCPU">
+      <linux icon="/DevCPU/icons/icon.xpm"/>
+      <macosx icon="/DevCPU/icons/icon.icns"/>
       <solaris/>
-      <win useIco="false">
+      <win useIco="true">
+         <ico path="/DevCPU/icons/icon.ico"/>
          <bmp/>
       </win>
    </launcher>
