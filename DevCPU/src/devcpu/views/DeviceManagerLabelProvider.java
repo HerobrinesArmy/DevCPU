@@ -1,16 +1,9 @@
 package devcpu.views;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Ship;
@@ -23,6 +16,7 @@ import devcpu.emulation.VirtualVectorDisplay;
 import devcpu.managers.DCPUManager;
 import devcpu.managers.FloppyManager;
 import devcpu.managers.HardwareManager;
+import devcpu.util.Util;
 
 public class DeviceManagerLabelProvider extends LabelProvider {
 	@Override
@@ -60,63 +54,45 @@ public class DeviceManagerLabelProvider extends LabelProvider {
 	public Image getImage(Object o) {
 		if (o instanceof DefaultControllableDCPU)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/dcpu.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/dcpu.png"));
 		} else if (o instanceof VirtualMonitor)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/lem.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/lem.png"));
 		} else if (o instanceof VirtualKeyboard)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/keyboard.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/keyboard.png"));
 		} else if (o instanceof VirtualVectorDisplay)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/sped.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/sped.png"));
 		} else if (o instanceof VirtualSleepChamber)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/spc.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/spc.png"));
 		} else if (o instanceof VirtualFloppyDrive)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/fd.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/fd.png"));
 		} else if (o instanceof VirtualClock)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/clock.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/clock.png"));
 		} else if (o instanceof FloppyDisk)
 		{
 			if (((FloppyDisk) o).isWriteProtected()) {
-				return new Image(Display.getCurrent(), loadResource("icons/protecteddisk.png"));
+				return new Image(Display.getCurrent(), Util.loadResource("icons/protecteddisk.png"));
 			} else {
-				return new Image(Display.getCurrent(), loadResource("icons/disk.png"));
+				return new Image(Display.getCurrent(), Util.loadResource("icons/disk.png"));
 			}
 		} else if (o instanceof FloppyManager)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/disk.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/disk.png"));
 		} else if (o instanceof DCPUManager)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/dcpu.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/dcpu.png"));
 		} else if (o instanceof HardwareManager)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/hw.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/hw.png"));
 		} else if (o instanceof Ship)
 		{
-			return new Image(Display.getCurrent(), loadResource("icons/ship.png"));
+			return new Image(Display.getCurrent(), Util.loadResource("icons/ship.png"));
 		}
 		return super.getImage(o);
 	}
-
-	private String loadResource(String filename) {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new org.eclipse.core.runtime.Path(filename), Collections.EMPTY_MAP);
-		URL fileUrl = null;
-		try {
-		fileUrl = FileLocator.toFileURL(url);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			return fileUrl.toURI().getRawPath();
-		} catch (URISyntaxException e) {
-			return null;
-		}
-	}
-	
-	
 }

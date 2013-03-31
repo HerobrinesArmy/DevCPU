@@ -10,16 +10,6 @@
          </run>
       </application>
    </extension>
-   <extension point="org.eclipse.ui.intro"> 
-   <intro
-            class="org.eclipse.ui.intro.HelloWorldIntroPart"
-            id="org.eclipse.ui.intro.examples.basic001_introId"
-            icon="some_icon.jpg"/>
-      <introProductBinding
-            introId="org.eclipse.ui.intro.HelloWorld_introId"
-            productId="org.eclipse.ui.intro.HelloWorld_product">
-      </introProductBinding>
-   </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -454,6 +444,24 @@
             label="DASM">
       </keyword>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="devcpu.launch.DCPUBreakpoint"
+            id="devcpu.breakpoint"
+            markerType="org.eclipse.debug.core.lineBreakpointMarker">
+      </breakpoint>
+   </extension>
+   <extension point="org.eclipse.ui.intro"> 
+   <intro
+            class="devcpu.IntroPart"
+            id="devcpu.intro"
+            icon="icons/icon_16.png"/>
+      <introProductBinding
+            introId="devcpu.intro"
+            productId="DevCPU.product">
+      </introProductBinding>
+   </extension>
   <!-- <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
@@ -526,30 +534,11 @@
       </shortcut>
    </extension>-->
    <extension
-         point="org.eclipse.debug.core.breakpoints">
-      <breakpoint
-            class="devcpu.launch.DCPUBreakpoint"
-            id="devcpu.breakpoint"
-            markerType="org.eclipse.debug.core.lineBreakpointMarker">
-      </breakpoint>
-   </extension>
-   <extension
-         point="org.eclipse.ui.intro">
-      <intro
-            class="org.eclipse.ui.intro.config.CustomizableIntroPart"
-            id="DevCPU.intro">
-      </intro>
-      <introProductBinding
-            introId="DevCPU.intro"
-            productId="DevCPU.product">
-      </introProductBinding>
-   </extension>
-   <extension
          point="org.eclipse.ui.intro.config">
       <config
             content="introContent.xml"
-            id="DevCPU.introConfigId"
-            introId="DevCPU.intro">
+            id="devcpu.introconfig"
+            introId="devcpu.intro">
          <presentation
                home-page-id="root">
             <implementation

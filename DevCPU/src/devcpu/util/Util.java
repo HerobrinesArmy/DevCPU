@@ -1,7 +1,11 @@
 package devcpu.util;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.internal.util.BundleUtility;
@@ -53,5 +57,21 @@ public class Util {
 		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
 		URL fullPathString = BundleUtility.find(bundle, path);
 		return ImageDescriptor.createFromURL(fullPathString);
+	}
+	
+	public static String loadResource(String filename) {
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new org.eclipse.core.runtime.Path(filename), Collections.EMPTY_MAP);
+		URL fileUrl = null;
+		try {
+		fileUrl = FileLocator.toFileURL(url);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			return fileUrl.toURI().getRawPath();
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 }
