@@ -5,7 +5,7 @@ import devcpu.assembler.providers.DirectiveProvider;
 
 public abstract class AbstractDirectiveException extends AbstractLineException implements DirectiveProvider {
 	private static final long serialVersionUID = 1L;
-	private Directive directive;
+	protected Directive directive;
 
 	public AbstractDirectiveException(Directive directive) {
 		super(directive.getLine());
@@ -15,5 +15,10 @@ public abstract class AbstractDirectiveException extends AbstractLineException i
 	@Override
 	public Directive getDirective() {
 		return directive;
+	}
+	
+	@Override
+	public String getMessage() {
+		return "Directive error (" + directive.getDirectiveName() + ") at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
 	}
 }

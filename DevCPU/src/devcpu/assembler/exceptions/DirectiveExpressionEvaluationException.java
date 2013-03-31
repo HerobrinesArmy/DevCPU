@@ -8,4 +8,9 @@ public class DirectiveExpressionEvaluationException extends AbstractDirectiveExc
 	public DirectiveExpressionEvaluationException(Directive directive) {
 		super(directive);
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Error evaluating expression in directive (" + directive.getDirectiveName() + ") at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

@@ -8,22 +8,21 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import de.congrace.exp4j.UnknownFunctionException;
-import de.congrace.exp4j.UnparsableExpressionException;
 import devcpu.assembler.Assembly;
-import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.views.DeviceManagerLabelProvider;
@@ -76,28 +75,21 @@ public class NavigatorCommandHandler implements IHandler {
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
+										IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
+										IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
+										es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 										try {
-											IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
 											long start = System.nanoTime();
 											Assembly a = new Assembly(file);
 											a.assemble(disk);
 											long stop = System.nanoTime();
 											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) was loaded and assembled to " + disk.getID() + " in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. Assembly reports " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of possible).\n");
-										} catch (AbstractAssemblyException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UnknownFunctionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UnparsableExpressionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (CoreException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
+										} catch (Exception e) {
+											try {
+												es.write("Assembly failed: " + e.getMessage() + "\n");
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
 										}
 										monitor.done();
 										return Status.OK_STATUS;
@@ -134,28 +126,21 @@ public class NavigatorCommandHandler implements IHandler {
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
+										IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
+										IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
+										es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 										try {
-											IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
 											long start = System.nanoTime();
 											Assembly a = new Assembly(file);
 											a.assemble(dcpu);
 											long stop = System.nanoTime();
 											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) was loaded and assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. Assembly reports " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of possible).\n");
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (AbstractAssemblyException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UnknownFunctionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (UnparsableExpressionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (CoreException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
+										} catch (Exception e) {
+											try {
+												es.write("Assembly failed: " + e.getMessage() + "\n");
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
 										}
 										monitor.done();
 										return Status.OK_STATUS;

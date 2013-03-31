@@ -23,4 +23,10 @@ public class UndefinedLabelException extends AbstractAssemblyException {
 	public List<LabelUse> getUses() {
 		return uses;
 	}
+	
+	@Override
+	public String getMessage() {
+		LabelUse use = uses.get(0);
+		return "Undefined label \"" + label + "\" at " + use.getLine().getDocument().getFile().getName() + ", Line " + use.getLine().getLineNumber() + ": " + use.getLine().getText();
+	}
 }

@@ -8,4 +8,9 @@ public class RecursiveDefinitionException extends AbstractDirectiveException {
 	public RecursiveDefinitionException(Directive directive) {
 		super(directive);
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Recursive definition at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

@@ -8,4 +8,9 @@ public class InvalidDefineFormatException extends AbstractDirectiveException {
 	public InvalidDefineFormatException(Directive directive) {
 		super(directive);
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Invalid define format at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

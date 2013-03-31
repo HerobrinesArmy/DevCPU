@@ -14,4 +14,9 @@ public class IncludeFileNotFoundException extends AbstractDirectiveException {
 	public Include getInclude() {
 		return include;
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Cannot locate file to include: \"" + include.getPath() + "\" at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

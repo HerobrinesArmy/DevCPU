@@ -16,4 +16,9 @@ public class AbstractDocumentException extends AbstractAssemblyException impleme
 	public AssemblyDocument getDocument() {
 		return document;
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Document error processing " + document.getFile().getName();
+	}
 }

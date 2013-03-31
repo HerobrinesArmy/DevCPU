@@ -16,4 +16,9 @@ public abstract class AbstractLineException extends AbstractDocumentException im
 	public AssemblyLine getLine() {
 		return line;
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Line error at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
+	}
 }

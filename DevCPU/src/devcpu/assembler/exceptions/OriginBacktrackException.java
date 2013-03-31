@@ -8,4 +8,9 @@ public class OriginBacktrackException extends AbstractDirectiveException {
 	public OriginBacktrackException(Directive directive) {
 		super(directive);
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Directive (" + directive.getDirectiveName() + ") is trying to move the origin backwards at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

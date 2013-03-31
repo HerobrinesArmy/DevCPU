@@ -30,4 +30,17 @@ public class TooManyRegistersInExpressionException extends AbstractAssemblyExcep
 	public String getValueType() {
 		return valueType;
 	}
+	
+	@Override
+	public String getMessage() {
+		String rs = "";
+		for (Register r : registers) {
+			if (rs.length() == 0) {
+				rs = r.getRegister();
+			} else {
+				rs += "," + r.getRegister();
+			}
+		}
+		return "Too many registers (" + rs + ") in expression. Bet you wish you knew where, don't you? Yeah, me too. Too bad I didn't write this exception to take in some location information.";
+	}
 }

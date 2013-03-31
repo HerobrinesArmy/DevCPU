@@ -20,6 +20,6 @@ public class BadValueException extends AbstractAssemblyException {
 
 	@Override
 	public String getMessage() {
-		return msg;
+		return msg + "...in one of the " + assembly.getLineCount() + " lines of the assembly (helpful, I know).";
 	}
 }

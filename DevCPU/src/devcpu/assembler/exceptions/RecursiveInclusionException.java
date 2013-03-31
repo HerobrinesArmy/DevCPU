@@ -22,4 +22,9 @@ public class RecursiveInclusionException extends AbstractDirectiveException {
 	public IFile getFile() {
 		return file;
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Infinitely recursive inclusion error at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+	}
 }

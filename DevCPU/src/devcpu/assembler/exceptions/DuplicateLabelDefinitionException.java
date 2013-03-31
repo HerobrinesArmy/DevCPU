@@ -21,4 +21,9 @@ public class DuplicateLabelDefinitionException extends AbstractAssemblyException
 	public LabelDefinition getNewDefinition() {
 		return newDef;
 	}
+	
+	@Override
+	public String getMessage() {
+		return "Duplicate label definition \"" + newDef.getLabelName() + "\" at " + newDef.getLine().getDocument().getFile().getName() + ", Line " + newDef.getLine().getLineNumber();
+	}
 }
