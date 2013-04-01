@@ -1,25 +1,25 @@
 package devcpu.assembler.exceptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import devcpu.assembler.Assembly;
-import devcpu.assembler.expression.Register;
+import devcpu.assembler.AssemblyLine;
 import devcpu.lexer.tokens.LexerToken;
 
-public class TooManyRegistersInExpressionException extends AbstractAssemblyException {
+public class TooManyRegistersInExpressionException extends AbstractLineException {
 	private static final long serialVersionUID = 1L;
-	private List<Register> registers;
+	private List<String> registers;
 	private LexerToken[] tokens;
 	private String valueType;
 
-	public TooManyRegistersInExpressionException(Assembly assembly, List<Register> registers, LexerToken[] tokens, String type) {
-		super(assembly);
+	public TooManyRegistersInExpressionException(AssemblyLine line, ArrayList<String> registers, LexerToken[] tokens, String type) {
+		super(line);
 		this.registers = registers;
 		this.tokens = tokens;
 		this.valueType = type;
 	}
 
-	public List<Register> getRegisters() {
+	public List<String> getRegisters() {
 		return registers;
 	}
 
@@ -34,13 +34,13 @@ public class TooManyRegistersInExpressionException extends AbstractAssemblyExcep
 	@Override
 	public String getMessage() {
 		String rs = "";
-		for (Register r : registers) {
+		for (String r : registers) {
 			if (rs.length() == 0) {
-				rs = r.getRegister();
+				rs = r;
 			} else {
-				rs += "," + r.getRegister();
+				rs += "," + r;
 			}
 		}
-		return "Too many registers (" + rs + ") in expression. Bet you wish you knew where, don't you? Yeah, me too. Too bad I didn't write this exception to take in some location information.";
+		return "Too many registers (" + rs + ") in expression for " + valueType + " value at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
 	}
 }

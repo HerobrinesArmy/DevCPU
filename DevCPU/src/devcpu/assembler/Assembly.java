@@ -605,20 +605,20 @@ public class Assembly {
 		if (line.bHasRegister) {
 			if (line.bRegister.equals("EX") || line.bRegister.equals("PC")) {
 				if (line.bIsAddress || line.bHasOperator) {
-					throw new BadValueException(this, tokens, line.bRegister + " used in an address or expression.");
+					throw new BadValueException(line, tokens, line.bRegister + " used in an address or expression.");
 				}
 			}
 			if (!line.bIsAddress && line.bHasOperator) {
-				throw new BadValueException(this, tokens, line.bRegister + " used in an expression outside of an address."); 
+				throw new BadValueException(line, tokens, line.bRegister + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(this, tokens, line.bRegister + " used in a unary operation.");
+				throw new BadValueException(line, tokens, line.bRegister + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(this, tokens, line.bRegister + " subtracted.");
+				throw new BadValueException(line, tokens, line.bRegister + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(this, tokens, line.bRegister + " used in disallowed operation.");
+				throw new BadValueException(line, tokens, line.bRegister + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(additionalOperators).build().calculate(); 
@@ -731,20 +731,20 @@ public class Assembly {
 		if (line.aHasRegister) {
 			if (line.aRegister.equals("EX") || line.aRegister.equals("PC")) {
 				if (line.aIsAddress || line.aHasOperator) {
-					throw new BadValueException(this, tokens, line.aRegister + " used in an address or expression.");
+					throw new BadValueException(line, tokens, line.aRegister + " used in an address or expression.");
 				}
 			}
 			if (!line.aIsAddress && line.aHasOperator) {
-				throw new BadValueException(this, tokens, line.aRegister + " used in an expression outside of an address."); 
+				throw new BadValueException(line, tokens, line.aRegister + " used in an expression outside of an address."); 
 			}
 			if (value.scanForRegistersInUnaryOperations()) {
-				throw new BadValueException(this, tokens, line.aRegister + " used in a unary operation.");
+				throw new BadValueException(line, tokens, line.aRegister + " used in a unary operation.");
 			}
 			if (value.scanForRegistersBeingSubtracted()) {
-				throw new BadValueException(this, tokens, line.aRegister + " subtracted.");
+				throw new BadValueException(line, tokens, line.aRegister + " subtracted.");
 			}
 			if (value.scanForRegistersInDisallowedOperations()) {
-				throw new BadValueException(this, tokens, line.aRegister + " used in disallowed operation.");
+				throw new BadValueException(line, tokens, line.aRegister + " used in disallowed operation.");
 			}
 		}
 		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(additionalOperators).build().calculate(); 

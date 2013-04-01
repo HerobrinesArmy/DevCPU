@@ -1,15 +1,15 @@
 package devcpu.assembler.exceptions;
 
-import devcpu.assembler.Assembly;
+import devcpu.assembler.AssemblyLine;
 import devcpu.lexer.tokens.LexerToken;
 
-public class BadValueException extends AbstractAssemblyException {
+public class BadValueException extends AbstractLineException {
 	private static final long serialVersionUID = 1L;
 	private LexerToken[] tokens;
 	private String msg;
 	
-	public BadValueException(Assembly assembly, LexerToken[] tokens, String msg) {
-		super(assembly);
+	public BadValueException(AssemblyLine line, LexerToken[] tokens, String msg) {
+		super(line);
 		this.tokens = tokens;
 		this.msg = msg;
 	}
@@ -20,6 +20,6 @@ public class BadValueException extends AbstractAssemblyException {
 
 	@Override
 	public String getMessage() {
-		return msg + "...in one of the " + assembly.getLineCount() + " lines of the assembly (helpful, I know).";
+		return msg + " At " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
 	}
 }
