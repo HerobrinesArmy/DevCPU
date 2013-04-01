@@ -48,8 +48,8 @@
       <plugin id="DevCPU"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="com.jcraft.jsch"/>
-      <plugin id="javax.annotation"/>
-      <plugin id="javax.inject"/>
+      <plugin id="javax.annotation" fragment=""/>
+      <plugin id="javax.inject" fragment=""/>
       <plugin id="javax.xml"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.util"/>
@@ -90,25 +90,25 @@
       <plugin id="org.eclipse.core.variables"/>
       <plugin id="org.eclipse.debug.core"/>
       <plugin id="org.eclipse.debug.ui"/>
-      <plugin id="org.eclipse.e4.core.commands"/>
-      <plugin id="org.eclipse.e4.core.contexts"/>
-      <plugin id="org.eclipse.e4.core.di"/>
-      <plugin id="org.eclipse.e4.core.di.extensions"/>
-      <plugin id="org.eclipse.e4.core.services"/>
-      <plugin id="org.eclipse.e4.ui.bindings"/>
-      <plugin id="org.eclipse.e4.ui.css.core"/>
-      <plugin id="org.eclipse.e4.ui.css.swt"/>
-      <plugin id="org.eclipse.e4.ui.css.swt.theme"/>
-      <plugin id="org.eclipse.e4.ui.di"/>
-      <plugin id="org.eclipse.e4.ui.model.workbench"/>
-      <plugin id="org.eclipse.e4.ui.services"/>
-      <plugin id="org.eclipse.e4.ui.widgets"/>
-      <plugin id="org.eclipse.e4.ui.workbench"/>
-      <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
-      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
+      <plugin id="org.eclipse.e4.core.commands" fragment=""/>
+      <plugin id="org.eclipse.e4.core.contexts" fragment=""/>
+      <plugin id="org.eclipse.e4.core.di" fragment=""/>
+      <plugin id="org.eclipse.e4.core.di.extensions" fragment=""/>
+      <plugin id="org.eclipse.e4.core.services" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.bindings" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.css.core" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.css.swt" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.css.swt.theme" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.di" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.model.workbench" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.services" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.widgets" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.workbench" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.workbench.addons.swt" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt" fragment=""/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
-      <plugin id="org.eclipse.e4.ui.workbench.swt"/>
-      <plugin id="org.eclipse.e4.ui.workbench3"/>
+      <plugin id="org.eclipse.e4.ui.workbench.swt" fragment=""/>
+      <plugin id="org.eclipse.e4.ui.workbench3" fragment=""/>
       <plugin id="org.eclipse.egit.core"/>
       <plugin id="org.eclipse.egit.ui"/>
       <plugin id="org.eclipse.emf.common"/>
@@ -184,10 +184,9 @@
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.ide.application"/>
-      <plugin id="org.eclipse.ui.intro"/>
       <plugin id="org.eclipse.ui.navigator"/>
       <plugin id="org.eclipse.ui.navigator.resources"/>
-      <plugin id="org.eclipse.ui.trace"/>
+      <plugin id="org.eclipse.ui.trace" fragment=""/>
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.views.properties.tabbed"/>
       <plugin id="org.eclipse.ui.win32" fragment="true"/>

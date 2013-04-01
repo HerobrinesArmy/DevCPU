@@ -1,6 +1,9 @@
 package devcpu.assembler;
 
+import java.util.ArrayList;
+
 import devcpu.assembler.exceptions.BadValueException;
+import devcpu.assembler.exceptions.TooManyRegistersInExpressionException;
 import devcpu.emulation.OpCodes;
 import devcpu.lexer.tokens.AddressStartToken;
 import devcpu.lexer.tokens.BValueEndToken;
@@ -47,8 +50,6 @@ public class AssemblyLine {
 	public char bVal;
 	public boolean aSet;
 	public boolean bSet;
-//	public boolean opCodeSet;//Needed?
-//	public boolean assembled;//Unused?
 	public boolean sized;
 	public boolean located;
 	//Set by Preprocess
@@ -56,7 +57,6 @@ public class AssemblyLine {
 	public boolean isDat; //Other preprocess fields invalid if this is true
 	public boolean isSpecial;
 	public boolean isBasic;
-//	public String mnemonic;
 	public boolean aHasRegister;
 	public boolean aIsAddress;
 	public boolean aHasOperator;
@@ -115,7 +115,7 @@ public class AssemblyLine {
 		}
 	}
 	
-	public void preprocess() throws BadValueException {
+	public void preprocess() throws BadValueException, TooManyRegistersInExpressionException {
 		if (!isDirective()) {
 			boolean inA = false;
 			int i = 0;
@@ -145,15 +145,19 @@ public class AssemblyLine {
 				} else if (t instanceof RegisterToken) {
 					if (inA) {
 						if (aHasRegister) {
-							//TODO Exception
-							System.out.println("Error");
+							ArrayList<String> registers = new ArrayList<String>();
+							registers.add(aRegister);
+							registers.add(((RegisterToken) t).getRegister());
+							throw new TooManyRegistersInExpressionException(this, registers, processedTokens, "a");
 						}
 						aRegister = ((RegisterToken) t).getRegister();
 						aHasRegister = true;
 					} else {
 						if (bHasRegister) {
-							//TODO Exception
-							System.out.println("Error");
+							ArrayList<String> registers = new ArrayList<String>();
+							registers.add(bRegister);
+							registers.add(((RegisterToken) t).getRegister());
+							throw new TooManyRegistersInExpressionException(this, registers, processedTokens, "b");
 						}
 						bRegister = ((RegisterToken) t).getRegister();
 						bHasRegister = true;
@@ -216,8 +220,7 @@ public class AssemblyLine {
 								opCodeToken.setAValueNextWord(true);
 								aVal = 0x1a;
 							} else {
-								//TODO Exception (PC/EX)
-								System.out.println("Error");
+								throw new BadValueException(this, processedTokens, aRegister + " used in an address.");
 							}
 						} else {
 							aClass = VALUE_REGISTER_OFFSET_MEMORY;
@@ -227,8 +230,8 @@ public class AssemblyLine {
 					} else {
 						aClass = VALUE_REGISTER_MEMORY;
 						if (idx == -1) {
-							//TODO Exception (PC/EX) (SP ruled out by lexer behavior)
-							System.out.println("Error");
+							//SP ruled out by lexer behavior
+							throw new BadValueException(this, processedTokens, aRegister + " used in an address.");
 						}
 						aVal = (char) (0x08 + idx);
 					}
@@ -236,7 +239,7 @@ public class AssemblyLine {
 				} else if (aHasSimpleStack) {
 					aClass = VALUE_SIMPLE_STACK;
 					if (aIsAddress || aHasOperator) {
-						throw new BadValueException(this.document.getAssembly(), processedTokens, aAccessor + " used in an address or expression.");
+						throw new BadValueException(this, processedTokens, aAccessor + " used in an address or expression.");
 					}
 					if ("POP".equals(aAccessor) || "[SP++]".equals(aAccessor)) {
 						aVal = 0x18;
@@ -301,8 +304,7 @@ public class AssemblyLine {
 									opCodeToken.setBValueNextWord(true);
 									bVal = 0x1a;
 								} else {
-									//TODO Exception (PC/EX)
-									System.out.println("Error");
+									throw new BadValueException(this, processedTokens, bRegister + " used in an address.");
 								}
 							} else {
 								bClass = VALUE_REGISTER_OFFSET_MEMORY;
@@ -312,8 +314,8 @@ public class AssemblyLine {
 						} else {
 							bClass = VALUE_REGISTER_MEMORY;
 							if (idx == -1) {
-								//TODO Exception (PC/EX) (SP ruled out by lexer behavior)
-								System.out.println("Error");
+								//SP ruled out by lexer behavior
+								throw new BadValueException(this, processedTokens, bRegister + " used in an address.");
 							}
 							bVal = (char) (0x08 + idx);
 						}
@@ -322,7 +324,7 @@ public class AssemblyLine {
 						bClass = VALUE_SIMPLE_STACK;
 						//SSA validity check
 						if (bIsAddress || bHasOperator) {
-							throw new BadValueException(this.document.getAssembly(), processedTokens, bAccessor + " used in an address or expression.");
+							throw new BadValueException(this, processedTokens, bAccessor + " used in an address or expression.");
 						}
 						if ("PUSH".equals(bAccessor) || "[--SP]".equals(bAccessor)) {
 							bVal = 0x18;
@@ -426,20 +428,4 @@ public class AssemblyLine {
 	public boolean isDirective() {
 		return directive != null;
 	}
-
-//	public void setOffset(int offset) {
-//		this.offset = offset;
-//	}
-//
-//	public int getOffset() {
-//		return offset;
-//	}
-//
-//	public void setSize(int size) {
-//		this.size = size;
-//	}
-//	
-//	public int getSize() {
-//		return size;
-//	}
 }

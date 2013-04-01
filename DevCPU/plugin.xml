@@ -452,17 +452,7 @@
             markerType="org.eclipse.debug.core.lineBreakpointMarker">
       </breakpoint>
    </extension>
-   <extension point="org.eclipse.ui.intro"> 
-   <intro
-            class="devcpu.IntroPart"
-            id="devcpu.intro"
-            icon="icons/icon_16.png"/>
-      <introProductBinding
-            introId="devcpu.intro"
-            productId="DevCPU.product">
-      </introProductBinding>
-   </extension>
-  <!-- <extension
+<!-- <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             class="devcpu.launch.DCPUSourceLocator"
@@ -533,6 +523,16 @@
          </contextualLaunch>
       </shortcut>
    </extension>-->
+   <!-- <extension point="org.eclipse.ui.intro"> 
+   <intro
+            class="devcpu.IntroPart"
+            id="devcpu.intro"
+            icon="icons/icon_16.png"/>
+      <introProductBinding
+            introId="devcpu.intro"
+            productId="DevCPU.product">
+      </introProductBinding>
+   </extension>
    <extension
          point="org.eclipse.ui.intro.config">
       <config
@@ -548,6 +548,6 @@
             </implementation>
          </presentation>
       </config>
-   </extension>
+   </extension> -->
 
 </plugin>
