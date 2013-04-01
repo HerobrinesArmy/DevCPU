@@ -21,6 +21,7 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.progress.UIJob;
 
 import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -72,12 +73,12 @@ public class NavigatorCommandHandler implements IHandler {
 						for (Object o : res) {
 							if (o instanceof FloppyDisk) {
 								final FloppyDisk disk = (FloppyDisk) o;
+								final IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
+								es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
 										IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
-										IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
-										es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 										try {
 											long start = System.nanoTime();
 											Assembly a = new Assembly(file);
@@ -123,12 +124,12 @@ public class NavigatorCommandHandler implements IHandler {
 						for (Object o : res) {
 							if (o instanceof DefaultControllableDCPU) {
 								final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+								final IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
+								es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
 										IOConsoleOutputStream os = Activator.getConsole().newOutputStream();
-										IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
-										es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
 										try {
 											long start = System.nanoTime();
 											Assembly a = new Assembly(file);
@@ -137,6 +138,7 @@ public class NavigatorCommandHandler implements IHandler {
 											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) was loaded and assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. Assembly reports " + a.getMissedShortLiteralEstimate() + " missed opportunities for short literals. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of possible).\n");
 										} catch (Exception e) {
 											try {
+												e.printStackTrace();
 												es.write("Assembly failed: " + e.getMessage() + "\n");
 											} catch (IOException e1) {
 												e1.printStackTrace();

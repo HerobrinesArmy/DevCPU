@@ -28,6 +28,7 @@ import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
 import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.TokenizationException;
+import devcpu.assembler.exceptions.UndefinedLabelException;
 import devcpu.assembler.exceptions.ValueResolutionException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
@@ -233,6 +234,9 @@ public class Assembly {
 					for (LexerToken token : line.getProcessedTokens()) {
 						if (token instanceof LabelToken) {
 							if (!((LabelToken) token).valueSet) {
+								if (!labelDefs.containsKey(((LabelToken) token).labelName)) {
+									throw new UndefinedLabelException(line, ((LabelToken) token).labelName, labelUses.get(((LabelToken) token).labelName));
+								}
 								if (labelDefs.get(((LabelToken) token).labelName).getLine().located) {
 									accomplishedSomething = true;
 									((LabelToken) token).value = labelDefs.get(((LabelToken) token).labelName).getLine().offset; //Setting it early

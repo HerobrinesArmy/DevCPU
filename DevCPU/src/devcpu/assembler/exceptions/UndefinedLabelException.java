@@ -2,16 +2,16 @@ package devcpu.assembler.exceptions;
 
 import java.util.List;
 
-import devcpu.assembler.Assembly;
+import devcpu.assembler.AssemblyLine;
 import devcpu.assembler.LabelUse;
 
-public class UndefinedLabelException extends AbstractAssemblyException {
+public class UndefinedLabelException extends AbstractLineException {
 	private static final long serialVersionUID = 1L;
 	private String label;
 	private List<LabelUse> uses;
 
-	public UndefinedLabelException(Assembly assembly, String label, List<LabelUse> uses) {
-		super(assembly);
+	public UndefinedLabelException(AssemblyLine line, String label, List<LabelUse> uses) {
+		super(line);
 		this.label = label;
 		this.uses = uses;
 	}
@@ -26,7 +26,9 @@ public class UndefinedLabelException extends AbstractAssemblyException {
 	
 	@Override
 	public String getMessage() {
-		LabelUse use = uses.get(0);
-		return "Undefined label \"" + label + "\" at " + use.getLine().getDocument().getFile().getName() + ", Line " + use.getLine().getLineNumber() + ": " + use.getLine().getText();
+		if (uses.size() > 1) {
+			return "Undefined label \"" + label + "\" at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + " (one of " + uses.size() + " places): " + line.getText();
+		}
+		return "Undefined label \"" + label + "\" at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
 	}
 }
