@@ -47,8 +47,6 @@ public class AssemblyLine {
 	public char bVal;
 	public boolean aSet;
 	public boolean bSet;
-//	public boolean opCodeSet;//Needed?
-//	public boolean assembled;//Unused?
 	public boolean sized;
 	public boolean located;
 	//Set by Preprocess
@@ -56,7 +54,6 @@ public class AssemblyLine {
 	public boolean isDat; //Other preprocess fields invalid if this is true
 	public boolean isSpecial;
 	public boolean isBasic;
-//	public String mnemonic;
 	public boolean aHasRegister;
 	public boolean aIsAddress;
 	public boolean aHasOperator;
@@ -426,20 +423,4 @@ public class AssemblyLine {
 	public boolean isDirective() {
 		return directive != null;
 	}
-
-//	public void setOffset(int offset) {
-//		this.offset = offset;
-//	}
-//
-//	public int getOffset() {
-//		return offset;
-//	}
-//
-//	public void setSize(int size) {
-//		this.size = size;
-//	}
-//	
-//	public int getSize() {
-//		return size;
-//	}
 }

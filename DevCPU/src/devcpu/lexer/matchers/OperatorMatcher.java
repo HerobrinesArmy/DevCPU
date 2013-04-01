@@ -11,14 +11,13 @@ import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.OperatorToken;
 
 public class OperatorMatcher implements LexerTokenMatcher {
-	//TODO Add more operators
-	private Pattern pattern = Pattern.compile("\\s*(\\+|\\-|\\/|\\*)");
+	//TODO Add even more operators
+	private Pattern pattern = Pattern.compile("\\s*(\\+|\\-|\\/|\\*|\\>\\>\\>|\\>\\>|\\<\\<)");
 	private static OperatorMatcher matcher = new OperatorMatcher();
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO?
 		return followTokenMatchers;
 	}
 
@@ -35,6 +34,6 @@ public class OperatorMatcher implements LexerTokenMatcher {
 	}
 	
 	public static OperatorMatcher get() {
-		return matcher ;
+		return matcher;
 	}
 }
