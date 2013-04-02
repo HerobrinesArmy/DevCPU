@@ -331,8 +331,8 @@ public class DCPU
         	cycles += 2;
         	//disables interrupt queueing, pops A from the stack, then pops PC from the stack
         	queueingEnabled = false;
-        	registers[0] = ram[++sp & 0xFFFF];
-	        pc = ram[++sp & 0xFFFF];
+        	registers[0] = ram[sp++ & 0xFFFF];
+	        pc = ram[sp++ & 0xFFFF];
         	break;
         case 12: //IAQ TODO: Verify implementation
         	cycles += 1;
