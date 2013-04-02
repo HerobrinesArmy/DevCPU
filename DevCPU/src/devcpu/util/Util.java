@@ -3,6 +3,8 @@ package devcpu.util;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -12,9 +14,104 @@ import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 
 import devcpu.Activator;
+import exp4j_int_custom.CustomOperator;
 
 @SuppressWarnings("restriction")
 public class Util {
+	public static final Collection<CustomOperator> OPERATORS = new ArrayList<CustomOperator>();
+	static {
+		OPERATORS.add(new CustomOperator("\'", false, 3, 1) {
+			@Override
+			protected int applyOperation(int[] values) {
+				return -values[0];
+			}
+		});
+
+		OPERATORS.add(new CustomOperator("**",true,4,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return (int) Math.pow(args[0],args[1]);
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("*",true,5,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] * args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("/",true,5,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] / args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("%",true,5,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] % args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("+",true,6,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] + args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("-",true,6,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] - args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("<<",true,7,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] << args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator(">>",true,7,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] >> args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator(">>>",true,7,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] >>> args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("&",true,10,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] & args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("^",true,11,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] ^ args[1];
+			}
+		});
+		
+		OPERATORS.add(new CustomOperator("|",true,12,2) {
+			@Override
+			protected int applyOperation(int[] args) {
+				return args[0] | args[1];
+			}
+		});
+	}
+	
 	public static int parseValue(String text) {
 		int val = 0;
 		if (text.startsWith("0x")) {

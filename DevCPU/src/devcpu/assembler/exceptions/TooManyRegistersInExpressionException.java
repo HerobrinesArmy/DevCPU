@@ -41,6 +41,6 @@ public class TooManyRegistersInExpressionException extends AbstractLineException
 				rs += "," + r;
 			}
 		}
-		return "Too many registers (" + rs + ") in expression for " + valueType + " value at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
+		return "Too many registers (" + rs + ") in expression for the" + valueType + " value at " + line.getDocument().getFile().getName() + ", Line " + line.getLineNumber() + ": " + line.getText();
 	}
 }

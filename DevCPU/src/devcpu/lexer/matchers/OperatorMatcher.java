@@ -12,7 +12,7 @@ import devcpu.lexer.tokens.OperatorToken;
 
 public class OperatorMatcher implements LexerTokenMatcher {
 	//TODO Add even more operators
-	private Pattern pattern = Pattern.compile("\\s*(\\+|\\-|\\/|\\*|\\>\\>\\>|\\>\\>|\\<\\<)");
+	private Pattern pattern = Pattern.compile("\\s*(\\*\\*|\\*|\\/|\\%|\\+|\\-|\\>\\>\\>|\\>\\>|\\<\\<|\\&|\\^|\\|)");
 	private static OperatorMatcher matcher = new OperatorMatcher();
 	
 	@Override

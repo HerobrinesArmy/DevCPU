@@ -8,7 +8,6 @@
 	<classpathentry exported="true" kind="lib" path="AppleJavaExtensions.jar"/>
 	<classpathentry exported="true" kind="lib" path="lwjgl_util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lwjgl.jar"/>
-	<classpathentry kind="lib" path="exp4j-0.3.10.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

@@ -7,10 +7,10 @@ import static devcpu.assembler.AssemblyLine.VALUE_REGISTER;
 import static devcpu.assembler.AssemblyLine.VALUE_REGISTER_MEMORY;
 import static devcpu.assembler.AssemblyLine.VALUE_REGISTER_OFFSET_MEMORY;
 import static devcpu.assembler.AssemblyLine.VALUE_SIMPLE_STACK;
+import static devcpu.util.Util.OPERATORS;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -18,10 +18,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import de.congrace.exp4j.CustomOperator;
-import de.congrace.exp4j.ExpressionBuilder;
-import de.congrace.exp4j.UnknownFunctionException;
-import de.congrace.exp4j.UnparsableExpressionException;
 import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
@@ -49,33 +45,13 @@ import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
 import devcpu.lexer.tokens.StringToken;
 import devcpu.util.Util;
+import exp4j_int_custom.ExpressionBuilder;
+import exp4j_int_custom.UnknownFunctionException;
+import exp4j_int_custom.UnparsableExpressionException;
 
 public class Assembly {
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
 	public static final String REGISTERS = "ABCXYZIJ";
-	private static final Collection<CustomOperator> additionalOperators = new ArrayList<CustomOperator>();
-	static {
-		additionalOperators.add(new CustomOperator("<<",0) {
-			@Override
-			protected double applyOperation(double[] args) {
-				return (int)args[0] << (int)args[1];
-			}
-		});
-		
-		additionalOperators.add(new CustomOperator(">>",0) {
-			@Override
-			protected double applyOperation(double[] args) {
-				return (int)args[0] >> (int)args[1];
-			}
-		});
-		
-		additionalOperators.add(new CustomOperator(">>>",0) {
-			@Override
-			protected double applyOperation(double[] args) {
-				return (int)args[0] >>> (int)args[1];
-			}
-		});
-	}
 	private AssemblyDocument rootDocument;
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	public static boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
@@ -268,7 +244,7 @@ public class Assembly {
 					if (directive.isOrigin()) {
 						if (line.nextOffset == 0) {
 							try {
-								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(additionalOperators).build().calculate();
+								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(OPERATORS).build().calculate();
 							} catch (Exception e) {
 								throw new DirectiveExpressionEvaluationException(directive);
 							}
@@ -285,7 +261,7 @@ public class Assembly {
 					} else if (directive.isAlign()) {
 						if (line.nextOffset == 0) {
 							try {
-								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(additionalOperators).build().calculate();
+								line.nextOffset = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(OPERATORS).build().calculate();
 							} catch (Exception e) {
 								throw new DirectiveExpressionEvaluationException(directive);
 							}
@@ -306,7 +282,7 @@ public class Assembly {
 							int i = 0;
 							while (!(paramTokens[++i] instanceof BValueStartToken)) {}
 							while (!(paramTokens[++i] instanceof BValueEndToken)) {spanText += paramTokens[i].getText();}
-							line.size = (int) new ExpressionBuilder(decimalize(spanText)).withOperations(additionalOperators).build().calculate();
+							line.size = (int) new ExpressionBuilder(decimalize(spanText)).withOperations(OPERATORS).build().calculate();
 							line.sized = true;
 						} catch (Exception e) {
 							throw new DirectiveExpressionEvaluationException(directive);
@@ -318,7 +294,7 @@ public class Assembly {
 						oMax += line.size;
 					} else if (directive.isReserve()) {
 						try {
-							line.size = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(additionalOperators).build().calculate();
+							line.size = (int) new ExpressionBuilder(decimalize(directive.getParametersToken().getText())).withOperations(OPERATORS).build().calculate();
 							line.sized = true;
 						} catch (Exception e) {
 							throw new DirectiveExpressionEvaluationException(directive);
@@ -509,7 +485,7 @@ public class Assembly {
 			//literal, even without knowing its exact value.
 			return false;
 		}
-		char val = (char) (int) new ExpressionBuilder(value.getExpression()).withOperations(additionalOperators).build().calculate();
+		char val = (char) (int) new ExpressionBuilder(value.getExpression()).withOperations(OPERATORS).build().calculate();
 		if (val >= 31 && val != 0xFFFF) {
 			line.literalA = (char) val;
 			line.literalASet = true;
@@ -555,7 +531,7 @@ public class Assembly {
 					int i = 0;
 					while (!(paramTokens[++i] instanceof AValueStartToken)) {}
 					while (!(paramTokens[++i] instanceof AValueEndToken)) {valText += paramTokens[i].getText();}
-					char v = (char)(int) new ExpressionBuilder(decimalize(valText)).withOperations(additionalOperators).build().calculate();
+					char v = (char)(int) new ExpressionBuilder(decimalize(valText)).withOperations(OPERATORS).build().calculate();
 					int end = pc + line.size;
 					while (pc < end) {
 						ram[pc++] = v;
@@ -603,7 +579,7 @@ public class Assembly {
 				expression += token.getText();
 			}
 		}
-		int val = (int) new ExpressionBuilder(expression).withOperations(additionalOperators).build().calculate();
+		int val = (int) new ExpressionBuilder(expression).withOperations(OPERATORS).build().calculate();
 		buf[pc++] = (char) val;
 		return pc;
 	}
@@ -659,7 +635,7 @@ public class Assembly {
 				throw new BadValueException(line, tokens, line.bRegister + " used in disallowed operation.");
 			}
 		}
-		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(additionalOperators).build().calculate(); 
+		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(OPERATORS).build().calculate(); 
 		
 		if (hasNextWord) {
 			buf[offset] = (char) literal;
@@ -785,7 +761,7 @@ public class Assembly {
 				throw new BadValueException(line, tokens, line.aRegister + " used in disallowed operation.");
 			}
 		}
-		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(additionalOperators).build().calculate(); 
+		int literal = (int) new ExpressionBuilder(value.getExpression()).withOperations(OPERATORS).build().calculate(); 
 		
 		if (hasNextWord) {
 			buf[offset] = (char) literal;
