@@ -21,7 +21,6 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.progress.UIJob;
 
 import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;

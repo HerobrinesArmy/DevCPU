@@ -52,8 +52,9 @@ public class FloppyDisk implements Identifiable {
 				dos.writeChar(data[i]);
 			}
 		} catch (IOException e) {
-			dos.close();
+			e.printStackTrace();
 		}
+		dos.close();
 	}
 	
 	public boolean isWriteProtected() {

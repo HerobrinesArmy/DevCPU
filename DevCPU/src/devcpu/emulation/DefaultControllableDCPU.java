@@ -202,8 +202,9 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 				dos.writeChar(ram[i]);
 			}
 		} catch (IOException e) {
-			dos.close();
+			e.printStackTrace();
 		}
+		dos.close();
 	}
 	
 	@Override
