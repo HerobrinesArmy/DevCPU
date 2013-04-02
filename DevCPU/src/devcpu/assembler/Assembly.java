@@ -88,6 +88,7 @@ public class Assembly {
 	private int shortened;
 	private long timer;
 	private int passes;
+	private boolean abandonOptimization;
 
 	public Assembly(IFile file) throws IOException, CoreException, AbstractAssemblyException {
 		rootDocument = new AssemblyDocument(file, this, null);
@@ -372,8 +373,13 @@ public class Assembly {
 								line.sized = true;
 							} else {
 								if (!sizeExpressionA(line)) {
-									oMin += 1+line.bSize;
-									oMax += 2+line.bSize;
+									if (abandonOptimization) {
+										line.size = 2 + line.bSize;
+										line.sized = true;
+									} else {
+										oMin += 1+line.bSize;
+										oMax += 2+line.bSize;
+									}
 									line.opCodeToken.setAValueNextWord(true);
 								}
 							}
@@ -397,8 +403,13 @@ public class Assembly {
 								} else {
 									AssemblyLine lRef = ((LabelToken) tokens[line.aStart]).lineRef;
 									if (lRef == null) {
-										oMin += 1+line.bSize;
-										oMax += 2+line.bSize;
+										if (abandonOptimization) {
+											line.size = 2 + line.bSize;
+											line.sized = true;
+										} else {
+											oMin += 1+line.bSize;
+											oMax += 2+line.bSize;
+										}
 										line.opCodeToken.setAValueNextWord(true);
 									} else {
 										if (lRef.minOffset > 0) {
@@ -417,30 +428,50 @@ public class Assembly {
 														line.sized = true;
 														line.opCodeToken.setAValueNextWord(false);
 													} else {
-														oMin += 1+line.bSize;
-														oMax += 2+line.bSize;
+														if (abandonOptimization) {
+															line.size = 2 + line.bSize;
+															line.sized = true;
+														} else {
+															oMin += 1+line.bSize;
+															oMax += 2+line.bSize;
+														}
 														line.opCodeToken.setAValueNextWord(true);
 													}
 												}
 											}
 										} else {
-											oMin += 1+line.bSize;
-											oMax += 2+line.bSize;
+											if (abandonOptimization) {
+												line.size = 2 + line.bSize;
+												line.sized = true;
+											} else {
+												oMin += 1+line.bSize;
+												oMax += 2+line.bSize;
+											}
 											line.opCodeToken.setAValueNextWord(true);
 										}
 									}
 								}
 							} else {
 								if (!sizeExpressionA(line)) {
-									oMin += 1+line.bSize;
-									oMax += 2+line.bSize;
+									if (abandonOptimization) {
+										line.size = 2 + line.bSize;
+										line.sized = true;
+									} else {
+										oMin += 1+line.bSize;
+										oMax += 2+line.bSize;
+									}
 									line.opCodeToken.setAValueNextWord(true);
 								}
 							}
 						} else {
 							if (!sizeExpressionA(line)) {
-								oMin += 1+line.bSize;
-								oMax += 2+line.bSize;
+								if (abandonOptimization) {
+									line.size = 2 + line.bSize;
+									line.sized = true;
+								} else {
+									oMin += 1+line.bSize;
+									oMax += 2+line.bSize;
+								}
 								line.opCodeToken.setAValueNextWord(true);
 							}
 						}
@@ -461,6 +492,9 @@ public class Assembly {
 			exact = oMin == oMax;
 		//			if (!line.sized) { System.out.println(line.getText());}
 			finished = finished && exact;
+		}
+		if (!accomplishedSomething && !finished) {
+			abandonOptimization = true;
 		}
 		return accomplishedSomething || !finished;
 	}

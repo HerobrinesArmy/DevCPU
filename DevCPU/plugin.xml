@@ -159,6 +159,10 @@
                                  property="org.eclipse.core.resources.name"
                                  value="*.dasm">
                            </test>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.10c">
+                           </test>
                         </or>
                      </adapt>
                   </iterate>
@@ -185,6 +189,10 @@
                            <test
                                  property="org.eclipse.core.resources.name"
                                  value="*.dasm">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.10c">
                            </test>
                         </or>
                      </adapt>
@@ -395,7 +403,7 @@
       <editor
             class="devcpu.editors.dasm.DASMEditor"
             default="false"
-            extensions="dasm,dasm16"
+            extensions="dasm,dasm16,10c"
             icon="icons/dasm.png"
             id="devcpu.dasmeditor"
             name="DASM Editor">
@@ -406,7 +414,7 @@
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
             class="devcpu.editors.dasm.DASMDocumentSetupParticipant"
-            extensions="dasm,dasm16">
+            extensions="dasm,dasm16,10c">
       </participant>
    </extension>
    <extension
@@ -515,6 +523,10 @@
                         <test
                               property="org.eclipse.debug.ui.matchesPattern"
                               value="*.dasm16">
+                        </test>
+                        <test
+                              property="org.eclipse.debug.ui.matchesPattern"
+                              value="*.10c	">
                         </test>
                      </or>
                   </iterate>
