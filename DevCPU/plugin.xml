@@ -526,7 +526,7 @@
                         </test>
                         <test
                               property="org.eclipse.debug.ui.matchesPattern"
-                              value="*.10c	">
+                              value="*.10c">
                         </test>
                      </or>
                   </iterate>
