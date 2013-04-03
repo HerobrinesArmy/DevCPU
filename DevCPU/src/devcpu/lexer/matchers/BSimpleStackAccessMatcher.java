@@ -11,7 +11,7 @@ import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.SimpleStackAccessToken;
 
 public class BSimpleStackAccessMatcher implements LexerTokenMatcher {
-	private Pattern pattern = Pattern.compile("\\s*(push|peek|\\[\\s*(sp|\\-\\-\\s*sp)\\s*\\]\\b)",Pattern.CASE_INSENSITIVE);
+	private Pattern pattern = Pattern.compile("\\s*(push\\b|peek\\b|\\[\\s*(sp|\\-\\-\\s*sp)\\s*\\])",Pattern.CASE_INSENSITIVE);
 	private static BSimpleStackAccessMatcher matcher = new BSimpleStackAccessMatcher();
 	
 	@Override
