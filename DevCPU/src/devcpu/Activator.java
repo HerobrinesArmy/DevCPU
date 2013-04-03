@@ -1,7 +1,6 @@
 package devcpu;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
@@ -10,32 +9,17 @@ import org.osgi.framework.BundleContext;
 
 import devcpu.emulation.Ship;
 
-/**
- * The activator class controls the plug-in life cycle
- */
 public class Activator extends AbstractUIPlugin {
-
-	// The plug-in ID
 	public static final String PLUGIN_ID = "DevCPU"; //$NON-NLS-1$
 
 	private static Ship ship = new Ship();
 	
 	private static MessageConsole console = new MessageConsole("Default Console", null);
 
-	private IWorkbenchPart activePart;
-	{
-//		new org.eclipse.debug.internal.ui.views.memory.MemoryView;
-		
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {console});  
-	}
-
-	// The shared instance
 	private static Activator plugin;
 	
-	/**
-	 * The constructor
-	 */
 	public Activator() {
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] {console});
 	}
 	
 	public static Ship getShip() {
@@ -82,13 +66,5 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	public void setActivePart(IWorkbenchPart part) {
-		activePart = part;
-	}
-
-	public IWorkbenchPart getActivePart() {
-		return activePart;
 	}
 }

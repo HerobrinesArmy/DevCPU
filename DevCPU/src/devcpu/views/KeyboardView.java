@@ -13,8 +13,12 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener2;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
@@ -52,6 +56,17 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 				}
 			}
 		});
+		getSite().getWorkbenchWindow().addPerspectiveListener(new IPerspectiveListener2() {
+			@Override public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective){}
+			@Override public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId){}
+
+			@Override
+			public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
+				if (KeyboardView.this.equals(partRef.getPart(false)) && changeId == IWorkbenchPage.CHANGE_VIEW_HIDE) {
+			  	kv.die();
+				}
+			}
+		});
 		frame = SWT_AWT.new_Frame(composite);
 		frame.add(kv.canvas);
 		makeActions();
@@ -78,17 +93,13 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		final MenuManager attachSubmenu = new MenuManager(
-				"Attach Generic Keyboard",
-				Util.getImageDescriptor("icons/keyboard.png"), null);
-		attachSubmenu.add(new Action() {
-		});
+		final MenuManager attachSubmenu = new MenuManager("Attach Generic Keyboard", Util.getImageDescriptor("icons/keyboard.png"), null);
+		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				attachSubmenu.removeAll();
-				for (DCPUHardware h : Activator.getShip().getHardwareManager()
-						.getDevices(VirtualKeyboard.class)) {
+				for (DCPUHardware h : Activator.getShip().getHardwareManager().getDevices(VirtualKeyboard.class)) {
 					final VirtualKeyboard vm = ((VirtualKeyboard) h);
 					attachSubmenu.add(new Action(vm.getID()) {
 						@Override

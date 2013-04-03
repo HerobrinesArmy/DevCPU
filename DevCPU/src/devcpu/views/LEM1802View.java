@@ -5,13 +5,16 @@ import java.awt.Frame;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener2;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartReference;
 
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
@@ -25,36 +28,36 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 	
 	private Action detachAction;
 
-	LEM1802Viewer lv = new LEM1802Viewer();
+	private LEM1802Viewer lv = new LEM1802Viewer();
 	private Frame frame;
 	
 	public void createPartControl(Composite parent) {
 		setPartName("LEM1802 - Not Connected");
 		Composite composite = new Composite(parent, SWT.EMBEDDED);
+		getSite().getWorkbenchWindow().addPerspectiveListener(new IPerspectiveListener2() {
+			@Override public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective){}
+			@Override public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId){}
+
+			@Override
+			public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
+				if (LEM1802View.this.equals(partRef.getPart(false)) && changeId == IWorkbenchPage.CHANGE_VIEW_HIDE) {
+					lv.die();
+					//TODO XXX Handle unmap here in fixing issue #1? 
+				}
+			}
+		});
 		frame = SWT_AWT.new_Frame(composite);
 		frame.add(lv.canvas);
 		makeActions();
-//		hookContextMenu();
 		contributeToActionBars();
 	}
 
 	public void setFocus() {
 	}
 
-//	private void hookContextMenu() {
-//		MenuManager menuMgr = new MenuManager("#PopupMenu");
-//		menuMgr.setRemoveAllWhenShown(true);
-//		menuMgr.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(IMenuManager manager) {
-//				LEM1802View.this.fillContextMenu(manager);
-//			}
-//		});
-//	}
-
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
@@ -82,34 +85,6 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 		});
 		manager.add(attachSubmenu);
 		manager.add(detachAction);
-	}
-
-//	private void fillContextMenu(IMenuManager manager) {
-//		manager.add(detachAction);
-//		// Other plug-ins can contribute there actions here
-//		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-//	}
-	
-	private void fillLocalToolBar(IToolBarManager manager) {
-//		final MenuManager attachSubmenu = new MenuManager("Attach LEM1802");
-//		attachSubmenu.addMenuListener(new IMenuListener() {
-//			@Override
-//			public void menuAboutToShow(IMenuManager manager) {
-//				attachSubmenu.removeAll();
-//				for (DCPUHardware h : Activator.getDefault().getShip().getDeviceManager().getDevices(VirtualMonitor.class)) {
-//					final VirtualMonitor vm = ((VirtualMonitor)h);
-//					attachSubmenu.add(new Action(vm.getID()) {
-//						public void run() {
-//							synchronized (lv) {
-//								map(vm);
-//							}
-//						}
-//					});
-//				}
-//			}
-//		});
-//		manager.add(attachSubmenu);
-//		manager.add(detachAction);
 	}
 
 	private void makeActions() {

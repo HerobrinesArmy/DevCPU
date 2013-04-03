@@ -22,9 +22,7 @@ public class KeyboardViewer {
 	private boolean focus;
 	
 	public KeyboardViewer() {
-		canvas.setPreferredSize(new Dimension(144, 112));
-		canvas.setMinimumSize(new Dimension(144, 112));
-		canvas.setMaximumSize(new Dimension(144, 112));
+		canvas.setMinimumSize(new Dimension(1, 1));
 		canvas.setFocusable(true);
 		Thread t = new Thread() {
 			public void run() {
