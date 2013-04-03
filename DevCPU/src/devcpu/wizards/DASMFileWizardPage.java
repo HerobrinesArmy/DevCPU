@@ -20,28 +20,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
-/**
- * The "New" wizard page allows setting the container for the new file as well
- * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (dasm).
- */
-
 public class DASMFileWizardPage extends WizardPage {
 	private Text containerText;
-
 	private Text fileText;
-
 	private ISelection selection;
 
-	/**
-	 * Constructor for SampleNewWizardPage.
-	 * 
-	 * @param pageName
-	 */
 	public DASMFileWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle("Multi-page Editor File");
-		setDescription("This wizard creates a new file with *.dasm extension that can be opened by a multi-page editor.");
+		setTitle("DASM File");
+		setDescription("This wizard creates a new DCPU-16 Assembly Language file with *.dasm extension.");
 		this.selection = selection;
 	}
 
@@ -89,23 +76,20 @@ public class DASMFileWizardPage extends WizardPage {
 		setControl(container);
 	}
 
-	/**
-	 * Tests if the current workbench selection is a suitable container to use.
-	 */
-
 	private void initialize() {
-		if (selection != null && selection.isEmpty() == false
-				&& selection instanceof IStructuredSelection) {
+		if (selection != null && selection.isEmpty() == false && selection instanceof IStructuredSelection) {
 			IStructuredSelection ssel = (IStructuredSelection) selection;
-			if (ssel.size() > 1)
+			if (ssel.size() > 1) {
 				return;
+			}
 			Object obj = ssel.getFirstElement();
 			if (obj instanceof IResource) {
 				IContainer container;
-				if (obj instanceof IContainer)
+				if (obj instanceof IContainer) {
 					container = (IContainer) obj;
-				else
+				}	else {
 					container = ((IResource) obj).getParent();
+				}
 				containerText.setText(container.getFullPath().toString());
 			}
 		}
@@ -114,15 +98,8 @@ public class DASMFileWizardPage extends WizardPage {
 		fileText.setSelection(0, 7);
 	}
 
-	/**
-	 * Uses the standard container selection dialog to choose the new value for
-	 * the container field.
-	 */
-
 	private void handleBrowse() {
-		ContainerSelectionDialog dialog = new ContainerSelectionDialog(
-				getShell(), ResourcesPlugin.getWorkspace().getRoot(), false,
-				"Select new file container");
+		ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), false, "Select new file container");
 		if (dialog.open() == ContainerSelectionDialog.OK) {
 			Object[] result = dialog.getResult();
 			if (result.length == 1) {
@@ -131,21 +108,15 @@ public class DASMFileWizardPage extends WizardPage {
 		}
 	}
 
-	/**
-	 * Ensures that both text fields are set.
-	 */
-
 	private void dialogChanged() {
-		IResource container = ResourcesPlugin.getWorkspace().getRoot()
-				.findMember(new Path(getContainerName()));
+		IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getContainerName()));
 		String fileName = getFileName();
 
 		if (getContainerName().length() == 0) {
-			updateStatus("File container must be specified");
+			updateStatus("Files can only be added inside of projects.");
 			return;
 		}
-		if (container == null
-				|| (container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0) {
+		if (container == null || (container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0) {
 			updateStatus("File container must exist");
 			return;
 		}

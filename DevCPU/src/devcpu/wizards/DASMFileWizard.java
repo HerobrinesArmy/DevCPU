@@ -25,28 +25,15 @@ public class DASMFileWizard extends Wizard implements INewWizard {
 	private DASMFileWizardPage page;
 	private ISelection selection;
 
-	/**
-	 * Constructor for DASMFileWizard.
-	 */
 	public DASMFileWizard() {
 		super();
-		setNeedsProgressMonitor(true);
 	}
 	
-	/**
-	 * Adding the page to the wizard.
-	 */
-
 	public void addPages() {
 		page = new DASMFileWizardPage(selection);
 		addPage(page);
 	}
 
-	/**
-	 * This method is called when 'Finish' button is pressed in
-	 * the wizard. We will create an operation and run it
-	 * using wizard as execution context.
-	 */
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
@@ -73,11 +60,6 @@ public class DASMFileWizard extends Wizard implements INewWizard {
 		return true;
 	}
 	
-	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
-	 */
 	private void doFinish(String containerName, String fileName, IProgressMonitor monitor) throws CoreException {
 		monitor.beginTask("Creating " + fileName, 2);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -102,12 +84,12 @@ public class DASMFileWizard extends Wizard implements INewWizard {
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
-					IEditorPart editor = IDE.openEditor(page, file, "devcpu.DASM", true);
+					IEditorPart editor = IDE.openEditor(page, file, "devcpu.dasmeditor", true);
 					editor.getEditorSite().getSelectionProvider().setSelection(new TextSelection(contents.length(), 0));
 				} catch (PartInitException e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -115,16 +97,10 @@ public class DASMFileWizard extends Wizard implements INewWizard {
 	}
 	
 	private void throwCoreException(String message) throws CoreException {
-		IStatus status =
-			new Status(IStatus.ERROR, "DevCPU", IStatus.OK, message, null);
+		IStatus status = new Status(IStatus.ERROR, "DevCPU", IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
 
-	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
-	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
-	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
 	}
