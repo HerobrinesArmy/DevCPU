@@ -49,14 +49,13 @@ public class LEM1802Viewer {
 		            }
           		}
           	}
-            Thread.sleep(1L);
+            Thread.sleep(16L);
           }
         } catch (Exception e) {
           e.printStackTrace();
           try {
-						Thread.sleep(1L);
+						Thread.sleep(16L);
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
         }

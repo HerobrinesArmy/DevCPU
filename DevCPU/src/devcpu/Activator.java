@@ -1,6 +1,7 @@
 package devcpu;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
@@ -20,6 +21,8 @@ public class Activator extends AbstractUIPlugin {
 	private static Ship ship = new Ship();
 	
 	private static MessageConsole console = new MessageConsole("Default Console", null);
+
+	private IWorkbenchPart activePart;
 	{
 //		new org.eclipse.debug.internal.ui.views.memory.MemoryView;
 		
@@ -79,5 +82,13 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	public void setActivePart(IWorkbenchPart part) {
+		activePart = part;
+	}
+
+	public IWorkbenchPart getActivePart() {
+		return activePart;
 	}
 }
