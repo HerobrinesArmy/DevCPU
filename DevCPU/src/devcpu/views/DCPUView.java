@@ -3,7 +3,6 @@ package devcpu.views;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -22,8 +21,7 @@ import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.util.Util;
 
-public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements DCPUTickListener*/ {
-
+public class DCPUView extends MappedView<DefaultControllableDCPU> {
 	public static final String ID = "devcpu.views.DCPUView";
 	
 	private Action detachAction;
@@ -40,7 +38,7 @@ public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements D
 	private Text txtEX;
 	private Text txtIA;
 
-	DefaultControllableDCPU dcpu;
+	private DefaultControllableDCPU dcpu;
 	
 	public void createPartControl(Composite parent) {
 		setPartName("DCPU - Not Connected");
@@ -81,7 +79,6 @@ public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements D
 		
 		makeActions();
 		hookContextMenu();
-//		hookDoubleClickAction();
 		contributeToActionBars();
 		final Display display = parent.getDisplay();
 		Runnable timer = new Runnable() {
@@ -116,18 +113,14 @@ public class DCPUView extends MappedView<DefaultControllableDCPU>/* implements D
     StringBuilder buffer = new StringBuilder(4);
     appendHexString(buffer, value);
     return buffer.toString();
-}
+  }
 
-static public void appendHexString(StringBuilder buffer, short value) {
-    int nibble = (value & 0xF000) >>> 12;
-    buffer.append(HEX_TABLE[nibble]);
-    nibble = (value & 0x0F00) >>> 8;
-    buffer.append(HEX_TABLE[nibble]);
-    nibble = (value & 0x00F0) >>> 4;
-    buffer.append(HEX_TABLE[nibble]);
-    nibble = (value & 0x000F);
-    buffer.append(HEX_TABLE[nibble]);
-}
+  static public void appendHexString(StringBuilder buffer, short value) {
+    buffer.append(HEX_TABLE[(value & 0xF000) >>> 12]);
+    buffer.append(HEX_TABLE[(value & 0x0F00) >>> 8]);
+    buffer.append(HEX_TABLE[(value & 0x00F0) >>> 4]);
+    buffer.append(HEX_TABLE[value & 0x000F]);
+  }
 
 	private Text makeRegisterText(int x, int y, Group grp) {
 		Text txt = new Text(grp, SWT.NONE);
@@ -161,7 +154,6 @@ static public void appendHexString(StringBuilder buffer, short value) {
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
@@ -193,25 +185,6 @@ static public void appendHexString(StringBuilder buffer, short value) {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 	
-	private void fillLocalToolBar(IToolBarManager manager) {
-//		final MenuManager attachSubmenu = new MenuManager("Attach DCPU");
-//		attachSubmenu.addMenuListener(new IMenuListener() {
-//			@Override
-//			public void menuAboutToShow(IMenuManager manager) {
-//				attachSubmenu.removeAll();
-//				for (final DefaultControllableDCPU d : Activator.getDefault().getShip().getDCPUManager().getDCPUs()) {
-//					attachSubmenu.add(new Action(d.getID()) {
-//						public void run() {
-//							connect(d);
-//						}
-//					});
-//				}
-//			}
-//		});
-//		manager.add(attachSubmenu);
-//		manager.add(detachAction);
-	}
-
 	private void connect(DefaultControllableDCPU d) {
 		map(d);
 	}

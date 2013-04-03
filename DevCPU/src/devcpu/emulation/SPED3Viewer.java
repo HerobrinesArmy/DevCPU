@@ -98,7 +98,6 @@ public class SPED3Viewer {
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					glLineWidth(2);
 					
-//					System.out.println("sadf");
 					if (vvd == null) {
 						try {
 							Thread.sleep(100);

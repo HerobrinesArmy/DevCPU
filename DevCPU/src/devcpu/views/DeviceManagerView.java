@@ -492,9 +492,4 @@ public class DeviceManagerView extends ViewPart {
 
 	public void setFocus() {
 	}
-	
-//	@Override
-//	public ShowInContext getShowInContext() {
-//		return new ShowInContext(((IStructuredSelection)treeViewer.getSelection()).getFirstElement(), treeViewer.getSelection());
-//	}
 }
