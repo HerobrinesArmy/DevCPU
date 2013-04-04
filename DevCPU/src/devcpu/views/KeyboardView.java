@@ -1,6 +1,8 @@
 package devcpu.views;
 
+import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.Panel;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -30,32 +32,11 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 	public static final String ID = "devcpu.views.KeyboardView";
 
 	private Action detachAction;
-
 	private KeyboardViewer kv = new KeyboardViewer();
-	private Frame frame;
 
 	public void createPartControl(Composite parent) {
 		setPartName("Keyboard - Not Connected");
-		Composite composite = new Composite(parent, SWT.EMBEDDED);
-		this.getSite().getPage().addPartListener(new IPartListener() {
-			@Override public void partOpened(IWorkbenchPart part){}
-			@Override public void partClosed(IWorkbenchPart part){}
-			@Override public void partBroughtToTop(IWorkbenchPart part){}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-				if (part == KeyboardView.this) {
-					kv.setFocused(false);
-				}
-			}
-
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (part == KeyboardView.this) {
-					kv.setFocused(true);
-				}
-			}
-		});
+		final Composite composite = new Composite(parent, SWT.EMBEDDED);
 		getSite().getWorkbenchWindow().addPerspectiveListener(new IPerspectiveListener2() {
 			@Override public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective){}
 			@Override public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId){}
@@ -67,8 +48,26 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 				}
 			}
 		});
-		frame = SWT_AWT.new_Frame(composite);
-		frame.add(kv.canvas);
+		this.getSite().getPage().addPartListener(new IPartListener() {
+			@Override public void partOpened(IWorkbenchPart part){}
+			@Override public void partClosed(IWorkbenchPart part){}
+			@Override public void partBroughtToTop(IWorkbenchPart part){}
+			@Override public void partDeactivated(IWorkbenchPart part){}
+
+			@Override
+			public void partActivated(IWorkbenchPart part) {
+				if (part == KeyboardView.this) {
+					kv.canvas.requestFocus();
+					//TODO Handle the case where they're on a platform that prefers part activation focus and they click in the view but outside of the canvas while it's already active.
+					//Right now, it loses focus. It's not a huge deal, but it might be slightly annoying to have to re-click the canvas when you switch the attached keyboard;
+				}
+			}
+		});
+		Frame frame = SWT_AWT.new_Frame(composite);
+		Panel panel = new Panel();
+		panel.setLayout(new BorderLayout()); 
+		panel.add(kv.canvas, BorderLayout.CENTER);
+		frame.add(panel);
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();

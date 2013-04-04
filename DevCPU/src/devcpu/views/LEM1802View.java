@@ -1,6 +1,8 @@
 package devcpu.views;
 
+import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.Panel;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -23,13 +25,10 @@ import devcpu.emulation.VirtualMonitor;
 import devcpu.util.Util;
 
 public class LEM1802View extends MappedView<VirtualMonitor> {
-
 	public static final String ID = "devcpu.views.LEM1802View";
 	
 	private Action detachAction;
-
 	private LEM1802Viewer lv = new LEM1802Viewer();
-	private Frame frame;
 	
 	public void createPartControl(Composite parent) {
 		setPartName("LEM1802 - Not Connected");
@@ -46,8 +45,11 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 				}
 			}
 		});
-		frame = SWT_AWT.new_Frame(composite);
-		frame.add(lv.canvas);
+		Frame frame = SWT_AWT.new_Frame(composite);
+		Panel panel = new Panel();
+		panel.setLayout(new BorderLayout()); 
+		panel.add(lv.canvas, BorderLayout.CENTER);
+		frame.add(panel);
 		makeActions();
 		contributeToActionBars();
 	}

@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -24,6 +26,17 @@ public class KeyboardViewer {
 	public KeyboardViewer() {
 		canvas.setMinimumSize(new Dimension(1, 1));
 		canvas.setFocusable(true);
+		canvas.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				focus = false;
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				focus = true;
+			}
+		});
 		Thread t = new Thread() {
 			public void run() {
 				try {
