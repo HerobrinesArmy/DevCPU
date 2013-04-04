@@ -57,6 +57,6 @@ public class Directive {
 	}
 
 	public boolean isFill() {
-		return "FILL".equals(directiveName);
+		return "FILL".equals(directiveName) || "PAD".equals(directiveName);
 	}
 }

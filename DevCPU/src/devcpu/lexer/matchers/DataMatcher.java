@@ -12,7 +12,7 @@ import devcpu.lexer.tokens.LexerToken;
 
 public class DataMatcher implements LexerTokenMatcher {
 	private static DataMatcher matcher = new DataMatcher();
-	private Pattern pattern = Pattern.compile("\\s*\\.?dat\\b", Pattern.CASE_INSENSITIVE);
+	private Pattern pattern = Pattern.compile("\\s*(\\.?dat|\\.dw)\\b", Pattern.CASE_INSENSITIVE);
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
