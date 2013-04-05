@@ -73,7 +73,7 @@ public class NavigatorCommandHandler implements IHandler {
 							if (o instanceof FloppyDisk) {
 								final FloppyDisk disk = (FloppyDisk) o;
 								final IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
-								es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
+								es.setColor(new Color(Display.getDefault(), new RGB(255,0,0)));
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);
@@ -124,7 +124,7 @@ public class NavigatorCommandHandler implements IHandler {
 							if (o instanceof DefaultControllableDCPU) {
 								final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
 								final IOConsoleOutputStream es = Activator.getConsole().newOutputStream();
-								es.setColor(new Color(Display.getCurrent(), new RGB(255,0,0)));
+								es.setColor(new Color(Display.getDefault(), new RGB(255,0,0)));
 								Job job = new Job("Assemble " + file.getName()) {
 									protected IStatus run(IProgressMonitor monitor) {
 										monitor.beginTask("Assembling " + file.getName() + "...", IProgressMonitor.UNKNOWN);

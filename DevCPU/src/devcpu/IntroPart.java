@@ -18,12 +18,12 @@ public class IntroPart extends org.eclipse.ui.part.IntroPart {
 	@Override
 	public void createPartControl(Composite container) {
     Composite outerContainer = new Composite(container, SWT.NONE);
-    outerContainer.setBackground(new Color(Display.getCurrent(), new RGB(190, 190, 190)));
+    outerContainer.setBackground(new Color(Display.getDefault(), new RGB(190, 190, 190)));
     Composite innerContainer = new Composite(outerContainer, SWT.CENTER);
     FillLayout fillLayout = new FillLayout();
     innerContainer.setLayout(fillLayout);
     innerContainer.setSize(960, 540);
-    innerContainer.setBackgroundImage(new Image(Display.getCurrent(), Util.loadResource("icons/fade.png")));
+    innerContainer.setBackgroundImage(new Image(Display.getDefault(), Util.loadResource("icons/fade.png")));
     innerContainer.setBackgroundMode(SWT.INHERIT_DEFAULT);
     container.getShell().setBackgroundMode(SWT.INHERIT_DEFAULT);
     label = new Label(innerContainer, SWT.CENTER);

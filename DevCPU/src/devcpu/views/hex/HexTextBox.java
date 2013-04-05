@@ -40,7 +40,7 @@ class HexTextBox extends BinaryTextBox {
 
 	public void appendRow(IDataProvider idp, int row, boolean isLastRow) {
 		int words = idp.getData(rowTemp,row);
-		Color red = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		for (int i = 0; i < words; i++) {
 			Character w = rowTemp[i];
 			if (w == null) {

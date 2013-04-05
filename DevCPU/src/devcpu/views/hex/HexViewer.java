@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Slider;
 
 public class HexViewer extends Composite {
 	
-	static Font fnt = new Font(Display.getCurrent(),"Courier New",10,0);	
+	static Font fnt = new Font(Display.getDefault(),"Courier New",10,0);	
 	static Color defaultBack = new Color(Display.getDefault(),255,255,255);
 	static Color defaultFore = new Color(Display.getDefault(),0,0,0);
 	

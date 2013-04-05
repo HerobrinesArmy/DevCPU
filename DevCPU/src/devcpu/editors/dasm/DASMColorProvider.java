@@ -16,7 +16,7 @@ public class DASMColorProvider {
 	public Color getColor(RGB rgb) {
     Color color= (Color) fColorTable.get(rgb);
     if (color == null) {
-      color= new Color(Display.getCurrent(), rgb);
+      color= new Color(Display.getDefault(), rgb);
       fColorTable.put(rgb, color);
     }
     return color;
