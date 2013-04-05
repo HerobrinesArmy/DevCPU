@@ -211,7 +211,7 @@ public class VirtualMonitor extends DCPUHardware
 			
 			      for (int y = 0; y < 12; y++) {
 			        for (int x = 0; x < 32; x++) {
-			          char dat = dcpu.ram[(screenMemMap + x + y * 32)];
+			          char dat = dcpu.ram[screenMemMap + x + y * 32 & 0xFFFF];
 			          int ch = dat & 0x7F;
 			          int colorIndex = dat >> '\b' & 0xFF;
 			          int co = charOffset + ch * 2;
