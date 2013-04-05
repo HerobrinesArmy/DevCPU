@@ -84,7 +84,7 @@ public class KeyboardViewer {
 						vk.keyTyped(e.getKeyChar());
 					}
 				}
-				return false;
+				return true;
 			}
 		});
 	}

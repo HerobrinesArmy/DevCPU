@@ -21,6 +21,7 @@ public class VirtualKeyboard extends DCPUHardware
   private boolean[] isDown = new boolean[256];
   private char interruptMessage;
   private boolean doInterrupt;
+  private boolean powered;
   
   private String id = "Generic Keyboard";
 	private HardwareManager manager;
@@ -36,32 +37,44 @@ public class VirtualKeyboard extends DCPUHardware
 	public VirtualKeyboard(KeyMapping keyMapping) {
 		this("Generic Keyboard", null, keyMapping);
 	}
+	
+	public boolean isPowered() {
+		return powered;
+	}
 
 	public void keyTyped(int i) {
-    if ((i <= 20) || (i > 127)) return;
-    if (keyBuffer[(kwp & 0x3F)] == 0) {
-      keyBuffer[(kwp++ & 0x3F)] = (char)i;
-      doInterrupt = true;
-    }
+//		System.out.println("Type " + i);
+		if (powered) {
+	    if ((i <= 20) || (i > 127)) return;
+	    if (keyBuffer[(kwp & 0x3F)] == 0) {
+	      keyBuffer[(kwp++ & 0x3F)] = (char)i;
+	      doInterrupt = true;
+	    }
+		}
   }
 
   public void keyPressed(int key) {
-    int i = keyMapping.getKey(key);
-    if (i < 0) return;
-    if ((i < 20) && 
-      (keyBuffer[(kwp & 0x3F)] == 0)) {
-      keyBuffer[(kwp++ & 0x3F)] = (char)i;
-    }
-
-    isDown[i] = true;
-    doInterrupt = true;
+//  	System.out.println("Press " + key);
+  	if (powered) {
+	    int i = keyMapping.getKey(key);
+	    if (i < 0) return;
+	    if ((i < 20) && 
+	      (keyBuffer[(kwp & 0x3F)] == 0)) {
+	      keyBuffer[(kwp++ & 0x3F)] = (char)i;
+	    }
+	    isDown[i] = true;
+	    doInterrupt = true;
+  	}
   }
 
   public void keyReleased(int key) {
-    int i = keyMapping.getKey(key);
-    if (i < 0) return;
-    isDown[i] = false;
-    doInterrupt = true;
+//  	System.out.println("Release " + key);
+  	if (powered) {
+	    int i = keyMapping.getKey(key);
+	    if (i < 0) return;
+	    isDown[i] = false;
+	    doInterrupt = true;
+  	}
   }
 
   public void interrupt() {
@@ -111,11 +124,17 @@ public class VirtualKeyboard extends DCPUHardware
 	
 	@Override
 	public void powerOff() {
+		this.powered = false;
 		this.keyBuffer = new char[64];
 	  this.krp = 0;
 	  this.kwp = 0;
 	  this.isDown = new boolean[256];
 	  this.interruptMessage = 0;
 	  this.doInterrupt = false;
+	}
+	
+	@Override
+	public void powerOn() {
+		this.powered = true;
 	}
 }

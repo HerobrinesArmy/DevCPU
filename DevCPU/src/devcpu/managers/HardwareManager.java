@@ -96,7 +96,7 @@ public class HardwareManager {
 	}
 
 	public VirtualKeyboard createVirtualKeyboard(String id) {
-		VirtualKeyboard vk = new VirtualKeyboard(id, this, new AWTKeyMapping());
+		VirtualKeyboard vk = new VirtualKeyboard(id, this, new AWTKeyMapping(false));
 		devices.add(vk);
 		return vk;
 	}
