@@ -38,33 +38,33 @@ public class DCPU
   public int getAddrB(int type)
   {
     switch (type & 0xF8) {
-    case 0:
-      return 65536 + (type & 0x7);
-    case 8:
+    case 0x00:
+      return 0x10000 + (type & 0x7);
+    case 0x08:
       return registers[type & 0x7];
-    case 16:
-      cycles += 1;
+    case 0x10:
+      cycles++;
       return ram[pc++] + registers[type & 0x7] & 0xFFFF;
-    case 24:
+    case 0x18:
       switch (type & 0x7) {
-      case 0:
+      case 0x0:
         return (--sp) & 0xFFFF;
-      case 1:
+      case 0x1:
         return sp & 0xFFFF;
-      case 2:
-        cycles += 1;
+      case 0x2:
+        cycles++;
         return ram[pc++] + sp & 0xFFFF;
-      case 3:
-        return 65544;
-      case 4:
-        return 65545;
-      case 5:
-        return 65552;
-      case 6:
-        cycles += 1;
+      case 0x3:
+        return 0x10008;
+      case 0x4:
+        return 0x10009;
+      case 0x5:
+        return 0x10010;
+      case 0x6:
+        cycles++;
         return ram[pc++];
       }
-      cycles += 1;
+      cycles++;
       return 0x20000 | ram[pc++];
     }
 
@@ -72,32 +72,32 @@ public class DCPU
   }
 
   public String getStr(int type, boolean isA) {
-    if (type >= 32) {
-      return Integer.toHexString((type & 0x1F) + 65535 & 0xFFFF);
+    if (type >= 0x20) {
+      return Integer.toHexString((type & 0x1F) + 0xFFFF & 0xFFFF);
     }
 
     switch (type & 0xF8) {
-    case 0:
+    case 0x00:
       return ""+"ABCXYZIJ".charAt(type & 0x7);
-    case 8:
+    case 0x08:
       return "[" + "ABCXYZIJ".charAt(type & 0x7) + "]";
-    case 16:
+    case 0x10:
       return "[" + Integer.toHexString(ram[pc++]) + "+" + "ABCXYZIJ".charAt(type & 0x7) + "]";
-    case 24:
+    case 0x18:
       switch (type & 0x7) {
-      case 0:
+      case 0x0:
         return isA ? "POP" : "PUSH";
-      case 1:
+      case 0x1:
         return "PEEK";
-      case 2:
+      case 0x2:
         return "[" + Integer.toHexString(ram[pc++]) + "+SP]";
-      case 3:
+      case 0x3:
         return "SP";
-      case 4:
+      case 0x4:
         return "PC";
-      case 5:
+      case 0x5:
         return "EX";
-      case 6:
+      case 0x6:
         return "[" + Integer.toHexString(ram[pc++]) + "]";
       }
       return Integer.toHexString(ram[pc++]);
@@ -107,38 +107,38 @@ public class DCPU
   }
 
   public int getAddrA(int type) {
-    if (type >= 32) {
-      return 0x20000 | (type & 0x1F) + 65535 & 0xFFFF;
+    if (type >= 0x20) {
+      return 0x20000 | (type & 0x1F) + 0xFFFF & 0xFFFF;
     }
 
     switch (type & 0xF8) {
-    case 0:
-      return 65536 + (type & 0x7);
-    case 8:
+    case 0x00:
+      return 0x10000 + (type & 0x7);
+    case 0x08:
       return registers[type & 0x7];
-    case 16:
-      cycles += 1;
+    case 0x10:
+      cycles++;
       return ram[pc++] + registers[type & 0x7] & 0xFFFF;
-    case 24:
+    case 0x18:
       switch (type & 0x7) {
-      case 0:
+      case 0x0:
         return sp++ & 0xFFFF;
-      case 1:
+      case 0x1:
         return sp & 0xFFFF;
-      case 2:
-        cycles += 1;
+      case 0x2:
+        cycles++;
         return ram[pc++] + sp & 0xFFFF;
-      case 3:
-        return 65544;
-      case 4:
-        return 65545;
-      case 5:
-        return 65552;
-      case 6:
-        cycles += 1;
+      case 0x3:
+        return 0x10008;
+      case 0x4:
+        return 0x10009;
+      case 0x5:
+        return 0x10010;
+      case 0x6:
+        cycles++;
         return ram[pc++];
       }
-      cycles += 1;
+      cycles++;
       return 0x20000 | ram[pc++];
     }
 
@@ -146,38 +146,38 @@ public class DCPU
   }
 
   public char getValA(int type) {
-    if (type >= 32) {
-      return (char)((type & 0x1F) + 65535);
+    if (type >= 0x20) {
+      return (char)((type & 0x1F) + 0xFFFF);
     }
 
     switch (type & 0xF8) {
-    case 0:
+    case 0x00:
       return registers[type & 0x7];
-    case 8:
+    case 0x08:
       return ram[registers[type & 0x7]];
-    case 16:
-      cycles += 1;
+    case 0x10:
+      cycles++;
       return ram[ram[pc++] + registers[type & 0x7] & 0xFFFF];
-    case 24:
+    case 0x18:
       switch (type & 0x7) {
-      case 0:
+      case 0x0:
         return ram[sp++ & 0xFFFF];
-      case 1:
+      case 0x1:
         return ram[sp & 0xFFFF];
-      case 2:
-        cycles += 1;
+      case 0x2:
+        cycles++;
         return ram[ram[pc++] + sp & 0xFFFF];
-      case 3:
+      case 0x3:
         return sp;
-      case 4:
+      case 0x4:
         return pc;
-      case 5:
+      case 0x5:
         return ex;
-      case 6:
-        cycles += 1;
+      case 0x6:
+        cycles++;
         return ram[ram[pc++]];
       }
-      cycles += 1;
+      cycles++;
       return ram[pc++];
     }
 
@@ -185,37 +185,36 @@ public class DCPU
   }
 
   public char get(int addr) {
-    if (addr < 65536)
+    if (addr < 0x10000)
       return ram[addr & 0xFFFF];
-    if (addr < 65544)
+    if (addr < 0x10008)
       return registers[addr & 0x7];
-    if (addr >= 131072)
+    if (addr >= 0x20000)
       return (char)addr;
-    if (addr == 65544)
+    if (addr == 0x10008)
       return sp;
-    if (addr == 65545)
+    if (addr == 0x10009)
       return pc;
-    if (addr == 65552) {
+    if (addr == 0x10010)
       return ex;
-    }
     throw new IllegalStateException("Illegal address " + Integer.toHexString(addr) + "! How did you manage that!?");
   }
 
   public void set(int addr, char val) {
-    if (addr < 65536)
+    if (addr < 0x10000)
       ram[addr & 0xFFFF] = val;
-    else if (addr < 65544) {
+    else if (addr < 0x10008) {
 //    	if (disassemble)
 //    	{
 //    		System.out.println("register[" + (int)(addr & 0x7) + "] = " + (int)val);
 //    	}
       registers[addr & 0x7] = val;
-    } else if (addr < 131072) {
-      if (addr == 65544)
+    } else if (addr < 0x20000) {
+      if (addr == 0x10008)
         sp = val;
-      else if (addr == 65545)
+      else if (addr == 0x10009)
         pc = val;
-      else if (addr == 65552)
+      else if (addr == 0x10010)
         ex = val;
       else
         throw new IllegalStateException("Illegal address " + Integer.toHexString(addr) + "! How did you manage that!?"); 
@@ -246,7 +245,7 @@ public class DCPU
   }
 
   public void tick() {
-    cycles += 1;
+    cycles++;
 
     if (disassemble)
     {
@@ -260,9 +259,9 @@ public class DCPU
       char val = (char) (pos >> 16);//(char) ThreadLocalRandom.current().nextInt(65536);
       int len = (int)(1 / (ThreadLocalRandom.current().nextFloat() + 0.001f)) - 80;
       */
-      int pos = (int)(Math.random() * 65536) & 0xFFFF;
-      char val = (char) ((int)(Math.random() * 65536) & 0xFFFF);
-      int len = (int)(1 / (Math.random() + 0.001f)) - 80;
+      int pos = (int)(Math.random() * 0x10000) & 0xFFFF;
+      char val = (char) ((int)(Math.random() * 0x10000) & 0xFFFF);
+      int len = (int)(1 / (Math.random() + 0.001f)) - 0x50;
       for (int i = 0; i < len; i++) {
         ram[(pos + i) & 0xFFFF] = val;
       }
@@ -335,7 +334,7 @@ public class DCPU
 	        pc = ram[sp++ & 0xFFFF];
         	break;
         case 12: //IAQ TODO: Verify implementation
-        	cycles += 1;
+        	cycles++;
         	//if a is nonzero, interrupts will be added to the queue instead of triggered. if a is zero, interrupts will be triggered as normal again
         	if (a == 0) {
         		queueingEnabled = false;
@@ -344,7 +343,7 @@ public class DCPU
         	}
         	break;
         case 16: //HWN
-          cycles += 1;
+          cycles++;
           set(aaddr, (char)hardware.size());
           break;
         case 17: //HWQ
@@ -390,25 +389,25 @@ public class DCPU
         b = a;
         break;
       case 2:{ //ADD
-        cycles += 1;
+        cycles++;
         int val = b + a;
         b = (char)val;
         ex = (char)(val >> 16);
         break;
       }case 3:{ //SUB
-        cycles += 1;
+        cycles++;
         int val = b - a;
         b = (char)val;
         ex = (char)(val >> 16);
         break;
       }case 4:{ //MUL
-        cycles += 1;
+        cycles++;
         int val = b * a;
         b = (char)val;
         ex = (char)(val >> 16);
         break;
       }case 5:{ //MLI
-        cycles += 1;
+        cycles++;
         int val = (short)b * (short)a;
         b = (char)val;
         ex = (char)(val >> 16);
@@ -469,45 +468,45 @@ public class DCPU
         b = (char)(b << a);
         break;
       case 16: //IFB
-        cycles += 1;
+        cycles++;
         if ((b & a) == 0) skip();
         return;
       case 17: //IFC
-        cycles += 1;
+        cycles++;
         if ((b & a) != 0) skip();
         return;
       case 18: //IFE
-        cycles += 1;
+        cycles++;
         if (b != a) skip();
         return;
       case 19: //IFN
-        cycles += 1;
+        cycles++;
         if (b == a) skip();
         return;
       case 20: //IFG
-        cycles += 1;
+        cycles++;
         if (b <= a) skip();
         return;
       case 21: //IFA
-        cycles += 1;
+        cycles++;
         if ((short)b <= (short)a) skip();
         return;
       case 22: //IFL
-        cycles += 1;
+        cycles++;
         if (b >= a) skip();
         return;
       case 23: //IFU
-        cycles += 1;
+        cycles++;
         if ((short)b >= (short)a) skip();
         return;
       case 26:{ //ADX
-        cycles += 1;
+        cycles++;
         int val = b + a + ex;
         b = (char)val;
         ex = (char)(val >> 16);
         break;
       }case 27:{ //SBX
-        cycles += 1;
+        cycles++;
         int val = b - a + ex;
         b = (char)val;
         ex = (char)(val >> 16);
@@ -596,17 +595,6 @@ public class DCPU
     System.out.println("EX: " + Integer.toHexString(ex));
   }
   
-  public static void load(char[] ram) throws Exception {
-    DataInputStream dis = new DataInputStream(DCPU.class.getResourceAsStream("testdump.dmp"));
-    try {
-      for (int i = 0; ; i++)
-        ram[i] = dis.readChar();
-    }
-    catch (IOException e) {
-      dis.close();
-    }
-  }
-
   public static void dump(char[] ram, int start, int len) throws Exception {
     DataOutputStream dos = new DataOutputStream(new FileOutputStream("mem.dmp"));
     for (int i = 0; i < len; i++) {
@@ -627,8 +615,6 @@ public class DCPU
 
         j++;
       }
-
-      System.out.println();
     }
   }
 
