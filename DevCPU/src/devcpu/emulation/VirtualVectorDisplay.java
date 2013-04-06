@@ -72,7 +72,7 @@ public class VirtualVectorDisplay extends DCPUHardware
     	mapLength = dcpu.registers[4];
     	break;
     case BEHAVIOR_ROTATE_DEVICE:
-    	targetDelta = (dcpu.registers[3] % 360) - angle;
+    	targetDelta = (dcpu.registers[3] - angle) % 360;
     	if (targetDelta > 180) {
     		targetDelta -= 360;
     	} else if (targetDelta < -180) {
