@@ -65,7 +65,7 @@ public class SPED3Viewer {
 					e.printStackTrace();
 					System.exit(0);
 				}
-				glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+				glClearColor(0.0625f, 0.0625f, 0.0625f, 1.0f);
 				glClearDepth(1.0f);
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(GL_LEQUAL);
