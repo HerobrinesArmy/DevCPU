@@ -84,18 +84,18 @@ public class VirtualVectorDisplay extends DCPUHardware
 	public void tick60hz() {
 		if (targetDelta < 0) {
 			if (targetDelta > -rotation60Hz) {
-				angle += targetDelta;
+				angle = (angle + targetDelta) % 360;
 				targetDelta = 0;
 			} else {
-				angle -= rotation60Hz;
+				angle = (angle - rotation60Hz) % 360;
 				targetDelta += rotation60Hz; 
 			}
 		} else if (targetDelta > 0) {
 			if (targetDelta < rotation60Hz) {
-				angle += targetDelta;
+				angle = (angle + targetDelta) % 360;
 				targetDelta = 0;
 			} else {
-				angle += rotation60Hz;
+				angle = (angle + rotation60Hz) % 360;
 				targetDelta -= rotation60Hz;
 			}
 		}
