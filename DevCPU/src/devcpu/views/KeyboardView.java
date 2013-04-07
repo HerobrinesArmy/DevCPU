@@ -50,7 +50,11 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 		});
 		this.getSite().getPage().addPartListener(new IPartListener() {
 			@Override public void partOpened(IWorkbenchPart part){}
-			@Override public void partClosed(IWorkbenchPart part){}
+			@Override public void partClosed(IWorkbenchPart part){
+				if (kv.vk != null) {
+					unmap(kv.vk);
+				}
+			}
 			@Override public void partBroughtToTop(IWorkbenchPart part){}
 			@Override public void partDeactivated(IWorkbenchPart part){}
 
