@@ -13,9 +13,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener2;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 import devcpu.Activator;
@@ -41,9 +43,19 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 			public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
 				if (LEM1802View.this.equals(partRef.getPart(false)) && changeId == IWorkbenchPage.CHANGE_VIEW_HIDE) {
 					lv.die();
-					//TODO XXX Handle unmap here in fixing issue #1? 
 				}
 			}
+		});
+		this.getSite().getPage().addPartListener(new IPartListener() {
+			@Override public void partOpened(IWorkbenchPart part){}
+			@Override public void partClosed(IWorkbenchPart part){
+				if (lv.vm != null) {
+					unmap(lv.vm);
+				}
+			}
+			@Override public void partBroughtToTop(IWorkbenchPart part){}
+			@Override public void partDeactivated(IWorkbenchPart part){}
+			@Override public void partActivated(IWorkbenchPart part){}
 		});
 		Frame frame = SWT_AWT.new_Frame(composite);
 		Panel panel = new Panel();
