@@ -15,7 +15,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
 
 import devcpu.Activator;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -43,6 +45,18 @@ public class DCPUView extends MappedView<DefaultControllableDCPU> {
 	public void createPartControl(Composite parent) {
 		setPartName("DCPU - Not Connected");
 		Composite container = new Composite(parent, SWT.NONE);
+	
+		this.getSite().getPage().addPartListener(new IPartListener() {
+			@Override public void partOpened(IWorkbenchPart part){}
+			@Override public void partClosed(IWorkbenchPart part){
+				if (dcpu != null) {
+					unmap(dcpu);
+				}
+			}
+			@Override public void partBroughtToTop(IWorkbenchPart part){}
+			@Override public void partDeactivated(IWorkbenchPart part){}
+			@Override public void partActivated(IWorkbenchPart part){}
+		});
 		
 		Group grpRegisters = new Group(container, SWT.NONE);
 		grpRegisters.setFont(new Font(parent.getDisplay(), new FontData("Fixedsys", 10, SWT.NORMAL)));
