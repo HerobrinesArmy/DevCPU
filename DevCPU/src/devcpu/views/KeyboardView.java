@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.Panel;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -21,6 +24,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.progress.UIJob;
 
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
@@ -61,7 +65,15 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 			@Override
 			public void partActivated(IWorkbenchPart part) {
 				if (part == KeyboardView.this) {
-					kv.canvas.requestFocus();
+					new UIJob("focus") {
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							System.out.println("focus start");
+							kv.canvas.requestFocus();
+							System.out.println("focus finish");
+							return Status.OK_STATUS;
+						}
+					}.schedule();
 					//TODO Handle the case where they're on a platform that prefers part activation focus and they click in the view but outside of the canvas while it's already active.
 					//Right now, it loses focus. It's not a huge deal, but it might be slightly annoying to have to re-click the canvas when you switch the attached keyboard;
 				}
