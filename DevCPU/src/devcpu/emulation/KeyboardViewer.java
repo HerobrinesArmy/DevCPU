@@ -53,10 +53,12 @@ public class KeyboardViewer {
 								Rectangle2D bounds = g2.getFontMetrics().getStringBounds(draw, g2);
 								g2.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 								g2.drawString(draw, (int) (canvas.getWidth() / 2d - bounds.getCenterX()), (int) (canvas.getHeight() / 2d - bounds.getCenterY()));
+								g2.dispose();
 								Graphics2D g = (Graphics2D) canvas.getGraphics();
 								if (g != null) {
 									g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
 								}
+								g.dispose();
 							}
 						}
 						Thread.sleep(16L);
