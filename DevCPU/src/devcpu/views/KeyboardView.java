@@ -65,9 +65,7 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							System.out.println("focus start");
 							kv.canvas.requestFocus();
-							System.out.println("focus finish");							
 						}
 					});
 					//TODO Handle the case where they're on a platform that prefers part activation focus and they click in the view but outside of the canvas while it's already active.
