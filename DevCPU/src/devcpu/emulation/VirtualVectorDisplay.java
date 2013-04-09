@@ -105,11 +105,11 @@ public class VirtualVectorDisplay extends DCPUHardware
 		{
 			vertices.clear();
 			for (int i = mapStart; i < mapStart + 2 * mapLength; i++) {
-				char word = dcpu.ram[i++];
+				char word = dcpu.ram[i++ & 0xFFFF];
 				Vertex vertex = new Vertex();
 				vertex.x = word & 0xFF;
 				vertex.y = word >> 8;
-				vertex.z = (word = dcpu.ram[i]) & 0xFF;
+				vertex.z = (word = dcpu.ram[i & 0xFFFF]) & 0xFF;
 				vertex.color = (word >>= 8) & 0x3;
 				vertex.intensity = (word & 0x4) == 0x4;
 				vertices.add(vertex);
