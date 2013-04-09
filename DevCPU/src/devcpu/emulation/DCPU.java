@@ -1,9 +1,7 @@
 package devcpu.emulation;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +31,6 @@ public class DCPU
   int ip;
   int iwp;
 	public boolean disassemble = DISASSEMBLE;
-//	public int[] opcounts = new int[64];
 
   public int getAddrB(int type)
   {
@@ -271,13 +268,11 @@ public class DCPU
       char opcode = ram[pc];
       int cmd = opcode & 0x1F;
       pc = (char)(pc + getInstructionLength(opcode));
-
       if ((cmd >= 16) && (cmd <= 23))
         isSkipping = true;
       else {
         isSkipping = false;
       }
-
       return;
     }
 
@@ -301,7 +296,6 @@ public class DCPU
       cmd = opcode >> 5 & 0x1F;
       if (cmd != 0)
       {
-//      	opcounts[32+cmd]++;
         int atype = opcode >> 10 & 0x3F;
         int aaddr = getAddrA(atype);
         char a = get(aaddr);
@@ -326,14 +320,14 @@ public class DCPU
         case 10: //IAS
           ia = a;
           break;
-        case 11: //RFI TODO: Verify implementation
+        case 11: //RFI
         	cycles += 2;
         	//disables interrupt queueing, pops A from the stack, then pops PC from the stack
         	queueingEnabled = false;
         	registers[0] = ram[sp++ & 0xFFFF];
 	        pc = ram[sp++ & 0xFFFF];
         	break;
-        case 12: //IAQ TODO: Verify implementation
+        case 12: //IAQ
         	cycles++;
         	//if a is nonzero, interrupts will be added to the queue instead of triggered. if a is zero, interrupts will be triggered as normal again
         	if (a == 0) {
@@ -375,7 +369,6 @@ public class DCPU
         }
       }
     } else {
-//    	opcounts[cmd]++;
       int atype = opcode >> 10 & 0x3F;
 
       char a = getValA(atype);
@@ -569,7 +562,7 @@ public class DCPU
       return "!?!?!?";
     } finally {
       pc = opc;
-    }//throw localObject;
+    }
   }
 
   public void tickHardware() {

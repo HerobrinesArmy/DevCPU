@@ -5,7 +5,6 @@ import java.awt.Frame;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -13,7 +12,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
 
 import devcpu.Activator;
 import devcpu.emulation.DCPUHardware;
@@ -48,6 +49,17 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 				}});
 			return;
 		}
+		this.getSite().getPage().addPartListener(new IPartListener() {
+			@Override public void partOpened(IWorkbenchPart part){}
+			@Override public void partClosed(IWorkbenchPart part){
+				if (s3v.vvd != null) {
+					unmap(s3v.vvd);
+				}
+			}
+			@Override public void partBroughtToTop(IWorkbenchPart part){}
+			@Override public void partDeactivated(IWorkbenchPart part){}
+			@Override public void partActivated(IWorkbenchPart part){}
+		});
 		this.setPartName("SPED-3 - Not Connected");
 		Composite composite = new Composite(parent, SWT.EMBEDDED);
 		frame = SWT_AWT.new_Frame(composite);
@@ -73,7 +85,6 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
@@ -108,29 +119,6 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 	
-	private void fillLocalToolBar(IToolBarManager manager) {
-//		final MenuManager attachSubmenu = new MenuManager("Attach SPED-3");
-//		attachSubmenu.addMenuListener(new IMenuListener() {
-//			@Override
-//			public void menuAboutToShow(IMenuManager manager) {
-//				attachSubmenu.removeAll();
-//				System.out.println("safads");
-//				for (DCPUHardware h : Activator.getDefault().getShip().getDeviceManager().getDevices(VirtualVectorDisplay.class)) {
-//					final VirtualVectorDisplay vvd = ((VirtualVectorDisplay)h);
-//					attachSubmenu.add(new Action(vvd.getID()) {
-//						public void run() {
-//							synchronized (s3v) {
-//								map(vvd);
-//							}
-//						}
-//					});
-//				}
-//			}
-//		});
-//		manager.add(attachSubmenu);
-//		manager.add(detachAction);
-	}
-
 	private void makeActions() {
 		detachAction = new Action() {
 			public void run() {
