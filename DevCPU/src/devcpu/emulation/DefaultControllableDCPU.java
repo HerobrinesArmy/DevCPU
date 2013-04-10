@@ -33,7 +33,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
 		this.id = id;
-		doInitDebugEnvironment();
+//		doInitDebugEnvironment();
 	}
 
 	private void doInitDebugEnvironment() {
