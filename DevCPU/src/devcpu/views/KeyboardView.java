@@ -103,6 +103,7 @@ public class KeyboardView extends MappedView<VirtualKeyboard> {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		final MenuManager attachSubmenu = new MenuManager("Attach Generic Keyboard", Util.getImageDescriptor("icons/keyboard.png"), null);
+		attachSubmenu.setRemoveAllWhenShown(true);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override

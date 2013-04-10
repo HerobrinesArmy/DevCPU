@@ -76,6 +76,7 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		final MenuManager attachSubmenu = new MenuManager("Attach LEM1802",Util.getImageDescriptor("icons/lem.png"),null);
+		attachSubmenu.setRemoveAllWhenShown(true);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override

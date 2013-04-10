@@ -89,6 +89,7 @@ public class SPED3View extends MappedView<VirtualVectorDisplay> {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		final MenuManager attachSubmenu = new MenuManager("Attach SPED-3", Util.getImageDescriptor("icons/sped.png"), null);
+		attachSubmenu.setRemoveAllWhenShown(true);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override

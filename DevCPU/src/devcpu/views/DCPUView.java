@@ -172,6 +172,7 @@ public class DCPUView extends MappedView<DefaultControllableDCPU> {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		final MenuManager attachSubmenu = new MenuManager("Attach DCPU",Util.getImageDescriptor("icons/dcpu.png"),null);
+		attachSubmenu.setRemoveAllWhenShown(true);
 		attachSubmenu.add(new Action(){});
 		attachSubmenu.addMenuListener(new IMenuListener() {
 			@Override
