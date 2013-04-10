@@ -36,6 +36,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 //		doInitDebugEnvironment();
 	}
 
+	@SuppressWarnings("unused")
 	private void doInitDebugEnvironment() {
 		try { //TODO
 			this.uid = Activator.getShip().getDCPUManager().assignUniqueID(this);

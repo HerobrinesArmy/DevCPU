@@ -27,7 +27,7 @@ public class IntroPart extends org.eclipse.ui.part.IntroPart {
     innerContainer.setBackgroundMode(SWT.INHERIT_DEFAULT);
     container.getShell().setBackgroundMode(SWT.INHERIT_DEFAULT);
     label = new Label(innerContainer, SWT.CENTER);
-    label.setText("\n\n\n\n\nWelcome to DevCPU v.0.0.0 (Release 0 Update 0)\nThis version is undocumented and unsupported. API stability, at this point, is nonexistent.\n\nSo deal with it.\n\n\nClose this tab to load the workbench.");
+    label.setText("\n\n\n\n\nWelcome to DevCPU v.0.0.0 (Release 0 Update 0)\nThis version is undocumented and unsupported. API stability, at this point, is nonexistent.\nNote: There are not currently any debugging features. If you think you found some here, you're wrong.\n\nSo deal with it.\n\n\nClose this tab to load the workbench.");
     GridData gd = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     gd.horizontalAlignment = GridData.CENTER;
     gd.verticalAlignment = GridData.CENTER;
