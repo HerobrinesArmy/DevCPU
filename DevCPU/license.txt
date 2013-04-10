@@ -1,0 +1,10 @@
+meh, the intentionally ambiguous license.
+Version 0, 31 March 2013
+
+Copyright (C) 2013 Herobrine <herobrine@outlook.com>
+
+The meh license is a license of nonspecific description. Interpreting it is dangerous, as it may change at any time. Attempting to use content licensed under meh, in any way, is done at one's own risk.
+
+TERMS AND CONDITIONS
+1. Meh.
+2. Use under this license constitutes agreement to be always bound by the latest version of this license.
