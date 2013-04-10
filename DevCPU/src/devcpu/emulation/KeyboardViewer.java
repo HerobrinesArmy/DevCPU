@@ -5,13 +5,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+
+import devcpu.Activator;
 
 public class KeyboardViewer {
 	protected static final Font font = new Font("Arial", Font.BOLD, 24);
@@ -30,11 +29,13 @@ public class KeyboardViewer {
 			@Override
 			public void focusLost(FocusEvent e) {
 				focus = false;
+				Activator.getFocusManager().lostFocus(KeyboardViewer.this);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
 				focus = true;
+				Activator.getFocusManager().gainedFocus(KeyboardViewer.this);
 			}
 		});
 		Thread t = new Thread() {
@@ -74,21 +75,6 @@ public class KeyboardViewer {
 			}
 		};
 		t.start();
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
-				if (focus && vk != null) {
-					if (e.getID() == KeyEvent.KEY_PRESSED) {
-						vk.keyPressed(e.getKeyCode());
-					} else if (e.getID() == KeyEvent.KEY_RELEASED) {
-						vk.keyReleased(e.getKeyCode());
-					} else if (e.getID() == KeyEvent.KEY_TYPED) {
-						vk.keyTyped(e.getKeyChar());
-					}
-				}
-				return true;
-			}
-		});
 	}
 	
 	public VirtualKeyboard attach(VirtualKeyboard vk) {
