@@ -260,7 +260,7 @@
          </property>
          <property
                name="aboutText"
-               value="You are using DevCPU v.0.0.0 (Release 0). DevCPU is an integrated DCPU-16 development and emulation environment, created by Herobrine. This version is unsupported and API stability, at this point, is nonexistent.">
+               value="You are using DevCPU v.0.0.0 (Release 0 Update 0). DevCPU is an integrated DCPU-16 development and emulation environment, created by Herobrine. This version is unsupported and API stability, at this point, is nonexistent.">
          </property>
          <property
                name="windowImages"
