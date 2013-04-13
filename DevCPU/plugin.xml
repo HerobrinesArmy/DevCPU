@@ -535,7 +535,7 @@
          </contextualLaunch>
       </shortcut>
    </extension>-->
-   <extension point="org.eclipse.ui.intro"> 
+<!--   <extension point="org.eclipse.ui.intro"> 
    <intro
             class="devcpu.IntroPart"
             id="devcpu.intro"
@@ -545,21 +545,5 @@
             productId="DevCPU.product">
       </introProductBinding>
    </extension>
-   <extension
-         point="org.eclipse.ui.intro.config">
-      <config
-            content="introContent.xml"
-            id="devcpu.introconfig"
-            introId="devcpu.intro">
-         <presentation
-               home-page-id="root">
-            <implementation
-                  kind="html"
-                  os="win32,linux,macosx"
-                  style="content/shared.css">
-            </implementation>
-         </presentation>
-      </config>
-   </extension>
-
+-->
 </plugin>

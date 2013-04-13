@@ -5,7 +5,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -28,10 +27,10 @@ public class IntroPart extends org.eclipse.ui.part.IntroPart {
     container.getShell().setBackgroundMode(SWT.INHERIT_DEFAULT);
     label = new Label(innerContainer, SWT.CENTER);
     label.setText("\n\n\n\n\nWelcome to DevCPU v.0.0.0 (Release 0 Update 0)\nThis version is undocumented and unsupported. API stability, at this point, is nonexistent.\nNote: There are not currently any debugging features. If you think you found some here, you're wrong.\n\nSo deal with it.\n\n\nClose this tab to load the workbench.");
-    GridData gd = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-    gd.horizontalAlignment = GridData.CENTER;
-    gd.verticalAlignment = GridData.CENTER;
-    label.setLayoutData(gd);
+//    GridData gd = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
+//    gd.horizontalAlignment = GridData.CENTER;
+//    gd.verticalAlignment = GridData.CENTER;
+//    label.setLayoutData(gd);
 	}
 
 	@Override
