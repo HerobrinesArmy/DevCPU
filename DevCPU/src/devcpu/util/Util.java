@@ -1,7 +1,7 @@
 package devcpu.util;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -156,19 +156,14 @@ public class Util {
 		return ImageDescriptor.createFromURL(fullPathString);
 	}
 	
-	public static String loadResource(String filename) {
+	public static InputStream loadResource(String filename) {
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), new org.eclipse.core.runtime.Path(filename), Collections.EMPTY_MAP);
-		URL fileUrl = null;
 		try {
-		fileUrl = FileLocator.toFileURL(url);
+			return FileLocator.toFileURL(url).openStream();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		try {
-			return fileUrl.toURI().getRawPath();
-		} catch (URISyntaxException e) {
-			return null;
-		}
+		return null;
 	}
 }
