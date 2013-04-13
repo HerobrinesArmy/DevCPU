@@ -1,4 +1,4 @@
-DevCPU
+DevCPU - Release 0 Update 0
 ======
 
 Integrated DCPU-16 development and emulation environment
