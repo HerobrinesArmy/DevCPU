@@ -7,9 +7,15 @@ import java.awt.event.KeyEvent;
 import devcpu.emulation.KeyboardViewer;
 
 public class FocusManager implements KeyEventDispatcher {
-
+	private static FocusManager manager;
 	private KeyboardViewer focus;
-
+	
+	public static FocusManager get() {
+		if (manager == null) {
+			manager = new FocusManager();
+		}
+		return manager;
+	}
 	public void lostFocus(KeyboardViewer viewer) {
 		if (focus == viewer) {
 			focus = null;

@@ -10,7 +10,7 @@ import java.awt.event.FocusListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import devcpu.Activator;
+import devcpu.FocusManager;
 
 public class KeyboardViewer {
 	protected static final Font font = new Font("Arial", Font.BOLD, 24);
@@ -29,13 +29,13 @@ public class KeyboardViewer {
 			@Override
 			public void focusLost(FocusEvent e) {
 				focus = false;
-				Activator.getFocusManager().lostFocus(KeyboardViewer.this);
+				FocusManager.get().lostFocus(KeyboardViewer.this);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
 				focus = true;
-				Activator.getFocusManager().gainedFocus(KeyboardViewer.this);
+				FocusManager.get().gainedFocus(KeyboardViewer.this);
 			}
 		});
 		Thread t = new Thread() {
