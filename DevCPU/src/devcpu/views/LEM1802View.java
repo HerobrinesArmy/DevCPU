@@ -62,6 +62,7 @@ public class LEM1802View extends MappedView<VirtualMonitor> {
 		panel.setLayout(new BorderLayout()); 
 		panel.add(lv.canvas, BorderLayout.CENTER);
 		frame.add(panel);
+		lv.canvas.setup();
 		makeActions();
 		contributeToActionBars();
 	}
