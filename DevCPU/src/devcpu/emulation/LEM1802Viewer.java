@@ -4,7 +4,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
@@ -38,7 +37,7 @@ public class LEM1802Viewer {
 		            	g.dispose();
 		            }
 		            g = (Graphics2D) canvas.getGraphics();
-		            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+//		            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		            if (g != null) {
 		            	float scale;
 		            	if ((float)canvas.getWidth() / (float)canvas.getHeight() > 144f/112f) {
