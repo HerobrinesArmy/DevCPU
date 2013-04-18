@@ -8,6 +8,7 @@ import devcpu.lexer.tokens.GroupStartToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
 import devcpu.lexer.tokens.LiteralToken;
+import devcpu.lexer.tokens.OffsetStackAccessToken;
 import devcpu.lexer.tokens.OperatorToken;
 import devcpu.lexer.tokens.PickValueEndToken;
 import devcpu.lexer.tokens.PickValueStartToken;
@@ -32,6 +33,7 @@ public class Group implements Operand {
 				while (!(tokens[++i] instanceof GroupEndToken)) {}
 			} else if (token instanceof PickValueStartToken) {
 				values.add(new PickValue(tokens, i, PickValueEndToken.class));
+				while (!(tokens[++i] instanceof PickValueEndToken)) {}
 			} else if (token instanceof LabelToken) {
 				if (!((LabelToken) token).valueSet) {
 					this.unresolvableLabel = true;
@@ -48,6 +50,9 @@ public class Group implements Operand {
 				values.add(new UnaryOperator(token));
 			} else if (token instanceof SimpleStackAccessToken) {
 				values.add(new SimpleStackAccessor((SimpleStackAccessToken) token));
+			} else if (token instanceof OffsetStackAccessToken) {
+				//I suppose I don't actually have to do anything with this. Better check to make sure this doesn't need 
+				//special handling in the case where there's a hard-to-resolve label used ( [sp+the_label] )
 			} else {
 				System.out.println("ERMAHGERD YER FERGERT ERBERT " + token.getClass().getCanonicalName());
 			}
