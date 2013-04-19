@@ -16,6 +16,7 @@ public class FocusManager implements KeyEventDispatcher {
 		}
 		return manager;
 	}
+	
 	public void lostFocus(KeyboardViewer viewer) {
 		if (focus == viewer) {
 			focus = null;

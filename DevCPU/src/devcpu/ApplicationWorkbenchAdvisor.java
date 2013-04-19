@@ -9,11 +9,9 @@ import org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor;
 
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchAdvisor extends IDEWorkbenchAdvisor {
-
 	private static final String PERSPECTIVE_ID = "devcpu.perspectives.hybrid";
 
-	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
-			IWorkbenchWindowConfigurer configurer) {
+	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
 		return new ApplicationWorkbenchWindowAdvisor(configurer);
 	}
 
