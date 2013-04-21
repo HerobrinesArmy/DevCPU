@@ -535,7 +535,6 @@ public class OldAssembler
   	try {
 			assembler.assemble("testfile.txt");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

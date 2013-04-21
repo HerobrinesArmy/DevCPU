@@ -22,7 +22,6 @@ public class AddressMatcher implements LexerTokenMatcher {
 	
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
-		//TODO Add other follow cases
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
 		followTokenMatchers.add(TrueMatcher.get());
 		return followTokenMatchers;

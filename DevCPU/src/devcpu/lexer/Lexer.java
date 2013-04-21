@@ -111,8 +111,6 @@ public class Lexer {
 	}
 	
 	public String[] getLegalContentTypes() {
-//		LinkedHashSet<String> types = new LinkedHashSet<String>();
-		//TODO
 		return new String[]{
 			"DASM_NOTHING",
 			"DASM_ERROR",

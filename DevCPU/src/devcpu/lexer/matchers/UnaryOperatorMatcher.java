@@ -18,7 +18,6 @@ public class UnaryOperatorMatcher implements LexerTokenMatcher {
 	@Override
 	public List<LexerTokenMatcher> getFollowTokenMatchers() {
 		ArrayList<LexerTokenMatcher> followTokenMatchers = new ArrayList<LexerTokenMatcher>();
-		//TODO?
 		return followTokenMatchers;
 	}
 
