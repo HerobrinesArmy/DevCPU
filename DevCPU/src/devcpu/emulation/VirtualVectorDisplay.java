@@ -115,7 +115,6 @@ public class VirtualVectorDisplay extends DCPUHardware
 				vertices.add(vertex);
 			}
 		}
-//		System.out.println("Vertices: " + vertices.size() + ", Angle: " + angle + ", Target Delta: " + targetDelta);
   }
 	
 	public List<Vertex> getVertices() {
@@ -148,7 +147,6 @@ public class VirtualVectorDisplay extends DCPUHardware
 	
 	@Override
 	public void powerOff() {
-//		this.angle = 0;
 //		this.broken = false; //TODO watch out for this one
 		this.mapLength = 0;
 		this.mapStart = 0;

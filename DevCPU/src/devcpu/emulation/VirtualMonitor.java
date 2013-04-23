@@ -175,11 +175,7 @@ public class VirtualMonitor extends DCPUHardware
 			      }
 			      if (bgColor < 0) bgColor = 0;
 			      int color = palette[bgColor];
-//			      for (int y = 96; y < 128; y++) {
-//			        for (int x = 0; x < 128; x++) {
-			          pixels[12288] = color;
-//			        }
-//			      }
+	          pixels[12288] = color;
 			
 			      int borderPixels = 100;
 			      reds += (color & 0xFF0000) * borderPixels;
@@ -235,11 +231,7 @@ public class VirtualMonitor extends DCPUHardware
 			      }
 			
 			      int color = palette[borderColor];
-//			      for (int y = 96; y < 128; y++) {
-//			        for (int x = 0; x < 128; x++) {
-			          pixels[12288] = color;
-//			        }
-//			      }
+	          pixels[12288] = color;
 			
 			      int borderPixels = 100;
 			      reds += (color & 0xFF0000) * borderPixels;

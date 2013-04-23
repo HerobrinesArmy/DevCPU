@@ -19,10 +19,6 @@ public class FloppyDisk implements Identifiable {
 	private VirtualFloppyDrive drive;
 	private FloppyManager manager;
 
-//	public FloppyDisk(File file, boolean writeProtected) throws Exception {
-//		this("Floppy", null);
-//	}
-
 	public FloppyDisk(String id, FloppyManager manager) {
 		this.id = id;
 		this.manager = manager;

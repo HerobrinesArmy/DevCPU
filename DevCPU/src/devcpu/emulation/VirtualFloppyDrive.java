@@ -147,7 +147,6 @@ public class VirtualFloppyDrive extends DCPUHardware
 	  			}
 	  		}
 	  		track = operation.sector / SECTORS_PER_TRACK;
-//	  		System.out.println("Read sector " + operation.sector + " in track " + track + " to 0x" +  Integer.toHexString(operation.memory));
 	  		operation = new FloppyOperation(FloppyOperation.NONE, 0, 0, Integer.MAX_VALUE);
 	  		setState(floppy.isWriteProtected() ? STATE_READY_WP : STATE_READY, ERROR_NONE);
 	  		break;
@@ -156,7 +155,6 @@ public class VirtualFloppyDrive extends DCPUHardware
 	  			floppy.data[operation.sector * WORDS_PER_SECTOR + i] = dcpu.ram[operation.memory + i];
 	  		}
 	  		track = operation.sector / SECTORS_PER_TRACK;
-//	  		System.out.println("Wrote sector " + operation.sector + " in track " + track + " from 0x" +  Integer.toHexString(operation.memory));
 	  		operation = new FloppyOperation(FloppyOperation.NONE, 0, 0, Integer.MAX_VALUE);
 	  		setState(STATE_READY, ERROR_NONE);
 	  		break;

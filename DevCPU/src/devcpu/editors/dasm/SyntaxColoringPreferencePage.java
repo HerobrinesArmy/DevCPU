@@ -32,7 +32,7 @@ implements IWorkbenchPreferencePage {
 
 	
 	public void createFieldEditors() {
-		//TODO shtuff
+		//TODO stuff
 		opCodeForegroundE = new ColorFieldEditor("OPCODE_FOREGROUND", "OpCodes: Foreground Color", getFieldEditorParent());
 		addField(opCodeForegroundE);
 		opCodeBackgroundE = new ColorFieldEditor("OPCODE_BACKGROUND", "OpCodes: Background Color", getFieldEditorParent());

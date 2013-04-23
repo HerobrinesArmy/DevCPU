@@ -4,6 +4,7 @@ public class AWTKeyMapping extends KeyMapping
 {
   public AWTKeyMapping(boolean useLowercase)
   {
+  	//TODO Find more keycodes?
   	//backspace
   	map(0x08, 0x10);
   	//return
