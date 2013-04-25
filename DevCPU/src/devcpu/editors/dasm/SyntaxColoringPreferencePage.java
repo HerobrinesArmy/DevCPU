@@ -8,10 +8,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import devcpu.Activator;
 
-public class SyntaxColoringPreferencePage extends FieldEditorPreferencePage
-implements IWorkbenchPreferencePage {
-	
-	// the field editors
+public class SyntaxColoringPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	ColorFieldEditor stringColorE;
 	BooleanFieldEditor stringBoldE;
 	ColorFieldEditor commentColorE;
@@ -22,14 +19,12 @@ implements IWorkbenchPreferencePage {
 	BooleanFieldEditor docBoldE;
 	private ColorFieldEditor opCodeBackgroundE;
 	private BooleanFieldEditor opCodeItalicE;
-
 	
 	public SyntaxColoringPreferencePage() {
 		super(GRID);
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 		setDescription("Syntax highlighting preferences for the DCPU-16 Assembly Language editor");
 	}
-
 	
 	public void createFieldEditors() {
 		//TODO stuff
@@ -57,7 +52,6 @@ implements IWorkbenchPreferencePage {
 	
 	public void init(IWorkbench workbench) {
 	}
-
 	
 	/** 
 	 * Saves the preferences to the preference store

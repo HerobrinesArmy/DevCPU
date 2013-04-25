@@ -8,8 +8,7 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 
 public class DCPUBreakpoint extends LineBreakpoint {
 	public DCPUBreakpoint(IResource resource, int lineNumber) throws CoreException {
-    IMarker marker = resource.createMarker(
-        "org.eclipse.debug.examples.core.pda.lineBreakpoint.marker");
+    IMarker marker = resource.createMarker("org.eclipse.debug.examples.core.pda.lineBreakpoint.marker");
     setMarker(marker);
     setEnabled(true);
     ensureMarker().setAttribute(IMarker.LINE_NUMBER, lineNumber);

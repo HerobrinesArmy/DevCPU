@@ -9,7 +9,6 @@ import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 public class DASMEditor extends TextEditor {
-
 	private TextFileDocumentProvider documentProvider = new DASMFileDocumentProvider();
 
 	@Override

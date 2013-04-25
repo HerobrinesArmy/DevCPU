@@ -147,7 +147,6 @@ public class VirtualVectorDisplay extends DCPUHardware
 	
 	@Override
 	public void powerOff() {
-//		this.broken = false; //TODO watch out for this one
 		this.mapLength = 0;
 		this.mapStart = 0;
 		this.targetDelta = 0;

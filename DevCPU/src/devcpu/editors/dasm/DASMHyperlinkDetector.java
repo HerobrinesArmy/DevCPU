@@ -12,11 +12,6 @@ public class DASMHyperlinkDetector extends AbstractHyperlinkDetector {
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 		//TODO
-//		LexerToken token = Lexer.get().getTokenAt(region.getOffset());
-//		if (token instanceof LabelToken) {
-//			System.out.println(token);
-//			return new IHyperlink
-//		}
 		return null;
 	}
 

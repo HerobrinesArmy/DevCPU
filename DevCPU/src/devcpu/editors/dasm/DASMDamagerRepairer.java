@@ -27,9 +27,7 @@ import devcpu.lexer.tokens.SimpleStackAccessToken;
 import devcpu.lexer.tokens.SpecialOpCodeToken;
 import devcpu.lexer.tokens.StringToken;
 
-
 public class DASMDamagerRepairer implements IPresentationRepairer, IPresentationDamager {
-
 	private static final Color DEFAULT_FOREGROUND = DASMColorProvider.get().getColor(new RGB(0, 0, 0));
 	private static final Color DEFAULT_BACKGROUND = DASMColorProvider.get().getColor(new RGB(255, 255, 255));
 	
