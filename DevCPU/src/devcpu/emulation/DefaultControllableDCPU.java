@@ -23,6 +23,9 @@ import devcpu.launch.DCPUMemoryUnit;
 import devcpu.managers.DCPUManager;
 
 public class DefaultControllableDCPU extends DCPU implements Identifiable { //, IDebugTarget {
+	public static final int RUN_MODE_OPTIMIZED = 1;
+	public static final int RUN_MODE_DEBUG = 2;
+	private int runMode = RUN_MODE_DEBUG;
 	private boolean keepAlive;
 	private String id = "DCPU";
 	private DCPUManager manager;
@@ -31,6 +34,8 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	private ILaunch launch;
 //	private ArrayList<DCPUTickListener> tickListeners = new ArrayList<>();
 	private Assembly assembly;
+	private boolean suspend;
+	private boolean suspended;
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
@@ -95,6 +100,105 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	}
 	
 	public void run() {
+		switch (runMode)
+		{
+		case RUN_MODE_OPTIMIZED:
+			runOptimized();
+			break;
+		case RUN_MODE_DEBUG:
+		default:
+			runDebug();
+		}
+	}
+	
+	public boolean suspend() {
+		if (runMode == RUN_MODE_DEBUG) {
+			//Wait until paused to return? 
+			this.suspend = true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean resume() {
+		if (runMode == RUN_MODE_DEBUG) {
+		//Wait until not paused to return?
+			this.suspend = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private void runDebug() {
+		keepAlive = true;
+		(new Thread() {
+			@Override
+			public void run() {
+				for (DCPUHardware hw : hardware) {
+		    	hw.powerOn();
+		    }
+//				opcounts = new int[64];
+		    int hz = 1000 * khz;
+		    int cyclesPerFrame = hz / 60 + 1;
+		    long nsPerFrame = 16666666L;
+		    long nextTime = System.nanoTime();
+
+		    while (keepAlive) {
+		      while (System.nanoTime() < nextTime) {
+		        try {
+		          Thread.sleep(1L);
+		        } catch (InterruptedException e) {
+		          e.printStackTrace();
+		        }
+		      }
+		      while (cycles < cyclesPerFrame) {
+		      	if (suspend) {
+		      		suspended = true;
+		      		while (suspend) {
+		      			try {
+				          Thread.sleep(10L);
+				        } catch (InterruptedException e) {
+				          e.printStackTrace();
+				        }
+		      			if (!keepAlive) {
+		      				break;
+		      			}
+		      		}
+		      		nextTime = System.nanoTime() + nsPerFrame;
+		      	}
+		      	if (keepAlive) {
+		      		tick();
+		      	}
+		      }
+		      if (keepAlive) {
+		      	tickHardware();
+		      	cycles -= cyclesPerFrame;
+		      	nextTime += nsPerFrame;
+		      }
+		    }
+		    pc = 0;
+		    sp = 0;
+		    ex = 0;
+		    ia = 0;
+		    registers = new char[8];
+		    cycles = 0;
+		    stop = false;
+		    isSkipping = false;
+		    isOnFire = false;
+		    queueingEnabled = false;
+		    interrupts = new char[256];
+		    ip = 0;
+		    iwp = 0;
+		    for (DCPUHardware hw : hardware) {
+		    	hw.powerOff();
+		    }
+			}
+		}).start();		
+	}
+
+	private void runOptimized() {
 		keepAlive = true;
 		(new Thread() {
 			@Override
@@ -119,11 +223,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		      }
 		      while (cycles < cyclesPerFrame) {
 		        tick();
-//		        for (DCPUTickListener l : tickListeners) {
-//		        	l.tick(dcpu);
-//		        }
 		      }
-
 		      tickHardware();
 		      cycles -= cyclesPerFrame;
 		      nextTime += nsPerFrame;
@@ -145,9 +245,9 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		    	hw.powerOff();
 		    }
 			}
-		}).start();
+		}).start();		
 	}
-	
+
 	public void stop() {
 		keepAlive = false;
 //		System.out.flush();
@@ -179,6 +279,10 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 
 	public boolean isRunning() {
 		return keepAlive;
+	}
+	
+	public boolean isSuspended() {
+		return suspended;
 	}
 
 	public void load(File file) throws IOException {

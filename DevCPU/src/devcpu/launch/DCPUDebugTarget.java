@@ -23,7 +23,7 @@ import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval {
 	boolean terminated = false;
-	boolean suspended = true;
+//	boolean suspended = true;
 	boolean connected = false;
 	
 	protected ILaunch launch;
@@ -53,6 +53,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
 		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[0]));
+		this.connected = true;
 	}
 	
 	/* (non-Javadoc)
@@ -111,48 +112,46 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
+		dcpu.stop();
 		terminated = true;
 		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
-		//TODO
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
-		return suspended && !terminated;
+		return dcpu.isSuspended() && !terminated;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
-		return !suspended && !terminated;
+		return !dcpu.isSuspended() && !terminated;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
-		return suspended;
+		return dcpu.isSuspended();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
-		suspended = false;
+		dcpu.resume();
 		fireEvent(new DebugEvent(this, DebugEvent.RESUME));
-		//TODO
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
-		suspended = true;		
+		dcpu.suspend();
 		fireEvent(new DebugEvent(thread, DebugEvent.SUSPEND));
-		//TODO
 	}
 
 	/* (non-Javadoc)
