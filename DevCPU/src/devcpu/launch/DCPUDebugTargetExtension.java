@@ -245,7 +245,7 @@
 //	}
 //
 //	public String getModelIdentifier() {
-//		return "devcpu.memoryview";
+//		return "devcpu.debugmodel";
 //	}
 //
 //	/* (non-Javadoc)

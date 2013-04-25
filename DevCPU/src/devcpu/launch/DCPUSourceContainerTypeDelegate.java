@@ -8,12 +8,14 @@ public class DCPUSourceContainerTypeDelegate implements ISourceContainerTypeDele
 	@Override
 	public ISourceContainer createSourceContainer(String memento) throws CoreException {
 		// TODO Auto-generated method stub
+System.out.println("DCPUSourceContainerTypeDelegate createSourceContainer");
 		return null;
 	}
 
 	@Override
 	public String getMemento(ISourceContainer container) throws CoreException {
 		// TODO Auto-generated method stub
+		System.out.println("DCPUSourceContainerTypeDelegate getMemento");
 		return null;
 	}
 }

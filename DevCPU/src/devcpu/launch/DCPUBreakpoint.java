@@ -8,15 +8,17 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 
 public class DCPUBreakpoint extends LineBreakpoint {
 	public DCPUBreakpoint(IResource resource, int lineNumber) throws CoreException {
+		System.out.println("DCPUBreakpoint DCPUBreakpoint");
     IMarker marker = resource.createMarker("org.eclipse.debug.examples.core.pda.lineBreakpoint.marker");
     setMarker(marker);
     setEnabled(true);
     ensureMarker().setAttribute(IMarker.LINE_NUMBER, lineNumber);
-    ensureMarker().setAttribute(IBreakpoint.ID, "devcpu.memoryview");
+    ensureMarker().setAttribute(IBreakpoint.ID, "devcpu.debugmodel");
  }
 
 	@Override
 	public String getModelIdentifier() {
-		return "devcpu.memoryview";
+		System.out.println("DCPUBreakpoint getModelIdentifier");
+		return "devcpu.debugmodel";
 	}
 }

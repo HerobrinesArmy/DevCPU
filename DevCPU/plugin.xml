@@ -304,7 +304,7 @@
       </activity>
       <activityPatternBinding
             activityId="DevCPU.hiddenviews"
-            pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy|.*?debug).*">
+            pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy|.*?debxug).*">
       </activityPatternBinding>
    </extension>
    <extension
@@ -323,7 +323,8 @@
             delegate="devcpu.launch.DCPULaunchDelegate"
             id="devcpu.dcpulaunch"
             modes="run, debug"
-            name="DCPU Launch Configuration">
+            name="DCPU Launch Configuration"
+            sourceLocatorId="devcpu.sourcelocator">
       </launchConfigurationType>
    </extension>
    <extension
@@ -338,7 +339,7 @@
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
             class="devcpu.launch.DCPUModelPresentation"
-            id="devcpu.memoryview">
+            id="devcpu.debugmodel">
       </debugModelPresentation>
    </extension>
    <extension
@@ -354,16 +355,11 @@
          point="org.eclipse.debug.ui.debugModelContextBindings">
       <modelContextBinding
             contextId="devcpu.debugging"
-            debugModelId="devcpu.memoryview">
+            debugModelId="devcpu.debugmodel">
       </modelContextBinding>
    </extension>
    <extension
          point="org.eclipse.debug.ui.contextViewBindings">
-      <contextViewBinding
-            autoOpen="true"
-            contextId="devcpu.debugging"
-            viewId="org.eclipse.debug.ui.MemoryView">
-      </contextViewBinding>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
@@ -460,7 +456,7 @@
             markerType="org.eclipse.debug.core.lineBreakpointMarker">
       </breakpoint>
    </extension>
-<!-- <extension
+   <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
             class="devcpu.launch.DCPUSourceLocator"
@@ -499,7 +495,7 @@
             plugin="devcpu">
       </statusHandler>
    </extension>
-   <extension
+<!--    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="devcpu.launch.DCPULaunchShortcut"
@@ -535,15 +531,4 @@
          </contextualLaunch>
       </shortcut>
    </extension>-->
-<!--   <extension point="org.eclipse.ui.intro"> 
-   <intro
-            class="devcpu.IntroPart"
-            id="devcpu.intro"
-            icon="icons/icon_16.png"/>
-      <introProductBinding
-            introId="devcpu.intro"
-            productId="DevCPU.product">
-      </introProductBinding>
-   </extension>
--->
 </plugin>

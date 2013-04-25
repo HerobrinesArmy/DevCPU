@@ -7,13 +7,26 @@ import org.eclipse.debug.core.model.IStackFrame;
 
 public class DCPUSourceLocator implements IPersistableSourceLocator {
 	private DCPUDebugTarget target;
+	
+	public DCPUSourceLocator() {
+		System.out.println("DCPUSourceLocator DCPUSourceLocator ");
+	}
 
 	public DCPUSourceLocator(DCPUDebugTarget target) {
+		System.out.println("DCPUSourceLocator DCPUSourceLocator " + target.getClass().getCanonicalName());
 		this.target = target;
 	}
 
 	@Override
 	public Object getSourceElement(IStackFrame stackFrame) {
+		System.out.println("DCPUSourceLocator getSourceElement " + stackFrame.getClass().getCanonicalName());
+		if (stackFrame instanceof DCPUStackFrame) {
+			System.out.println("OH YEAAAAAAAH");
+			return ((DCPUStackFrame) stackFrame).getDCPU().getAssembly();
+		} else {
+			System.out.println("NUUU");
+		}
+			
 		// TODO Auto-generated method stub
 		//XXX HIT
 		return null;
@@ -21,21 +34,25 @@ public class DCPUSourceLocator implements IPersistableSourceLocator {
 
 	@Override
 	public String getMemento() throws CoreException {
+		System.out.println("DCPUSourceLocator getMemento ");
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public DCPUDebugTarget getTarget() {
+		System.out.println("DCPUSourceLocator getTarget ");
 		return target;
 	}
 
 	@Override
 	public void initializeFromMemento(String memento) throws CoreException {
+		System.out.println("DCPUSourceLocator initializeFromMemento " + memento);
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void initializeDefaults(ILaunchConfiguration configuration) throws CoreException {
+		System.out.println("DCPUSourceLocator initializeDefaults " + configuration.getClass().getCanonicalName());
 		// TODO Auto-generated method stub
 //XXX Hit
 	}

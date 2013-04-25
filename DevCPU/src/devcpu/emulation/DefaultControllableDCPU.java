@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.MemoryByte;
 
 import devcpu.Activator;
+import devcpu.assembler.Assembly;
 import devcpu.launch.DCPUMemoryUnit;
 import devcpu.managers.DCPUManager;
 
@@ -29,14 +30,15 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	private String uid;
 	private ILaunch launch;
 //	private ArrayList<DCPUTickListener> tickListeners = new ArrayList<>();
+	private Assembly assembly;
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
 		this.id = id;
-//		doInitDebugEnvironment();
+		doInitDebugEnvironment();
 	}
 
-	@SuppressWarnings("unused")
+//	@SuppressWarnings("unused")
 	private void doInitDebugEnvironment() {
 		try { //TODO
 			this.uid = Activator.getShip().getDCPUManager().assignUniqueID(this);
@@ -236,7 +238,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 //	@Override
 //	public String getModelIdentifier() {
 //		System.out.println("hit DCPU getMI");
-//		return "devcpu.memoryview";
+//		return "devcpu.debugmodel";
 //	}
 //
 //	@Override
@@ -480,5 +482,13 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		}
 		
 		return returnBytes;
+	}
+	
+	public void setAssembly(Assembly assembly) {
+		this.assembly = assembly;
+	}
+
+	public Assembly getAssembly() {
+		return assembly;
 	}
 }

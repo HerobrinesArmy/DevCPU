@@ -85,6 +85,7 @@ public class Assembly {
 		System.out.println(timerReset() + "ms to zero RAM");
 		assembleToBuffer(dcpu.ram);
 		System.out.println(timerEnd() + "ms in Final Assembly");
+		dcpu.setAssembly(this);
 	}
 	
 	public void assemble(FloppyDisk disk) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {

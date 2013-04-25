@@ -15,6 +15,8 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 
 import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
@@ -225,13 +227,19 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAdapter(Class adapter) {
 		//XXX hit in debug perspective for IModelProxyFactory2, IModelProxyFactory, IElementLabelProvider, IDebugModelProvider, ILaunch, ISourceDisplay, IMemoryBlockRetrieval, IElementMememntoProvider, IElementContentProvider, IColumnPresentationFactory, IAddMemoryBlocksTarget, IViewerInputProvider, ITerminateHandler, IStepIntoHandler, IStepFiltersHandler, ISuspendHandler, IDropToFrameHandler, IRestartHandler, IStepReturnHandler, IStepOverHandler, IResumeHandler, IDisconnectHandler, IModelSelectionPolicyFactory, IViewActionProvider
 		if (adapter == ILaunch.class) {
 			return getLaunch();
 		} else if (adapter == IMemoryBlockRetrieval.class) {
 			return this;
+		} else if (adapter == ILabelProvider.class) {
+			return DCPUModelPresentation.getDCPUModelPresentation();
+		} else if (adapter == IContentProvider.class) {
+			return DCPUModelPresentation.getDCPUModelPresentation();
+		} else if (adapter.isAssignableFrom(DCPUModelPresentation.class)) {
+			return DCPUModelPresentation.getDCPUModelPresentation();
 		}
 		System.out.println("DCPUDebugTarget getAdapter " + adapter.getCanonicalName());
 		return super.getAdapter(adapter);
@@ -246,7 +254,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public String getModelIdentifier() {
-		return "devcpu.memoryview";
+		return "devcpu.debugmodel";
 	}
 //
 //	/* (non-Javadoc)

@@ -11,6 +11,8 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
+import devcpu.emulation.DefaultControllableDCPU;
+
 public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	private DCPUThread thread;
 	private DCPURegisterGroup registerGroup;
@@ -152,5 +154,9 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 
 	public void terminate() throws DebugException {
 		thread.terminate();
+	}
+	
+	public DefaultControllableDCPU getDCPU() {
+		return target.getDCPU();
 	}
 }
