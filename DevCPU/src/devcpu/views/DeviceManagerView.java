@@ -46,14 +46,16 @@ public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
 	private TreeViewer treeViewer;
 	private DeviceManagerContentProvider contentProvider;
+	private DeviceManagerLabelProvider labelProvider;
 	
 	public void createPartControl(Composite parent) {
 		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
-		contentProvider = new DeviceManagerContentProvider();
+		contentProvider = DeviceManagerContentProvider.get();
+		labelProvider = DeviceManagerLabelProvider.get();
 		treeViewer = new TreeViewer(container, SWT.NONE);
 		treeViewer.setContentProvider(contentProvider);
-		treeViewer.setLabelProvider(new DeviceManagerLabelProvider());
+		treeViewer.setLabelProvider(labelProvider);
 		treeViewer.setInput(Activator.getDefault());
 		treeViewer.expandAll();
 		
@@ -81,7 +83,7 @@ public class DeviceManagerView extends ViewPart {
 								int result = dialog.open();
 								if (result == Window.OK) {
 									identifiable.setID(dialog.getValue());
-									contentProvider.update();
+									treeViewer.refresh();
 								}
 	        		}
 	        	});
@@ -92,7 +94,7 @@ public class DeviceManagerView extends ViewPart {
 	          	manager.add(new Action("Destroy") {
 	          		public void run() {
 	          			Activator.getShip().getDCPUManager().destroyDCPU(dcpu);
-	          			contentProvider.update();
+	          			treeViewer.refresh();
 	          		};
 	  					});
 	        	} else if (o instanceof DCPUHardware) {
@@ -100,7 +102,7 @@ public class DeviceManagerView extends ViewPart {
 		        	manager.add(new Action("Destroy") {
 		        		public void run() {
 		        			Activator.getShip().getHardwareManager().destroyDevice(hardware);
-		        			contentProvider.update();
+		        			treeViewer.refresh();
 		        		};
 							});
 	        	} else if (o instanceof FloppyDisk) {
@@ -108,7 +110,7 @@ public class DeviceManagerView extends ViewPart {
 		        	manager.add(new Action("Destroy") {
 		        		public void run() {
 		        			Activator.getShip().getFloppyManager().destroyDisk(disk);
-		        			contentProvider.update();
+		        			treeViewer.refresh();
 		        		};
 							});
 	        	}
@@ -122,7 +124,7 @@ public class DeviceManagerView extends ViewPart {
 		        	manager.add(new Action("Disconnect") {
 		        		public void run() {
 		        			hardware.disconnect();
-		        			contentProvider.update();
+		        			treeViewer.refresh();
 		        		};
 							});
 	        	}
@@ -138,7 +140,7 @@ public class DeviceManagerView extends ViewPart {
     	    		public void run() {
 	        			DefaultControllableDCPU dcpu = dcpuManager.createDCPU();
 	        			treeViewer.expandToLevel(dcpu, 0);
-	        			contentProvider.update();
+	        			treeViewer.refresh();
 	        		};
 						});
 	        } else if (o instanceof FloppyManager) {
@@ -151,7 +153,7 @@ public class DeviceManagerView extends ViewPart {
     	    		public void run() {
 	        			FloppyDisk disk = floppyManager.createFloppyDisk();
 	        			treeViewer.expandToLevel(disk, 0);
-	        			contentProvider.update();
+	        			treeViewer.refresh();
 	        		};
 						});
 	        } else if (o instanceof FloppyDisk) {
@@ -168,7 +170,7 @@ public class DeviceManagerView extends ViewPart {
 										e.printStackTrace();
 									}
 	              }
-	        			contentProvider.update();
+	        			treeViewer.refresh();
 	        		};
 						});
 	        	if (disk.getDriveUsing() == null) {
@@ -176,7 +178,7 @@ public class DeviceManagerView extends ViewPart {
 		        		manager.add(new Action("Unprotect") {
 			        		public void run() {
 			        			disk.setWriteProtected(false);
-			        			contentProvider.update();
+			        			treeViewer.refresh();
 			        		};
 								});
 		        	} else {
@@ -192,13 +194,13 @@ public class DeviceManagerView extends ViewPart {
 												e.printStackTrace();
 											}
 			              }
-			        			contentProvider.update();
+			        			treeViewer.refresh();
 			        		};
 								});
 		        		manager.add(new Action("Protect") {
 			        		public void run() {
 			        			disk.setWriteProtected(true);
-			        			contentProvider.update();
+			        			treeViewer.refresh();
 			        		};
 								});
 		        	}
@@ -206,7 +208,7 @@ public class DeviceManagerView extends ViewPart {
 	        		manager.add(new Action("Eject") {
 		        		public void run() {
 		        			disk.getDriveUsing().eject();
-		        			contentProvider.update();
+		        			treeViewer.refresh();
 		        		};
 							});
 	        	}
@@ -224,7 +226,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualClock vc = hardwareManager.createVirtualClock();
       	    			treeViewer.expandToLevel(vc, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    	manager.add(new Action("Generic Keyboard") {
@@ -235,7 +237,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualKeyboard vk = hardwareManager.createVirtualKeyboard();
       	    			treeViewer.expandToLevel(vk, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    	manager.add(new Action("LEM1802") {
@@ -246,7 +248,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualMonitor vm = hardwareManager.createVirtualMonitor();
       	    			treeViewer.expandToLevel(vm, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    	manager.add(new Action("M35FD") {
@@ -257,7 +259,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualFloppyDrive vfd = hardwareManager.createVirtualFloppyDrive();
       	    			treeViewer.expandToLevel(vfd, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    	manager.add(new Action("SPC2000") {
@@ -268,7 +270,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualSleepChamber vsc = hardwareManager.createVirtualSleepChamber();
       	    			treeViewer.expandToLevel(vsc, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    	manager.add(new Action("SPED-3") {
@@ -279,7 +281,7 @@ public class DeviceManagerView extends ViewPart {
       	    		public void run() {
       	    			VirtualVectorDisplay vvd = hardwareManager.createVirtualVectorDisplay();
       	    			treeViewer.expandToLevel(vvd, 0);
-      	    			contentProvider.update();
+      	    			treeViewer.refresh();
       	    		};
       	    	});
       	    }
@@ -296,7 +298,7 @@ public class DeviceManagerView extends ViewPart {
     	    		}
     	    		public void run() {
     	    			dcpu.stop();
-    	    			contentProvider.update();
+    	    			treeViewer.refresh();
     	    		};
     	    	});
 	    		} else {
@@ -307,7 +309,7 @@ public class DeviceManagerView extends ViewPart {
     	    		}
     	    		public void run() {
     	    			dcpu.run();
-    	    			contentProvider.update();
+    	    			treeViewer.refresh();
     	    		};
     	    	});
 	    			manager.add(new Action("Clear RAM") {
@@ -315,7 +317,7 @@ public class DeviceManagerView extends ViewPart {
 	  	    			for (int i = 0; i < 65536; i++) {
 	  	    				dcpu.ram[i] = 0;
 	  	    			}
-	  	    			contentProvider.update();
+	  	    			treeViewer.refresh();
 	  	    		};
 	  	    	});
 		    		manager.add(new Action("Load from binary...") {
@@ -330,7 +332,7 @@ public class DeviceManagerView extends ViewPart {
 											e.printStackTrace();
 										}
 	              }
-	        			contentProvider.update();
+	        			treeViewer.refresh();
 	        		};
 						});
 	    		}
@@ -346,7 +348,7 @@ public class DeviceManagerView extends ViewPart {
 									e.printStackTrace();
 								}
               }
-        			contentProvider.update();
+        			treeViewer.refresh();
         		};
 					});
 	    		
@@ -356,7 +358,7 @@ public class DeviceManagerView extends ViewPart {
   	    			return Util.getImageDescriptor("icons/hw.png");
   	    		}
   	    		public void run() {
-        			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getShip().getHardwareManager(), new DeviceManagerContentProvider(), new DeviceManagerLabelProvider(), "Choose hardware to connect to "+dcpu.getID()+".");
+        			ListSelectionDialog listDialog = new ListSelectionDialog(container.getShell(), Activator.getShip().getHardwareManager(), contentProvider, labelProvider, "Choose hardware to connect to "+dcpu.getID()+".");
 							listDialog.setTitle("Connect Hardware");
 							int open = listDialog.open();
 							if (open == ListSelectionDialog.OK) {
@@ -367,7 +369,7 @@ public class DeviceManagerView extends ViewPart {
 									}
 								}
 							}
-							contentProvider.update();
+							treeViewer.refresh();
         		}
 	    		});
         } else if (o instanceof VirtualFloppyDrive) {
@@ -393,7 +395,7 @@ public class DeviceManagerView extends ViewPart {
 		        	    		}
 		        	    		public void run() {
 		        	    			vfd.insert(fd);
-		        	    			contentProvider.update();
+		        	    			treeViewer.refresh();
 		        	    		};
 		        	    	});
 		      	    	}
@@ -414,7 +416,7 @@ public class DeviceManagerView extends ViewPart {
     	    		}
     	    		public void run() {
     	    			vfd.eject();
-    	    			contentProvider.update();
+    	    			treeViewer.refresh();
     	    		};
     	    	});
         	}

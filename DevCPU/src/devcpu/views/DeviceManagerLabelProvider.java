@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
+import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Ship;
@@ -19,6 +20,15 @@ import devcpu.managers.HardwareManager;
 import devcpu.util.Util;
 
 public class DeviceManagerLabelProvider extends LabelProvider {
+	private static final DeviceManagerLabelProvider instance = new DeviceManagerLabelProvider();
+	
+	private DeviceManagerLabelProvider() {
+	}
+	
+	public static DeviceManagerLabelProvider get() {
+		return instance;
+	}
+	
 	@Override
 	public String getText(Object o) {
 		if (o instanceof Ship) {
@@ -30,7 +40,13 @@ public class DeviceManagerLabelProvider extends LabelProvider {
 		} else if (o instanceof FloppyManager) {
 			return "Floppies";
 		} else if (o instanceof DefaultControllableDCPU) {
-			return ((DefaultControllableDCPU)o).getID();
+			DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+			Assembly assembly = dcpu.getAssembly();
+			if (assembly != null) {
+				return dcpu.getID() + ": " + dcpu.getAssembly().getRootDocument().getFile().getName();
+			} else {
+				return dcpu.getID();				
+			}
 		} else if (o instanceof VirtualClock) {
 			return ((VirtualClock)o).getID();
 		} else if (o instanceof VirtualFloppyDrive) {

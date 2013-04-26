@@ -15,15 +15,21 @@ import devcpu.managers.HardwareManager;
 
 public class DeviceManagerContentProvider implements ITreeContentProvider {
 	private static Object[] EMPTY_ARRAY = new Object[0];
-	private static final DeviceManagerContentProvider provider = new DeviceManagerContentProvider();
-	private Viewer viewer;
+	private static final DeviceManagerContentProvider instance = new DeviceManagerContentProvider();
+
+	private DeviceManagerContentProvider() {
+	}
+	
+	public static DeviceManagerContentProvider get() {
+		return instance;
+	}
 	
 	@Override
 	public void dispose() {}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		this.viewer = viewer;
+		viewer.refresh();
 	}
 
 	@Override
@@ -98,13 +104,5 @@ public class DeviceManagerContentProvider implements ITreeContentProvider {
 			return ((VirtualFloppyDrive) o).getDisk() != null;
 		}
 		return false;
-	}
-
-	public void update() {
-		viewer.refresh();
-	}
-
-	public static DeviceManagerContentProvider get() {
-		return provider ;
 	}
 }

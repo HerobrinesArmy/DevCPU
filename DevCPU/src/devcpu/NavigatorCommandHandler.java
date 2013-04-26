@@ -59,7 +59,7 @@ public class NavigatorCommandHandler implements IHandler {
 							disks.remove(disk);
 						}
 					}
-					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), DeviceManagerLabelProvider.get()); //$NON-NLS-1$
 					listDialog.setElements(disks.toArray());
 					listDialog.setEmptyListMessage("There aren't any unprotected floppies available that aren't currently inserted in a floppy drive.");
 					listDialog.setEmptySelectionMessage("Select a floppy disk");
@@ -110,7 +110,7 @@ public class NavigatorCommandHandler implements IHandler {
 				if (firstElement instanceof IFile) {
 					final IFile file = (IFile) firstElement;
 					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
-					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), DeviceManagerLabelProvider.get()); //$NON-NLS-1$
 					listDialog.setElements(dcpus.toArray());
 					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
 					listDialog.setEmptySelectionMessage("Select a DCPU");
@@ -167,7 +167,7 @@ public class NavigatorCommandHandler implements IHandler {
 							disks.remove(disk);
 						}
 					}
-					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), DeviceManagerLabelProvider.get()); //$NON-NLS-1$
 					listDialog.setElements(disks.toArray());
 					listDialog.setEmptyListMessage("There aren't any unprotected floppies available that aren't currently inserted in a floppy drive.");
 					listDialog.setEmptySelectionMessage("Select a floppy disk");
@@ -197,7 +197,7 @@ public class NavigatorCommandHandler implements IHandler {
 				if (firstElement instanceof IFile) {
 					IFile file = (IFile) firstElement;
 					ArrayList<DefaultControllableDCPU> dcpus = Activator.getShip().getDCPUManager().getDCPUs();
-					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), new DeviceManagerLabelProvider()); //$NON-NLS-1$
+					final ElementListSelectionDialog listDialog = new ElementListSelectionDialog(HandlerUtil.getActiveShell(event), DeviceManagerLabelProvider.get()); //$NON-NLS-1$
 					listDialog.setElements(dcpus.toArray());
 					listDialog.setEmptyListMessage("There aren't any DCPUs available.");
 					listDialog.setEmptySelectionMessage("Select a DCPU");
