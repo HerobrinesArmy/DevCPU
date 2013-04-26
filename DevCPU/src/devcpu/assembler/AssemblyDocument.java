@@ -8,9 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.progress.UIJob;
 
 import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
@@ -35,7 +42,28 @@ public class AssemblyDocument {
 	}
 
 	public void readLines() throws IOException, CoreException, AbstractAssemblyException {
-		//TODO prompt if unsync?
+		//TODO Don't include in assembly time the time spent prompting user to save
+		UIJob promptJob = new UIJob("Promp to save changes") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				return IDE.saveAllEditors(new IResource[]{file}, true) ? Status.OK_STATUS : Status.CANCEL_STATUS;
+			}
+			@Override
+			public boolean belongsTo(Object family) {
+				return AssemblyDocument.this.equals(family);
+			}
+		};
+		promptJob.schedule();
+		try {
+			UIJob.getJobManager().join(this, null);
+		} catch (OperationCanceledException e) {
+			//TODO
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			//TODO
+			e.printStackTrace();
+		}
+		
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
 		int tempOffset = 0; //TODO FIXME XXX replace this. this was just for testing and it doesn't account for the difference caused by choice of line terminators.

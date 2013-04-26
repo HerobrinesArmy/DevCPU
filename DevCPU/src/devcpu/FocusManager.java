@@ -27,7 +27,7 @@ public class FocusManager implements KeyEventDispatcher {
 		focus = viewer;
 	}
 	
-	public FocusManager() {
+	private FocusManager() {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 	}
 

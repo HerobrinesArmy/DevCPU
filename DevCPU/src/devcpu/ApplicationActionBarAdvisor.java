@@ -2,6 +2,7 @@ package devcpu;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -44,9 +45,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 //		MenuManager searchMenu = new MenuManager("&Search", "search");
 //		searchMenu.setRemoveAllWhenShown(true);
 //		searchMenu.add(new Action(""){});
-		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
+		final MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
+		windowMenu.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				windowMenu.add(showViewMenuMgr);
+			}
+		});
+		windowMenu.setRemoveAllWhenShown(true);
 		showViewMenuMgr.add(showViewItem);
-		windowMenu.add(showViewMenuMgr);
+		
 		// MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
 
 		menuBar.add(fileMenu);

@@ -8,7 +8,5 @@ package devcpu;
  * @see org.eclipse.jface.action.IAction#setActionDefinitionId(String)
  */
 public interface ICommandIds {
-
     public static final String CMD_OPEN = "devcpu.open";
-    
 }

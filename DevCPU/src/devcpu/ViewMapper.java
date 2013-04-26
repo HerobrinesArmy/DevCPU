@@ -13,11 +13,13 @@ import devcpu.views.MappedView;
 
 public class ViewMapper {
 	private static final ViewMapper mapper = new ViewMapper();
-	
 	private static final LinkedHashMap<Object, ArrayList<MappedView<?>>> viewMap  = new LinkedHashMap<Object, ArrayList<MappedView<?>>>();
 	private static final LinkedHashMap<MappedView<?>, Object> objectMap = new LinkedHashMap<MappedView<?>, Object>();
 	private static final LinkedHashSet<MappedView<?>> unmappedViews = new LinkedHashSet<MappedView<?>>();
 	private static int viewCounter;
+
+	private ViewMapper() {
+	}
 	
 	public static ViewMapper get() {
 		return mapper;
