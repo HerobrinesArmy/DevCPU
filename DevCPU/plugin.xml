@@ -295,7 +295,7 @@
             name="Open View">
       </command>
    </extension>
-   <extension
+<!--   <extension
          point="org.eclipse.ui.activities">
       <activity
             description="Hidden views"
@@ -306,7 +306,7 @@
             activityId="DevCPU.hiddenviews"
             pattern=".*(?&lt;!devcpu.{0,999})(jdt\.ui\.|ierarchy|.*?debxug).*">
       </activityPatternBinding>
-   </extension>
+   </extension> -->
    <extension
          point="org.eclipse.debug.ui.memoryRenderings">
       <renderingBindings
