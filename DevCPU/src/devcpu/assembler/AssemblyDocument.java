@@ -29,7 +29,7 @@ public class AssemblyDocument {
 
 	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) {
 		this.file = file;
-		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release.
+		//TODO This setup sucks. Documents should be dumb and shouldn't need a reference to the assembly. Rework this in a later release?
 		this.assembly = assembly;
 		this.parent = parent;
 	}
@@ -38,6 +38,7 @@ public class AssemblyDocument {
 		//TODO prompt if unsync?
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
+		int tempOffset = 0; //TODO FIXME XXX replace this. this was just for testing and it doesn't account for the difference caused by choice of line terminators.
 		int n = 0;
 		while((lineText=isr.readLine()) != null) {
 			AssemblyLine line = null;
@@ -45,7 +46,8 @@ public class AssemblyDocument {
 			++n;
 			boolean tokenize = true;
 			while (tokenize) {
-				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true));
+				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), tempOffset);
+				tempOffset += lineText.length() + 1;
 				tokenize = false;
 				Directive directive = null;
 				for (LexerToken token : line.getTokens()) {
@@ -62,6 +64,7 @@ public class AssemblyDocument {
 							for (String key : assembly.defines.keySet()) {
 								//TODO Even this won't catch the bizarre case where the directive name itself is specified by an earlier define
 								//TODO This has slowed down the assembly. Consider switching it back and detecting the case in preprocssAndSize, and doing an additional preprocess=true pass if it happens.
+								//TODO Yeah, screw that. Just make a normal preprocessor and be done with it
 								Pattern pattern = Pattern.compile("\\b"+Pattern.quote(key)+"\\b");
 								if (pattern.matcher(text).find()) {
 									tokenize = true;

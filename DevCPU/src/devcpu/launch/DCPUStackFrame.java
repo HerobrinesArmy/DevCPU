@@ -11,6 +11,8 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
+import devcpu.assembler.Assembly;
+import devcpu.assembler.AssemblyLine;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUStackFrame extends DebugElement implements IStackFrame {
@@ -52,18 +54,36 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public int getLineNumber() throws DebugException {
-		//TODO
-		return 0;
+		System.out.println("DCPUStackFrame getLineNumber");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = target.getDCPU().getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(target.getDCPU().pc);
+			 return line.getLineNumber();
+		 }
+		 return 0;
 	}
 
 	public int getCharStart() throws DebugException {
-		//TODO
-		return 0;
+		System.out.println("DCPUStackFrame getCharStart");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = target.getDCPU().getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(target.getDCPU().pc);
+			 return line.getDocumentStart();
+		 }
+		 return 0;
 	}
 
 	public int getCharEnd() throws DebugException {
-		//TODO
-		return 0;
+		System.out.println("DCPUStackFrame getCharEnd");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = target.getDCPU().getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(target.getDCPU().pc);
+			 return line.getDocumentStart() + line.getText().length();
+		 }
+		 return 0;
 	}
 
 	public String getName() throws DebugException {
@@ -94,8 +114,7 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public boolean canStepInto() {
-		//TODO
-		return false;
+		return thread.canStepInto();
 	}
 
 	public boolean canStepOver() {
@@ -103,17 +122,15 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public boolean canStepReturn() {
-		//TODO
-		return false;
+		return thread.canStepReturn();
 	}
 
 	public boolean isStepping() {
-		//TODO
-		return false;
+		return thread.isStepping();
 	}
 
 	public void stepInto() throws DebugException {
-		//TODO
+		thread.stepInto();
 	}
 
 	public void stepOver() throws DebugException {
@@ -121,7 +138,7 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 	}
 
 	public void stepReturn() throws DebugException {
-		//TODO
+		thread.stepReturn();
 	}
 
 	public boolean canResume() {

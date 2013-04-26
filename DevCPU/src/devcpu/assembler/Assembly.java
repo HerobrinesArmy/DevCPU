@@ -918,4 +918,17 @@ public class Assembly {
 	private void timerStart() {
 		this.timer = System.nanoTime();
 	}
+
+	public AssemblyLine getLineFromOffset(int offset) {
+		System.out.println("Assembly getLineFromOffset");
+		AssemblyLine ln = null;
+		for (AssemblyLine line : lines) {
+			if (line.offset > offset) {
+				break;
+			}
+			ln = line;
+		}
+		System.out.println("Assembly getLineFromOffset returning " + ln);
+		return ln;
+	}
 }

@@ -36,6 +36,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	private Assembly assembly;
 	private boolean suspend;
 	private boolean suspended;
+	private boolean step;
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
@@ -113,8 +114,14 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	
 	public boolean suspend() {
 		if (runMode == RUN_MODE_DEBUG) {
-			//Wait until paused to return? 
-			this.suspend = true;
+			suspend = true;
+			while (!suspended) {
+        try {
+          Thread.sleep(1L);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
 			return true;
 		} else {
 			return false;
@@ -123,8 +130,53 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	
 	public boolean resume() {
 		if (runMode == RUN_MODE_DEBUG) {
-		//Wait until not paused to return?
-			this.suspend = false;
+			if (keepAlive) {
+				suspend = false;
+				while (suspended) {
+	        try {
+	          Thread.sleep(1L);
+	        } catch (InterruptedException e) {
+	          e.printStackTrace();
+	        }
+	      }
+			} else {
+				runDebug();
+				while (!keepAlive) {
+	        try {
+	          Thread.sleep(1L);
+	        } catch (InterruptedException e) {
+	          e.printStackTrace();
+	        }
+	      }
+			}
+			return true;
+		} else {
+			if (keepAlive) {
+				return false;
+			} else {
+				runOptimized();
+				while (!keepAlive) {
+	        try {
+	          Thread.sleep(1L);
+	        } catch (InterruptedException e) {
+	          e.printStackTrace();
+	        }
+	      }
+				return true;
+			}
+		}
+	}
+
+	public boolean step() {
+		if (runMode == RUN_MODE_DEBUG) {
+			step = true;
+			while (step) {
+        try {
+          Thread.sleep(1L);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
 			return true;
 		} else {
 			return false;
@@ -154,6 +206,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		        }
 		      }
 		      while (cycles < cyclesPerFrame) {
+		      	step = false;
 		      	if (suspend) {
 		      		suspended = true;
 		      		while (suspend) {
@@ -162,11 +215,15 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 				        } catch (InterruptedException e) {
 				          e.printStackTrace();
 				        }
-		      			if (!keepAlive) {
+		      			if (step || !keepAlive) {
 		      				break;
 		      			}
 		      		}
-		      		nextTime = System.nanoTime() + nsPerFrame;
+		      		if (!suspend) {
+		      			suspended = false;
+		      			nextTime = System.nanoTime() + nsPerFrame;
+		      			//TODO analyze how this might affect hardware getting ticked at the correct time and consider alternet looping metric if there's a problem
+		      		}
 		      	}
 		      	if (keepAlive) {
 		      		tick();
@@ -195,7 +252,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		    	hw.powerOff();
 		    }
 			}
-		}).start();		
+		}).start();
 	}
 
 	private void runOptimized() {
@@ -590,6 +647,11 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	
 	public void setAssembly(Assembly assembly) {
 		this.assembly = assembly;
+		if (keepAlive) {
+			suspend = true;
+		} else {
+			suspended = true;
+		}
 	}
 
 	public Assembly getAssembly() {

@@ -127,56 +127,53 @@ public class DCPUThread extends DebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
-		return false;
+		return target.canStepInto();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
 	public boolean canStepOver() {
-		if (!target.isTerminated()) {
+		/*if (!target.isTerminated()) {
 			return true;
 		}
-		return target.isSuspended();
+		return target.isSuspended();*/
+		return target.canStepOver();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
 	public boolean canStepReturn() {
-		//TODO
-		return false;
+		return target.canStepReturn();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
-		//TODO
-		return false;
+		return target.isStepping();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
-		 //TODO
+		target.stepInto();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
 	public void stepOver() throws DebugException {
-		target.resume();
-		target.suspend();
-		//TODO
+		target.stepOver();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
-		//TODO
+		target.stepReturn();
 	}
 
 	/* (non-Javadoc)

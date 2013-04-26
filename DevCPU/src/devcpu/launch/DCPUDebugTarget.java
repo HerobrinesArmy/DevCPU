@@ -14,6 +14,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -21,7 +22,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import devcpu.assembler.Assembly;
 import devcpu.emulation.DefaultControllableDCPU;
 
-public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval {
+public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep {
 	boolean terminated = false;
 //	boolean suspended = true;
 	boolean connected = false;
@@ -33,6 +34,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	private IProcess process;
 	
 	private LinkedHashSet<DCPUBreakpoint> breakpoints = new LinkedHashSet<DCPUBreakpoint>();
+	private boolean stepping;
 	
 	/**
 	 * Creates DCPUDebugTarget
@@ -290,5 +292,41 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	public DefaultControllableDCPU getDCPU() {
 		return dcpu;
+	}
+
+	@Override
+	public boolean canStepInto() {
+		return false;
+	}
+
+	@Override
+	public boolean canStepOver() {
+		return connected && !stepping && !terminated && (dcpu.isSuspended() || !dcpu.isRunning());
+	}
+
+	@Override
+	public boolean canStepReturn() {
+		return false;
+	}
+
+	@Override
+	public boolean isStepping() {
+		return stepping;
+	}
+
+	@Override
+	public void stepInto() throws DebugException {
+	}
+
+	@Override
+	public void stepOver() throws DebugException {
+		stepping = true;
+		dcpu.step();
+		stepping = false;
+		fireEvent(new DebugEvent(this, DebugEvent.STEP_OVER));
+	}
+
+	@Override
+	public void stepReturn() throws DebugException {
 	}
 }

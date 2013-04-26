@@ -83,13 +83,15 @@ public class AssemblyLine {
 	public char literalA;
 //	public char literalB;
 	public boolean literalASet;
+	private int documentStart;
 //	public boolean literalBSet;
 
-	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens) {
+	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens, int documentStart) {
 		this.document = document;
 		this.lineNumber = lineNumber;
 		this.text = lineText;
 		this.processedTokens = this.sourceTokens = tokens;
+		this.documentStart = documentStart;
 	}
 	
 	public String getText() {
@@ -427,5 +429,9 @@ public class AssemblyLine {
 	
 	public boolean isDirective() {
 		return directive != null;
+	}
+	
+	public int getDocumentStart() {
+		return documentStart;
 	}
 }
