@@ -21,14 +21,8 @@ public class DCPUSourceLocator implements IPersistableSourceLocator {
 	public Object getSourceElement(IStackFrame stackFrame) {
 		System.out.println("DCPUSourceLocator getSourceElement " + stackFrame.getClass().getCanonicalName());
 		if (stackFrame instanceof DCPUStackFrame) {
-			System.out.println("OH YEAAAAAAAH");
 			return ((DCPUStackFrame) stackFrame).getDCPU().getAssembly();
-		} else {
-			System.out.println("NUUU");
 		}
-			
-		// TODO Auto-generated method stub
-		//XXX HIT
 		return null;
 	}
 

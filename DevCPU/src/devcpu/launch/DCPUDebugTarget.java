@@ -24,7 +24,6 @@ import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep {
 	boolean terminated = false;
-//	boolean suspended = true;
 	boolean connected = false;
 	
 	protected ILaunch launch;

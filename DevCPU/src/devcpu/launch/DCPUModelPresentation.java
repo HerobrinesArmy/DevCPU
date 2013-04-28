@@ -198,7 +198,6 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	public void removeAnnotations(IEditorPart editorPart, IThread thread) {
 		System.out.println("DCPUModelPresentation removeAnnotations " + editorPart.getClass().getCanonicalName() + " " + thread.getClass().getCanonicalName());
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
