@@ -42,9 +42,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillMenuBar(IMenuManager menuBar) {
 		MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
 		MenuManager editMenu = new MenuManager("&Edit", IWorkbenchActionConstants.M_EDIT);
-//		MenuManager searchMenu = new MenuManager("&Search", "search");
-//		searchMenu.setRemoveAllWhenShown(true);
-//		searchMenu.add(new Action(""){});
 		final MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		windowMenu.addMenuListener(new IMenuListener() {
 			@Override
@@ -54,12 +51,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		});
 		windowMenu.setRemoveAllWhenShown(true);
 		showViewMenuMgr.add(showViewItem);
-		
-		// MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
-
 		menuBar.add(fileMenu);
 		menuBar.add(editMenu);
-//		menuBar.add(searchMenu);
 		menuBar.add(windowMenu);
 		fileMenu.add(exitAction);
 	}
@@ -67,7 +60,5 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillCoolBar(ICoolBarManager coolBar) {
 		 IToolBarManager toolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		 coolBar.add(new ToolBarContributionItem(toolbar, "main"));
-		// toolbar.add(openViewAction);
-		// toolbar.add(messagePopupAction);
 	}
 }

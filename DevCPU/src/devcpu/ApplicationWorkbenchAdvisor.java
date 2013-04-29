@@ -28,6 +28,5 @@ public class ApplicationWorkbenchAdvisor extends IDEWorkbenchAdvisor {
 	@Override
 	public void initialize(IWorkbenchConfigurer configurer) {
 		super.initialize(configurer);
-//		IPreferenceStore store = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 	}	
 }
