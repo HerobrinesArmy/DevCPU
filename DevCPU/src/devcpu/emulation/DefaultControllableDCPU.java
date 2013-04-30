@@ -650,7 +650,8 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		if (keepAlive) {
 			suspend = true;
 		} else {
-			suspended = true;
+			suspend = true;
+			run();
 		}
 	}
 

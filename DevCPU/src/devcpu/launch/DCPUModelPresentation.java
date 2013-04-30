@@ -33,6 +33,7 @@ import org.eclipse.ui.progress.UIJob;
 import devcpu.Activator;
 import devcpu.assembler.Assembly;
 import devcpu.editors.dasm.DASMColorProvider;
+import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUModelPresentation implements IDebugModelPresentation, IDebugModelPresentationExtension, IDebugEditorPresentation, IColorProvider, IMemoryBlockTablePresentation, IDebugModelProvider {
 	private static DCPUModelPresentation presentation;
@@ -93,9 +94,11 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	 */
 	public String getEditorId(IEditorInput input, Object element) {
 		System.out.println("DCPUModelPresentation getEditorId " + input.getClass().getCanonicalName() + " " + element.getClass().getCanonicalName());
-		if (element instanceof Assembly) {
-			System.out.println("devcpu.dasmeditor");
-			return "devcpu.dasmeditor";
+		if (element instanceof DefaultControllableDCPU) {
+			if (((DefaultControllableDCPU) element).getAssembly() != null) {
+				System.out.println("devcpu.dasmeditor");
+				return "devcpu.dasmeditor";
+			}
 		}
 		System.out.println("no editor id");
 		return null;
@@ -106,9 +109,13 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	 */
 	public IEditorInput getEditorInput(Object element) {
 		System.out.println("DCPUModelPresentation getEditorInput " + element.getClass().getCanonicalName());
-		if (element instanceof Assembly) {
-			System.out.println("Assembly element");
-			return new FileEditorInput(((Assembly) element).getFile());
+		if (element instanceof DefaultControllableDCPU) {
+			DefaultControllableDCPU dcpu = (DefaultControllableDCPU) element;
+			Assembly a = dcpu.getAssembly();
+			if (a != null) {
+				System.out.println("Assembly element");
+				return new FileEditorInput(a.getLineFromOffset(dcpu.pc).getDocument().getFile());
+			}
 		}
 		System.out.println("some other element");
 		return null;
