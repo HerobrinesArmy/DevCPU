@@ -113,7 +113,8 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 			DefaultControllableDCPU dcpu = (DefaultControllableDCPU) element;
 			Assembly a = dcpu.getAssembly();
 			if (a != null) {
-				System.out.println("Assembly element");
+				System.out.println("DefaultControllableDCPU element");
+				System.out.println(a.getLineFromOffset(dcpu.pc).getDocument().getFile().getName());
 				return new FileEditorInput(a.getLineFromOffset(dcpu.pc).getDocument().getFile());
 			}
 		}

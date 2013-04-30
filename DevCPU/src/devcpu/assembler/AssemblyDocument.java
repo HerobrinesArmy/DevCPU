@@ -1,6 +1,5 @@
 package devcpu.assembler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import devcpu.lexer.Lexer;
 import devcpu.lexer.tokens.DirectiveParametersToken;
 import devcpu.lexer.tokens.DirectiveToken;
 import devcpu.lexer.tokens.LexerToken;
+import devcpu.util.BufferedReader;
 
 public class AssemblyDocument {
 	private IFile file;
@@ -66,16 +66,15 @@ public class AssemblyDocument {
 		
 		BufferedReader isr = new BufferedReader(new InputStreamReader(file.getContents(true)));
 		String lineText = null;
-		int tempOffset = 0; //TODO FIXME XXX replace this. this was just for testing and it doesn't account for the difference caused by choice of line terminators.
 		int n = 0;
+		int o = isr.getOffset();
 		while((lineText=isr.readLine()) != null) {
 			AssemblyLine line = null;
 			String text = lineText;
 			++n;
 			boolean tokenize = true;
 			while (tokenize) {
-				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), tempOffset);
-				tempOffset += lineText.length() + 1;
+				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), o);
 				tokenize = false;
 				Directive directive = null;
 				for (LexerToken token : line.getTokens()) {
@@ -111,6 +110,7 @@ public class AssemblyDocument {
 			}
 			lines.add(line); 
 			assembly.lines.add(line);
+			o = isr.getOffset();
 		}
 		isr.close();
 	}
