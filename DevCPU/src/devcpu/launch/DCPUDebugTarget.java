@@ -28,7 +28,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	
 	protected ILaunch launch;
 	protected ArrayList<DCPUMemoryBlock> memoryBlocks = new ArrayList<DCPUMemoryBlock>();
-	protected IThread thread;
+	protected DCPUThread thread;
 	private DefaultControllableDCPU dcpu;
 	private IProcess process;
 	
@@ -53,7 +53,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			e.printStackTrace();
 		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
-		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[0]));
+		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[]{new DCPUMemoryBlock(dcpu, this)}));
 		this.connected = true;
 	}
 	
@@ -75,6 +75,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse.debug.core.model.IBreakpoint)
 	 */
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
+		System.out.println("DCPUDebugTarget supportsBreakpoint " + breakpoint.getClass().getCanonicalName());
 		if (breakpoint instanceof DCPUBreakpoint) {
 			return true;
 		}
@@ -153,12 +154,14 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	public void suspend() throws DebugException {
 		dcpu.suspend();
 		fireEvent(new DebugEvent(thread, DebugEvent.SUSPEND));
+		thread.updateStackFrame();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse.debug.core.model.IBreakpoint)
 	 */
 	public void breakpointAdded(IBreakpoint breakpoint) {
+		System.out.println("DCPUDebugTarget breakpointAdded " + breakpoint.getClass().getCanonicalName());
 		if (breakpoint instanceof DCPUBreakpoint) {
 			breakpoints.add((DCPUBreakpoint) breakpoint);
 		}
@@ -168,6 +171,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+		System.out.println("DCPUDebugTarget breakpointRemoved " + breakpoint.getClass().getCanonicalName() + " " + delta);
 		if (breakpoint instanceof DCPUBreakpoint) {
 			breakpoints.remove((DCPUBreakpoint) breakpoint);
 		}
@@ -177,6 +181,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse.debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
+		System.out.println("DCPUDebugTarget breakpointChanged " + breakpoint.getClass().getCanonicalName() + " " + delta);
 		//TODO
 	}
 
@@ -321,11 +326,21 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	public void stepOver() throws DebugException {
 		stepping = true;
 		dcpu.step();
+		thread.updateStackFrame();
 		stepping = false;
 		fireEvent(new DebugEvent(this, DebugEvent.STEP_OVER));
 	}
 
 	@Override
 	public void stepReturn() throws DebugException {
+	}
+
+	public IBreakpoint[] getBreakpoints() {
+		IBreakpoint[] bp = new IBreakpoint[breakpoints.size()];
+		int i = 0;
+		for (DCPUBreakpoint b : breakpoints) {
+			bp[i++] = b;
+		}
+		return bp;
 	}
 }

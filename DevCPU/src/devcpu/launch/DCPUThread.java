@@ -1,5 +1,6 @@
 package devcpu.launch;
 
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.DebugElement;
@@ -63,8 +64,7 @@ public class DCPUThread extends DebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
 	 */
 	public IBreakpoint[] getBreakpoints() {
-		//TODO
-		return new IBreakpoint[0];
+		return target.getBreakpoints();
 	}
 
 	/* (non-Javadoc)
@@ -204,5 +204,10 @@ public class DCPUThread extends DebugElement implements IThread {
 			return target.getLaunch();
 		}
 		return super.getAdapter(adapter);
+	}
+
+	public void updateStackFrame() {
+		stackFrame.fireChangeEvent(DebugEvent.STATE);
+		stackFrame.fireChangeEvent(DebugEvent.CONTENT);
 	}
 }

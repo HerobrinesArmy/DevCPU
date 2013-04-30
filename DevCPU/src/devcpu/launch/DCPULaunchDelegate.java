@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
@@ -19,29 +20,30 @@ public class DCPULaunchDelegate extends LaunchConfigurationDelegate {
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		System.out.println("DCPULaunchDelegate launch " + configuration.getClass().getCanonicalName() + " " + launch.getClass().getCanonicalName());
 		String uid = (String) configuration.getAttributes().get("DCPU");
 		DefaultControllableDCPU dcpu = Activator.getShip().getDCPUManager().getDCPUFromUniqueID(uid);
-//		IDebugTarget target = dcpu;//new DCPUDebugTarget(launch, dcpu);
 		DCPUDebugTarget target = new DCPUDebugTarget(launch, dcpu);
-		launch.setSourceLocator(new DCPUSourceLocator(target)); //Can be removed
 		launch.addDebugTarget(target);
 	}
 	
 	@Override
 	public boolean buildForLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
+		System.out.println("DCPULaunchDelegate buildForLaunch " + configuration.getClass().getCanonicalName());
 		return super.buildForLaunch(configuration, mode, monitor);
 	}
 	
 	@Override
 	protected IBreakpoint[] getBreakpoints(ILaunchConfiguration configuration) {
 		// TODO Auto-generated method stub
+		System.out.println("DCPULaunchDelegate getBreakpoints " + configuration.getClass().getCanonicalName());
 		return super.getBreakpoints(configuration);
 	}
 	
 	@Override
 	public ILaunch getLaunch(ILaunchConfiguration configuration, String mode) throws CoreException {
-		// TODO Auto-generated method stub
-		return super.getLaunch(configuration, mode);
+		System.out.println("DCPULaunchDelegate getLaunch " + configuration.getClass().getCanonicalName());
+		return new Launch(configuration, mode, new DCPUSourceLocator());
 	}
 }

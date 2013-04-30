@@ -453,7 +453,8 @@
       <breakpoint
             class="devcpu.launch.DCPUBreakpoint"
             id="devcpu.breakpoint"
-            markerType="org.eclipse.debug.core.lineBreakpointMarker">
+            markerType="org.eclipse.debug.core.lineBreakpointMarker"
+            name="DCPU Breakpoint">
       </breakpoint>
    </extension>
    <extension
@@ -494,6 +495,24 @@
             id="devcpu.statushandler.running"
             plugin="devcpu">
       </statusHandler>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="devcpu.editors.dasm.DASMBreakpointAdaptorFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         id="dcpuBreakpointMarker"
+         name="DCPU Breakpoint Marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.debug.core.breakpointMarker">
+      </super>
    </extension>
 <!--    <extension
          point="org.eclipse.debug.ui.launchShortcuts">

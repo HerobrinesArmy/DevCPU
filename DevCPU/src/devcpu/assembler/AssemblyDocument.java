@@ -74,7 +74,7 @@ public class AssemblyDocument {
 			++n;
 			boolean tokenize = true;
 			while (tokenize) {
-				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), o);
+				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), o+1);
 				tokenize = false;
 				Directive directive = null;
 				for (LexerToken token : line.getTokens()) {
