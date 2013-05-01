@@ -92,7 +92,7 @@ public class DCPUStackFrame extends DebugElement implements IStackFrame {
 
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
 		if (registerGroup == null) {
-			registerGroup = new DCPURegisterGroup(this, target);
+			registerGroup = new DCPURegisterGroup(target);
 		}
 		return new IRegisterGroup[] {registerGroup};
 	}

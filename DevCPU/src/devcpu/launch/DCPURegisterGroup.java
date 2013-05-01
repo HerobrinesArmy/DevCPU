@@ -21,30 +21,28 @@ public class DCPURegisterGroup extends DebugElement implements IRegisterGroup {
 	DCPURegister sp;
 	DCPURegister ex;
 	DCPURegister ia;
-	DCPUStackFrame frame;
 	private DCPUDebugTarget target;
 	
-	public DCPURegisterGroup(DCPUStackFrame frame, DCPUDebugTarget target)
+	public DCPURegisterGroup(DCPUDebugTarget target)
 	{
-		super(frame.getDebugTarget());
-		this.frame = frame;
+		super(target);
 		this.target = target;
 		createRegisters();
 	}
 	
 	private void createRegisters() {
-		a = new DCPURegister(frame, this, "A", target);
-		b = new DCPURegister(frame, this, "B", target);
-		c = new DCPURegister(frame, this, "C", target);
-		x = new DCPURegister(frame, this, "X", target);
-		y = new DCPURegister(frame, this, "Y", target);
-		z = new DCPURegister(frame, this, "Z", target);
-		i = new DCPURegister(frame, this, "I", target);
-		j = new DCPURegister(frame, this, "J", target);
-		pc = new DCPURegister(frame, this, "PC", target);
-		sp = new DCPURegister(frame, this, "SP", target);
-		ex = new DCPURegister(frame, this, "EX", target);
-		ia = new DCPURegister(frame, this, "IA", target);
+		a = new DCPURegister(this, "A", target);
+		b = new DCPURegister(this, "B", target);
+		c = new DCPURegister(this, "C", target);
+		x = new DCPURegister(this, "X", target);
+		y = new DCPURegister(this, "Y", target);
+		z = new DCPURegister(this, "Z", target);
+		i = new DCPURegister(this, "I", target);
+		j = new DCPURegister(this, "J", target);
+		pc = new DCPURegister(this, "PC", target);
+		sp = new DCPURegister(this, "SP", target);
+		ex = new DCPURegister(this, "EX", target);
+		ia = new DCPURegister(this, "IA", target);
 	}
 
 	public String getName() throws DebugException {
@@ -60,14 +58,14 @@ public class DCPURegisterGroup extends DebugElement implements IRegisterGroup {
 	}
 
 	public String getModelIdentifier() {
-		return frame.getModelIdentifier();
+		return target.getModelIdentifier();
 	}
 
 	public IDebugTarget getDebugTarget() {
-		return frame.getDebugTarget();
+		return target;
 	}
 
 	public ILaunch getLaunch() {
-		return frame.getLaunch();
+		return target.getLaunch();
 	}
 }

@@ -8,13 +8,13 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
 public class DCPUVariable extends DebugElement implements IVariable{
-	private final DCPUStackFrame frame;
+	private final DCPUDebugTarget target;
 	private String name;
 
-	DCPUVariable(DCPUStackFrame frame, String name)
+	DCPUVariable(DCPUDebugTarget target, String name)
 	{
-		super(frame.getDebugTarget());
-		this.frame = frame;
+		super(target);
+		this.target = target;
 		this.name = name;
 	}
 
@@ -36,15 +36,15 @@ public class DCPUVariable extends DebugElement implements IVariable{
 	}
 
 	public String getModelIdentifier() {
-		return frame.getModelIdentifier();
+		return target.getModelIdentifier();
 	}
 
 	public IDebugTarget getDebugTarget() {
-		return frame.getDebugTarget();
+		return target;
 	}
 
 	public ILaunch getLaunch() {
-		return frame.getLaunch();
+		return target.getLaunch();
 	}
 
 	public void setValue(IValue value) throws DebugException {

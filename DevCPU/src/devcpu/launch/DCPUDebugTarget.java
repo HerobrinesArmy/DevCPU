@@ -32,12 +32,12 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	
 	protected ILaunch launch;
 	protected ArrayList<DCPUMemoryBlock> memoryBlocks = new ArrayList<DCPUMemoryBlock>();
-//	protected DCPUThread thread;
 	private DefaultControllableDCPU dcpu;
-	private DCPUProcess process;
 	
 	private LinkedHashSet<DCPUBreakpoint> breakpoints = new LinkedHashSet<DCPUBreakpoint>();
 	private boolean stepping;
+	private IRegisterGroup registerGroup;
+	private ArrayList<DCPUVariable> variables = new ArrayList<DCPUVariable>();
 	
 	/**
 	 * Creates DCPUDebugTarget
@@ -48,8 +48,6 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		super(null);
 		this.launch = launch;
 		this.dcpu = dcpu;
-		this.process = new DCPUProcess(this);
-//		this.thread = new DCPUThread(this);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 		try {
 			memoryBlocks.add((DCPUMemoryBlock) getMemoryBlock(0, 65536*2));
@@ -65,7 +63,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
 	 */
 	public IProcess getProcess() {
-		return process;
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -256,7 +254,6 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	public IThread[] getThreads() throws DebugException {
 		return new IThread[0];
-//			return new IThread[]{thread};
 	}
 
 	public String getName() {
@@ -266,16 +263,6 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	public String getModelIdentifier() {
 		return "devcpu.debugmodel";
 	}
-//
-//	/* (non-Javadoc)
-//	 * @see org.eclipse.debug.core.model.IMemoryBlockRetrievalExtension#getExtendedMemoryBlock(java.lang.String, java.lang.Object)
-//	 */
-//	public IMemoryBlockExtension getExtendedMemoryBlock(String expression, Object context) {
-//		//XXX hit upon adding memory view
-//		DCPUMemoryBlock memoryBlock =  new DCPUMemoryBlock(dcpu, this);//TODO
-//		memoryBlocks.add(memoryBlock);
-//		return memoryBlock;
-//	}
 
 	public char getRegisterValue(DCPURegister register) {
 		//TODO This is stupid.
@@ -376,18 +363,17 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	@Override
 	public IVariable[] getVariables() throws DebugException {
-		return null;
+		return variables.toArray(new IVariable[0]);//new IVariable[]{new DCPUVariable(this, "sampleVariable")};
 	}
 
 	@Override
 	public boolean hasVariables() throws DebugException {
-		return false;
+		return true;
 	}
 
 	@Override
 	public int getLineNumber() throws DebugException {
 		System.out.println("DCPUDebugTarget getLineNumber");
-		//TODO Figure out what to do with this when we get multiple documents working
 		 Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
@@ -399,7 +385,6 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	@Override
 	public int getCharStart() throws DebugException {
 		System.out.println("DCPUDebugTarget getCharStart");
-		//TODO Figure out what to do with this when we get multiple documents working
 		 Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
@@ -411,7 +396,6 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	@Override
 	public int getCharEnd() throws DebugException {
 		System.out.println("DCPUDebugTarget getCharEnd");
-		//TODO Figure out what to do with this when we get multiple documents working
 		 Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
@@ -422,12 +406,15 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	@Override
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		return null;
+		if (registerGroup == null) {
+			registerGroup = new DCPURegisterGroup(this);
+		}
+		return new IRegisterGroup[] {registerGroup};
 	}
 
 	@Override
 	public boolean hasRegisterGroups() throws DebugException {
-		return false;
+		return true;
 	}
 	
 	public void updateStackFrame() {
