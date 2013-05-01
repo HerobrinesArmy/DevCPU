@@ -399,7 +399,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 //	@Override
 //	public String getModelIdentifier() {
 //		System.out.println("hit DCPU getMI");
-//		return "devcpu.debugmodel";
+//		return DCPUModelPresentation.DEBUG_MODEL_ID;
 //	}
 //
 //	@Override

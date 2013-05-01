@@ -12,6 +12,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import devcpu.launch.DCPUBreakpoint;
+import devcpu.launch.DCPUModelPresentation;
 
 public class DASMLineBreakpointAdapter implements IToggleBreakpointsTarget {
 	@Override
@@ -22,7 +23,7 @@ public class DASMLineBreakpointAdapter implements IToggleBreakpointsTarget {
 			IResource resource = (IResource) textEditor.getEditorInput().getAdapter(IResource.class);
 			ITextSelection textSelection = (ITextSelection) selection;
 			int lineNumber = textSelection.getStartLine();
-			IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints("devcpu.debugmodel");
+			IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(DCPUModelPresentation.DEBUG_MODEL_ID);
 			for (int i = 0; i < breakpoints.length; i++) {
 				IBreakpoint breakpoint = breakpoints[i];
 				if (resource.equals(breakpoint.getMarker().getResource())) {

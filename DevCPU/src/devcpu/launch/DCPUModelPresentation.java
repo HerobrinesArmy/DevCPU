@@ -36,10 +36,11 @@ import devcpu.editors.dasm.DASMColorProvider;
 import devcpu.emulation.DefaultControllableDCPU;
 
 public class DCPUModelPresentation implements IDebugModelPresentation, IDebugModelPresentationExtension, IDebugEditorPresentation, IColorProvider, IMemoryBlockTablePresentation, IDebugModelProvider {
+	public static final String DEBUG_MODEL_ID = "devcpu.debugmodel";
 	private static DCPUModelPresentation presentation;
 	private static Color blue;
 
-	public DCPUModelPresentation() {
+	private DCPUModelPresentation() {
 		System.out.println("DCPUModelPresentation");// TODO Auto-generated constructor stub
 	}
 	
@@ -227,6 +228,6 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	@Override
 	public String[] getModelIdentifiers() {
 		System.out.println("DCPUModelPresentation getModelIdentifiers ");
-		return new String[]{"devcpu.debugmodel"};
+		return new String[]{DEBUG_MODEL_ID};
 	}
 }

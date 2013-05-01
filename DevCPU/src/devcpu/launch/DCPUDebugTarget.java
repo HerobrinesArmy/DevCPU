@@ -261,7 +261,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public String getModelIdentifier() {
-		return "devcpu.debugmodel";
+		return DCPUModelPresentation.DEBUG_MODEL_ID;
 	}
 
 	public char getRegisterValue(DCPURegister register) {

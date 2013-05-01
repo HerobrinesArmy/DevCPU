@@ -13,12 +13,12 @@ public class DCPUBreakpoint extends LineBreakpoint {
     setMarker(marker);
     setEnabled(true);
     ensureMarker().setAttribute(IMarker.LINE_NUMBER, lineNumber);
-    ensureMarker().setAttribute(IBreakpoint.ID, "devcpu.debugmodel");
+    ensureMarker().setAttribute(IBreakpoint.ID, DCPUModelPresentation.DEBUG_MODEL_ID);
  }
 
 	@Override
 	public String getModelIdentifier() {
 		System.out.println("DCPUBreakpoint getModelIdentifier");
-		return "devcpu.debugmodel";
+		return DCPUModelPresentation.DEBUG_MODEL_ID;
 	}
 }
