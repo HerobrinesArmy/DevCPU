@@ -149,9 +149,7 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
 	public String getText(Object element) {
-		if (element instanceof DCPUProcess) {
-			return ((DCPUDebugTarget)((DCPUProcess) element).getLaunch().getDebugTarget()).getDCPU().getID();
-		} else if (element instanceof DCPUDebugTarget) {
+		if (element instanceof DCPUDebugTarget) {
 			return ((DCPUDebugTarget) element).getDCPU().getID();
 		}
 		return "TEXT";

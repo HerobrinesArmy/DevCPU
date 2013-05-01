@@ -481,13 +481,6 @@
       </sourceContainerType>
    </extension>
    <extension
-         point="org.eclipse.debug.core.processFactories">
-      <processFactory
-            class="devcpu.launch.DCPUProcessFactory"
-            id="devcpu.processfactory">
-      </processFactory>
-   </extension>
-   <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
             class="devcpu.launch.DCPURunningStatusHandler"
