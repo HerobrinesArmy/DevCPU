@@ -55,7 +55,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			e.printStackTrace();
 		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
-		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[]{new DCPUMemoryBlock(dcpu, this)}));
+		DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(memoryBlocks.toArray(new IMemoryBlock[0]));
 		this.connected = true;
 	}
 	

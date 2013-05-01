@@ -152,12 +152,8 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 		System.out.println("DCPUModelPresentation getText " + element.getClass().getCanonicalName());
 		if (element instanceof DCPUProcess) {
 			return ((DCPUDebugTarget)((DCPUProcess) element).getLaunch().getDebugTarget()).getDCPU().getID();
-		} else if (element instanceof DCPUThread) {
-			return ((DCPUDebugTarget)((DCPUThread) element).getDebugTarget()).getDCPU().getID();
 		} else if (element instanceof DCPUDebugTarget) {
 			return ((DCPUDebugTarget) element).getDCPU().getID();
-		} else if (element instanceof DCPUStackFrame) {
-			return ((DCPUStackFrame) element).getDCPU().getID();
 		}
 		return "TEXT";
 	}
