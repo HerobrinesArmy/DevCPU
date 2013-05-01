@@ -48,6 +48,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		super(null);
 		this.launch = launch;
 		this.dcpu = dcpu;
+		dcpu.setDebugTarget(this);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 		try {
 			memoryBlocks.add((DCPUMemoryBlock) getMemoryBlock(0, 65536*2));

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -297,7 +298,11 @@ public class DeviceManagerView extends ViewPart {
     	    			return Util.getImageDescriptor("icons/stop.png");
     	    		}
     	    		public void run() {
-    	    			dcpu.stop();
+    	    			try {
+									dcpu.getDebugTarget().terminate();
+								} catch (DebugException e) {
+									e.printStackTrace();
+								}
     	    			treeViewer.refresh();
     	    		};
     	    	});

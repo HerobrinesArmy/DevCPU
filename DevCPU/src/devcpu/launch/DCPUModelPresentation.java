@@ -40,7 +40,7 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	private static DCPUModelPresentation presentation;
 	private static Color blue;
 
-	private DCPUModelPresentation() {
+	public DCPUModelPresentation() {
 		System.out.println("DCPUModelPresentation");// TODO Auto-generated constructor stub
 	}
 	
@@ -149,7 +149,6 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
 	public String getText(Object element) {
-		System.out.println("DCPUModelPresentation getText " + element.getClass().getCanonicalName());
 		if (element instanceof DCPUProcess) {
 			return ((DCPUDebugTarget)((DCPUProcess) element).getLaunch().getDebugTarget()).getDCPU().getID();
 		} else if (element instanceof DCPUDebugTarget) {

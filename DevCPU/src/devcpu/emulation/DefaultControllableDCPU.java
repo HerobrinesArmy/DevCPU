@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -19,6 +20,7 @@ import org.eclipse.debug.core.model.MemoryByte;
 
 import devcpu.Activator;
 import devcpu.assembler.Assembly;
+import devcpu.launch.DCPUDebugTarget;
 import devcpu.launch.DCPUMemoryUnit;
 import devcpu.managers.DCPUManager;
 
@@ -37,6 +39,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	private boolean suspend;
 	private boolean suspended;
 	private boolean step;
+	private DCPUDebugTarget debugTarget;
 
 	public DefaultControllableDCPU(String id, DCPUManager manager) {
 		this.manager = manager;
@@ -46,13 +49,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 
 //	@SuppressWarnings("unused")
 	private void doInitDebugEnvironment() {
-		try { //TODO
 			this.uid = Activator.getShip().getDCPUManager().assignUniqueID(this);
-			ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
-			ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
-			ILaunchConfigurationWorkingCopy workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
-			workingCopy.setAttribute("DCPU",uid);
-			this.launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
 //			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 //
 //		  if (page != null)
@@ -88,9 +85,6 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 //		view.getMemoryRenderingContainers()[0].
 //		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
 //		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -184,6 +178,17 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 	}
 	
 	private void runDebug() {
+		ILaunchManager manager  = DebugPlugin.getDefault().getLaunchManager();
+		ILaunchConfigurationType type = manager.getLaunchConfigurationType("devcpu.dcpulaunch");
+		ILaunchConfigurationWorkingCopy workingCopy;
+		try {
+			workingCopy = type.newInstance(null, "devcpu.dcpulaunch");
+			workingCopy.setAttribute("DCPU",uid);
+			this.launch = workingCopy.launch(ILaunchManager.DEBUG_MODE, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
 		keepAlive = true;
 		(new Thread() {
 			@Override
@@ -657,5 +662,13 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 
 	public Assembly getAssembly() {
 		return assembly;
+	}
+
+	public void setDebugTarget(DCPUDebugTarget target) {
+		this.debugTarget = target;
+	}
+	
+	public DCPUDebugTarget getDebugTarget() {
+		return debugTarget;
 	}
 }
