@@ -151,8 +151,10 @@ public class DCPUModelPresentation implements IDebugModelPresentation, IDebugMod
 	public String getText(Object element) {
 		if (element instanceof DCPUDebugTarget) {
 			return ((DCPUDebugTarget) element).getDCPU().getID();
+		} else {
+			System.out.println("Get label for " + element.getClass().getCanonicalName());
+			return "The fuck is this?";
 		}
-		return "TEXT";
 	}
 
 	/* (non-Javadoc)

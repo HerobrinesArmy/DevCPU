@@ -26,7 +26,7 @@ import devcpu.assembler.Assembly;
 import devcpu.assembler.AssemblyLine;
 import devcpu.emulation.DefaultControllableDCPU;
 
-public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep, IThread, IStackFrame{
+public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep, IThread, IStackFrame {
 	boolean terminated = false;
 	boolean connected = false;
 	
@@ -293,12 +293,12 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	@Override
 	public boolean canStepInto() {
-		return false;
+		return connected && !stepping && !terminated && (dcpu.isSuspended() || !dcpu.isRunning());
 	}
 
 	@Override
 	public boolean canStepOver() {
-		return connected && !stepping && !terminated && (dcpu.isSuspended() || !dcpu.isRunning());
+		return false;
 	}
 
 	@Override
@@ -313,15 +313,15 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 
 	@Override
 	public void stepInto() throws DebugException {
-	}
-
-	@Override
-	public void stepOver() throws DebugException {
 		stepping = true;
 		dcpu.step();
 		updateStackFrame();
 		stepping = false;
-		fireEvent(new DebugEvent(this, DebugEvent.STEP_OVER));
+		fireEvent(new DebugEvent(this, DebugEvent.STEP_INTO));
+	}
+
+	@Override
+	public void stepOver() throws DebugException {
 	}
 
 	@Override
@@ -380,9 +380,12 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
 			 return line.getLineNumber();
 		 }
-		 return 0;
+		 return -1;
 	}
 
+	//TODO XXX FIXME NOTE: These aren't required yet and might never be required.
+	//They are, however, implemented and currently in use. Consider returning -1,
+	//letting it fall back to getLineNumber().
 	@Override
 	public int getCharStart() throws DebugException {
 		System.out.println("DCPUDebugTarget getCharStart");
@@ -391,18 +394,18 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
 			 return line.getDocumentStart();
 		 }
-		 return 0;
+		 return -1;
 	}
 
 	@Override
 	public int getCharEnd() throws DebugException {
 		System.out.println("DCPUDebugTarget getCharEnd");
-		 Assembly assembly = dcpu.getAssembly();
+		Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
 			 return line.getDocumentStart() + line.getText().length();
 		 }
-		 return 0;
+		 return -1;
 	}
 
 	@Override
