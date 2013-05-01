@@ -14,23 +14,27 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IMemoryBlockRetrieval;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.IRegisterGroup;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 
 import devcpu.assembler.Assembly;
+import devcpu.assembler.AssemblyLine;
 import devcpu.emulation.DefaultControllableDCPU;
 
-public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep {
+public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemoryBlockRetrieval, IStep, IThread, IStackFrame{
 	boolean terminated = false;
 	boolean connected = false;
 	
 	protected ILaunch launch;
 	protected ArrayList<DCPUMemoryBlock> memoryBlocks = new ArrayList<DCPUMemoryBlock>();
-	protected DCPUThread thread;
+//	protected DCPUThread thread;
 	private DefaultControllableDCPU dcpu;
-	private IProcess process;
+	private DCPUProcess process;
 	
 	private LinkedHashSet<DCPUBreakpoint> breakpoints = new LinkedHashSet<DCPUBreakpoint>();
 	private boolean stepping;
@@ -45,7 +49,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		this.launch = launch;
 		this.dcpu = dcpu;
 		this.process = new DCPUProcess(this);
-		this.thread = new DCPUThread(this);
+//		this.thread = new DCPUThread(this);
 		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 		try {
 			memoryBlocks.add((DCPUMemoryBlock) getMemoryBlock(0, 65536*2));
@@ -68,7 +72,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
 	 */
 	public boolean hasThreads() throws DebugException {
-		return true;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -153,8 +157,8 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	 */
 	public void suspend() throws DebugException {
 		dcpu.suspend();
-		fireEvent(new DebugEvent(thread, DebugEvent.SUSPEND));
-		thread.updateStackFrame();
+		fireEvent(new DebugEvent(this, DebugEvent.SUSPEND));
+		this.updateStackFrame();
 	}
 
 	/* (non-Javadoc)
@@ -251,7 +255,8 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	}
 
 	public IThread[] getThreads() throws DebugException {
-			return new IThread[]{thread};
+		return new IThread[0];
+//			return new IThread[]{thread};
 	}
 
 	public String getName() {
@@ -326,7 +331,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 	public void stepOver() throws DebugException {
 		stepping = true;
 		dcpu.step();
-		thread.updateStackFrame();
+		updateStackFrame();
 		stepping = false;
 		fireEvent(new DebugEvent(this, DebugEvent.STEP_OVER));
 	}
@@ -342,5 +347,91 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 			bp[i++] = b;
 		}
 		return bp;
+	}
+
+	@Override
+	public IStackFrame[] getStackFrames() throws DebugException {
+		return new IStackFrame[0];
+	}
+
+	@Override
+	public boolean hasStackFrames() throws DebugException {
+		return true;
+	}
+
+	@Override
+	public int getPriority() throws DebugException {
+		return 0;
+	}
+
+	@Override
+	public IStackFrame getTopStackFrame() throws DebugException {
+		return this;
+	}
+
+	@Override
+	public IThread getThread() {
+		return this;
+	}
+
+	@Override
+	public IVariable[] getVariables() throws DebugException {
+		return null;
+	}
+
+	@Override
+	public boolean hasVariables() throws DebugException {
+		return false;
+	}
+
+	@Override
+	public int getLineNumber() throws DebugException {
+		System.out.println("DCPUDebugTarget getLineNumber");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = dcpu.getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
+			 return line.getLineNumber();
+		 }
+		 return 0;
+	}
+
+	@Override
+	public int getCharStart() throws DebugException {
+		System.out.println("DCPUDebugTarget getCharStart");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = dcpu.getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
+			 return line.getDocumentStart();
+		 }
+		 return 0;
+	}
+
+	@Override
+	public int getCharEnd() throws DebugException {
+		System.out.println("DCPUDebugTarget getCharEnd");
+		//TODO Figure out what to do with this when we get multiple documents working
+		 Assembly assembly = dcpu.getAssembly();
+		 if (assembly != null) {
+			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
+			 return line.getDocumentStart() + line.getText().length();
+		 }
+		 return 0;
+	}
+
+	@Override
+	public IRegisterGroup[] getRegisterGroups() throws DebugException {
+		return null;
+	}
+
+	@Override
+	public boolean hasRegisterGroups() throws DebugException {
+		return false;
+	}
+	
+	public void updateStackFrame() {
+		fireChangeEvent(DebugEvent.STATE);
+		fireChangeEvent(DebugEvent.CONTENT);
 	}
 }
