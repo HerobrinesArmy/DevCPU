@@ -392,7 +392,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		 Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
-			 return line.getDocumentStart();
+			 return line.getDocumentOffset();
 		 }
 		 return -1;
 	}
@@ -403,7 +403,7 @@ public class DCPUDebugTarget extends DebugElement implements IDebugTarget, IMemo
 		Assembly assembly = dcpu.getAssembly();
 		 if (assembly != null) {
 			 AssemblyLine line = assembly.getLineFromOffset(dcpu.pc);
-			 return line.getDocumentStart() + line.getText().length();
+			 return line.getDocumentOffset() + line.getText().length();
 		 }
 		 return -1;
 	}
