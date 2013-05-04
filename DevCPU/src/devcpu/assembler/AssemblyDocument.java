@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -41,8 +42,9 @@ public class AssemblyDocument {
 		this.parent = parent;
 	}
 
-	public void readLines() throws IOException, CoreException, AbstractAssemblyException {
-		//TODO Don't include in assembly time the time spent prompting user to save
+	public List<RawLine> readLines() throws IOException, CoreException, AbstractAssemblyException {
+		return assembly.getLineLoader().readLines(this);
+/*		//TODO Don't include in assembly time the time spent prompting user to save
 		UIJob promptJob = new UIJob("Promp to save changes") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -71,46 +73,46 @@ public class AssemblyDocument {
 			AssemblyLine line = null;
 			String text = lineText;
 			++n;
-			boolean tokenize = true;
-			while (tokenize) {
-				line = new AssemblyLine(this, n, text, Lexer.get().generateTokens(text, true), isr.getLastLineOffset());
-				tokenize = false;
-				Directive directive = null;
-				for (LexerToken token : line.getTokens()) {
-					if (token instanceof DirectiveToken) {
-						directive = new Directive(line, (DirectiveToken) token);
-					} else if (token instanceof DirectiveParametersToken) {
-						directive.setParameters((DirectiveParametersToken)token);
-						line.setDirective(directive);
-						if (directive.isInclude()) {
-							AssemblyDocument doc = loadInclude(new Include(directive));
-							children.put(directive,doc);
-							doc.readLines();
-						} else if (directive.isDefine()) {
-							for (String key : assembly.defines.keySet()) {
-								//TODO Even this won't catch the bizarre case where the directive name itself is specified by an earlier define
-								//TODO This has slowed down the assembly. Consider switching it back and detecting the case in preprocssAndSize, and doing an additional preprocess=true pass if it happens.
-								//TODO Yeah, screw that. Just make a normal preprocessor and be done with it
-								Pattern pattern = Pattern.compile("\\b"+Pattern.quote(key)+"\\b");
-								if (pattern.matcher(text).find()) {
-									tokenize = true;
-									text = text.replaceAll(pattern.pattern(), assembly.defines.get(key).getValue());
-								}
-							}
-							if (tokenize) {
-								line.setProcessedTokens(Lexer.get().generateTokens(text, true));
-							} else {
-								Define define = new Define(directive);
-								assembly.defines.put(define.getKey(), define);
-							}
-						}
-					}
-				}
-			}
+//			boolean tokenize = true;
+//			while (tokenize) {
+				line = new AssemblyLine(this, n, text, isr.getLastLineOffset());
+//				tokenize = false;
+//				Directive directive = null;
+//				for (LexerToken token : line.getTokens()) {
+//					if (token instanceof DirectiveToken) {
+//						directive = new Directive(line, (DirectiveToken) token);
+//					} else if (token instanceof DirectiveParametersToken) {
+//						directive.setParameters((DirectiveParametersToken)token);
+//						line.setDirective(directive);
+//						if (directive.isInclude()) {
+//							AssemblyDocument doc = loadInclude(new Include(directive));
+//							children.put(directive,doc);
+//							doc.readLines();
+//						} else if (directive.isDefine()) {
+//							for (String key : assembly.defines.keySet()) {
+//								//TODO Even this won't catch the bizarre case where the directive name itself is specified by an earlier define
+//								//TODO This has slowed down the assembly. Consider switching it back and detecting the case in preprocssAndSize, and doing an additional preprocess=true pass if it happens.
+//								//TODO Yeah, screw that. Just make a normal preprocessor and be done with it
+//								Pattern pattern = Pattern.compile("\\b"+Pattern.quote(key)+"\\b");
+//								if (pattern.matcher(text).find()) {
+//									tokenize = true;
+//									text = text.replaceAll(pattern.pattern(), assembly.defines.get(key).getValue());
+//								}
+//							}
+//							if (tokenize) {
+//								line.setProcessedTokens(Lexer.get().generateTokens(text, true));
+//							} else {
+//								Define define = new Define(directive);
+//								assembly.defines.put(define.getKey(), define);
+//							}
+//						}
+//					}
+//				}
+//			}
 			lines.add(line); 
 			assembly.lines.add(line);
 		}
-		isr.close();
+		isr.close();*/
 	}
 
 	public IFile getFile() {

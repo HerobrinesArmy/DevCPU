@@ -63,7 +63,7 @@ public class AssemblyLine {
 	public boolean aHasSimpleStack;
 	public boolean aHasOffsetStack;
 	public String bRegister;
-	public 	String bAccessor;
+	public String bAccessor;
 	public boolean bHasRegister;
 	public boolean bIsAddress;
 	public boolean bHasOperator;
@@ -81,17 +81,15 @@ public class AssemblyLine {
 	public int bClass;
 	//Set on Calculation
 	public char literalA;
-//	public char literalB;
 	public boolean literalASet;
-	private int documentStart;
-//	public boolean literalBSet;
+	private int documentOffset;
 
-	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, LexerToken[] tokens, int documentStart) {
+	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, /*LexerToken[] tokens, */int documentOffset) {
 		this.document = document;
 		this.lineNumber = lineNumber;
 		this.text = lineText;
-		this.processedTokens = this.sourceTokens = tokens;
-		this.documentStart = documentStart;
+//		this.processedTokens = this.sourceTokens = tokens;
+		this.documentOffset = documentOffset;
 	}
 	
 	public String getText() {
@@ -431,7 +429,7 @@ public class AssemblyLine {
 		return directive != null;
 	}
 	
-	public int getDocumentStart() {
-		return documentStart;
+	public int getDocumentOffset() {
+		return documentOffset;
 	}
 }

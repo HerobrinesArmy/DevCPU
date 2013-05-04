@@ -28,6 +28,8 @@ import devcpu.assembler.exceptions.UndefinedLabelException;
 import devcpu.assembler.exceptions.ValueResolutionException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
+import devcpu.assembler.preprocessor.DASMPreprocessor;
+import devcpu.assembler.preprocessor.Preprocessor;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.lexer.Lexer;
@@ -52,6 +54,8 @@ import exp4j_int_custom.UnparsableExpressionException;
 public class Assembly {
 	public static final boolean DEFAULT_LABELS_CASE_SENSITIVE = false;
 	public static final String REGISTERS = "ABCXYZIJ";
+	private LineLoader lineLoader = new DASMLineLoader(this);
+	private Preprocessor preprocessor = new DASMPreprocessor(this);
 	private AssemblyDocument rootDocument;
 	private ArrayList<AssemblyDocument> documents = new ArrayList<AssemblyDocument>();
 	public static boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
@@ -74,7 +78,7 @@ public class Assembly {
 	//TODO Add Error handling delegate of some sort; Also, these non-AAEs should be caught where they're generated and be handled or throw AAEs
 	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
-		rootDocument.readLines();
+		preprocessor.preprocess(this);
 		System.out.println(timerReset() + "ms in Line Loading");
 		boolean preprocess = true;
 		int passes = 1;
@@ -930,5 +934,13 @@ public class Assembly {
 		}
 		System.out.println("Assembly getLineFromOffset returning " + ln);
 		return ln;
+	}
+	
+	public LineLoader getLineLoader() {
+		return lineLoader;
+	}
+	
+	public Preprocessor getPreprocessor() {
+		return preprocessor;
 	}
 }
