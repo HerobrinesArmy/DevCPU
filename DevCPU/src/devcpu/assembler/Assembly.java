@@ -61,7 +61,6 @@ public class Assembly {
 	public static boolean labelsCaseSensitive = DEFAULT_LABELS_CASE_SENSITIVE;
 	
 	public ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
-	public LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
 	public LinkedHashMap<String,LabelDefinition> labelDefs = new LinkedHashMap<String, LabelDefinition>();
 	public LinkedHashMap<String,List<LabelUse>> labelUses = new LinkedHashMap<String, List<LabelUse>>();
 	private int missed;

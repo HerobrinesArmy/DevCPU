@@ -16,10 +16,25 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 	private Pattern pattern = Pattern.compile("\\s*[\\.#]("+ Lexer.REGEX_IDENTIFIER +")\\b[\\s\\,]*", Pattern.CASE_INSENSITIVE);
 	private ArrayList<String> allowedDirectives = new ArrayList<String>();
 	{
+		//TODO Consider using different tokens for Assembler vs Preprocessor directives.
+		//That way, you can give them different visual styles to encourage people to think
+		//about the distinction. It would also make it possible to lex them differently
+		//depending on what's using the lexer (code editor vs assembler). Example Scenario:
+		//Assembler doesn't use the "PreprocessorDirectiveMatcher", making it slightly
+		//faster and allowing it to error differently, not having to check for unknown
+		//directives while assembling.
+		
+		//Preprocessor
 		allowedDirectives.add("include");
 		allowedDirectives.add("import");
 		allowedDirectives.add("define");
+		allowedDirectives.add("def");
 		allowedDirectives.add("equ");
+		allowedDirectives.add("undef");
+		allowedDirectives.add("ifdef");
+		allowedDirectives.add("ifndef");
+		
+		//Assembler
 		allowedDirectives.add("origin");
 		allowedDirectives.add("org");
 		allowedDirectives.add("align");
@@ -53,6 +68,6 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 	}
 	
 	public static DirectiveMatcher get() {
-		return matcher ;
+		return matcher;
 	}
 }
