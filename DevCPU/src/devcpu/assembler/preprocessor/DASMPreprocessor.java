@@ -49,16 +49,26 @@ public class DASMPreprocessor implements Preprocessor {
 		int currentlevel = 0;
 		int scopedLevel = 0;
 		for (RawLine line : rawLines) {
+			//TODO Consider adding support for line splicing
 			Matcher m = preprocessorDirectivePattern.matcher(line.getText());
 			if (m.find() && m.start() == 0) {
 				String name = m.group(1).toUpperCase();
 				String params = m.group(2);
 				if ("DEFINE".equals(name) || "EQU".equals(name) || "DEF".equals(name)) {
+					Matcher matcher = Define.pattern.matcher(line.getText());
+					if (matcher.find() && matcher.start() == 0) {
+						String key = matcher.group(1);
+						String value = matcher.group(2);
+						if (Pattern.matches("\\b"+Pattern.quote(key)+"\\b", value)) {
+//							throw new RecursiveDefinitionException(directive);
+						}
+					} else {
+//						throw new InvalidDefineFormatException(directive);
+					}
 					Define define = new Define(line, params); 
 					defines.put(define.getKey(), define);
 				}
 			}
-			//TODO Consider adding support for line splicing
 			replaceMacros(line);
 			
 		}

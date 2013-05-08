@@ -9,7 +9,7 @@ import devcpu.assembler.exceptions.RecursiveDefinitionException;
 import devcpu.lexer.Lexer;
 
 public class Define {
-	private static final Pattern pattern = Pattern.compile("\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
+	public static final Pattern pattern = Pattern.compile("\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
 	private static final Pattern extractPattern = Pattern.compile("\\s*[#\\.]" + Lexer.REGEX_IDENTIFIER + "\\s*" + Lexer.REGEX_IDENTIFIER + "\\s*([^;\\r\\n]*)");
 	private Directive directive;
 	private String key;
