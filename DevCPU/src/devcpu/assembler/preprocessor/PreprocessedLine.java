@@ -2,12 +2,12 @@ package devcpu.assembler.preprocessor;
 
 import devcpu.assembler.RawLine;
 
-public class PreprocessorLine {
+public class PreprocessedLine {
 	private RawLine rawLine;
 	public String text;
 	public boolean preprocessorDirective;
 
-	public PreprocessorLine(RawLine line) {
+	public PreprocessedLine(RawLine line) {
 		this.rawLine = line;
 		this.text = line.getText();
 	}
