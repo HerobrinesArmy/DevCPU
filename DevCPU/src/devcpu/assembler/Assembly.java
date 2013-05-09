@@ -78,6 +78,7 @@ public class Assembly {
 	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
 		preprocessor.preprocess(this);
+		if (true) return;//TODO REMOVE
 		System.out.println(timerReset() + "ms in Line Loading");
 		boolean preprocess = true;
 		int passes = 1;
@@ -114,14 +115,6 @@ public class Assembly {
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
-		LinkedHashMap<Pattern, Define> patterns = null;
-		if (preprocess) {
-			accomplishedSomething = true;
-			patterns = new LinkedHashMap<Pattern, Define>();
-			for (String key : defines.keySet()) {
-				patterns.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), defines.get(key));
-			}
-		}
 		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
 			if (exact) {
@@ -143,23 +136,6 @@ public class Assembly {
 				}
 				boolean retokenize = false;
 				String text = line.getText();
-				for (Pattern pattern : patterns.keySet()) {
-					if (isDefine) {
-						if (patterns.get(pattern).getDirective().getLine().equals(line)) {
-							continue;
-						}
-					}
-					if (pattern.matcher(text).find()) {
-						retokenize = true;
-						text = text.replaceAll(pattern.pattern(), patterns.get(pattern).getValue());
-					}
-				}
-				if (retokenize) {
-					if (isDefine) {
-						defines.get(pass).setValue(Define.extractValue(text));
-					}
-					line.setProcessedTokens(Lexer.get().generateTokens(text, true));
-				}
 				line.preprocess();
 				for (LexerToken token : line.getProcessedTokens()) {
 					if (token instanceof LabelDefinitionToken) {

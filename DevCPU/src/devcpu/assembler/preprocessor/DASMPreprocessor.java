@@ -43,40 +43,55 @@ public class DASMPreprocessor implements Preprocessor {
 	@Override
 	public PreprocessorResult preprocess(Assembly assembly) {
 		List<RawLine> rawLines = assembly.getLineLoader().readLines(assembly.getRootDocument());
-		List<AssemblyLine> preprocessedLines = new ArrayList<AssemblyLine>();
-		LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
+		List<PreprocessorLine> lines = new ArrayList<PreprocessorLine>();
+		LinkedHashMap<Pattern,String> defines = new LinkedHashMap<Pattern, String>();
 		//Decision: Preprocessor will not be iterative.		
 		int currentlevel = 0;
 		int scopedLevel = 0;
-		for (RawLine line : rawLines) {
+		for (RawLine raw : rawLines) {
+			PreprocessorLine line = new PreprocessorLine(raw);
 			//TODO Consider adding support for line splicing
 			Matcher m = preprocessorDirectivePattern.matcher(line.getText());
 			if (m.find() && m.start() == 0) {
 				String name = m.group(1).toUpperCase();
 				String params = m.group(2);
 				if ("DEFINE".equals(name) || "EQU".equals(name) || "DEF".equals(name)) {
-					Matcher matcher = Define.pattern.matcher(line.getText());
+					line.preprocessorDirective = true;
+					params = replaceMacros(params, defines);
+					Matcher matcher = Define.pattern.matcher(params);
 					if (matcher.find() && matcher.start() == 0) {
 						String key = matcher.group(1);
 						String value = matcher.group(2);
-						if (Pattern.matches("\\b"+Pattern.quote(key)+"\\b", value)) {
+						defines.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), value);
+//						if (Pattern.matches("\\b"+Pattern.quote(key)+"\\b", value)) {
 //							throw new RecursiveDefinitionException(directive);
-						}
+//						}
 					} else {
 //						throw new InvalidDefineFormatException(directive);
 					}
-					Define define = new Define(line, params); 
-					defines.put(define.getKey(), define);
 				}
 			}
-			replaceMacros(line);
-			
+			lines.add(line);
 		}
-		return new DASMPreprocessorResult(rawLines, preprocessedLines);
+		for (PreprocessorLine line : lines) {
+			if (!line.preprocessorDirective) {
+				replaceMacros(line, defines);
+			}
+			System.out.println(line.text);
+		}
+		return new DASMPreprocessorResult(rawLines, lines);
 	}
 
-	private void replaceMacros(RawLine line) {
-		// TODO Auto-generated method stub
-		
+	private void replaceMacros(PreprocessorLine line, LinkedHashMap<Pattern,String> defines) {
+		for (Pattern pattern : defines.keySet()) {
+			line.text = line.text.replaceAll(pattern.pattern(), defines.get(pattern));
+		}
+	}
+	
+	private String replaceMacros(String params, LinkedHashMap<Pattern,String> defines) {
+		for (Pattern pattern : defines.keySet()) {
+			params = params.replaceAll(pattern.pattern(), defines.get(pattern));
+		}
+		return params;
 	}
 }

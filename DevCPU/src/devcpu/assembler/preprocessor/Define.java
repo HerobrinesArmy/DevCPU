@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import devcpu.assembler.RawLine;
-import devcpu.assembler.exceptions.AbstractDirectiveException;
 import devcpu.lexer.Lexer;
 
 public class Define {

@@ -52,7 +52,7 @@ public class DASMLineLoader implements LineLoader {
 			String lineText = null;
 			int n = 0;
 			while ((lineText = isr.readLine()) != null) {
-				RawLine line = new RawLine(document, lineText, ++n, isr.getLastLineOffset());
+				RawLine line = new RawLine(document, ++n, isr.getLastLineOffset(), lineText);
 				lines.add(line);
 			}
 			isr.close();

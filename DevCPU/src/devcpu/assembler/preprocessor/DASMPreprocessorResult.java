@@ -7,9 +7,9 @@ import devcpu.assembler.RawLine;
 
 public class DASMPreprocessorResult implements PreprocessorResult {
 	private List<RawLine> rawLines;
-	private List<AssemblyLine> preprocessedLines;
+	private List<PreprocessorLine> preprocessedLines;
 
-	public DASMPreprocessorResult(List<RawLine> rawLines,	List<AssemblyLine> preprocessedLines) {
+	public DASMPreprocessorResult(List<RawLine> rawLines,	List<PreprocessorLine> preprocessedLines) {
 		this.rawLines = rawLines;
 		this.preprocessedLines = preprocessedLines;
 	}
@@ -20,7 +20,7 @@ public class DASMPreprocessorResult implements PreprocessorResult {
 	}
 
 	@Override
-	public List<AssemblyLine> getPreprocessedLines() {
+	public List<PreprocessorLine> getPreprocessedLines() {
 		return preprocessedLines;
 	}
 }
