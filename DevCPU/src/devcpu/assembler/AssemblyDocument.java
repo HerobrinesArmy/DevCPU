@@ -1,32 +1,18 @@
 package devcpu.assembler;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.progress.UIJob;
 
 import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.IncludeFileNotFoundException;
 import devcpu.assembler.exceptions.RecursiveInclusionException;
-import devcpu.lexer.Lexer;
-import devcpu.lexer.tokens.DirectiveParametersToken;
-import devcpu.lexer.tokens.DirectiveToken;
-import devcpu.lexer.tokens.LexerToken;
-import devcpu.util.CountingLineReader;
 
 public class AssemblyDocument {
 	private IFile file;

@@ -44,6 +44,7 @@ public class DASMPreprocessor implements Preprocessor {
 		List<RawLine> rawLines = assembly.getLineLoader().readLines(assembly.getRootDocument());
 		List<PreprocessedLine> lines = new ArrayList<PreprocessedLine>();
 		LinkedHashMap<Pattern,String> defines = new LinkedHashMap<Pattern, String>();
+		LinkedHashMap<String,Pattern> patterns = new LinkedHashMap<String, Pattern>();
 		//Decision: Preprocessor will not be iterative.		
 		int currentlevel = 0;
 		int scopedLevel = 0;
@@ -55,13 +56,16 @@ public class DASMPreprocessor implements Preprocessor {
 				String name = m.group(1).toUpperCase();
 				String params = m.group(2);
 				if ("DEFINE".equals(name) || "EQU".equals(name) || "DEF".equals(name)) {
+					//TODO Check to see if we're handling value(param)-less defines
 //					line.preprocessorDirective = true;
 					params = replaceMacros(params, defines);
 					Matcher matcher = Define.pattern.matcher(params);
 					if (matcher.find() && matcher.start() == 0) {
 						String key = matcher.group(1);
 						String value = matcher.group(2);
-						defines.put(Pattern.compile("\\b"+Pattern.quote(key)+"\\b"), value);
+						Pattern pattern = Pattern.compile("\\b"+Pattern.quote(key)+"\\b");
+						patterns.put(key, pattern);
+						defines.put(pattern, value);
 //						if (Pattern.matches("\\b"+Pattern.quote(key)+"\\b", value)) {
 //							throw new RecursiveDefinitionException(directive);
 //						}
@@ -69,7 +73,10 @@ public class DASMPreprocessor implements Preprocessor {
 //						throw new InvalidDefineFormatException(directive);
 					}
 				} else if ("UNDEF".equals(name)) {
-					//TODO
+					Pattern pattern = patterns.get(params);
+					if (pattern != null) {
+						defines.remove(pattern);
+					}
 				} else if ("IFDEF".equals(name)) {
 					//TODO
 				} else if ("IFNDEF".equals(name)) {
