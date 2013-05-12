@@ -11,8 +11,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 import devcpu.assembler.exceptions.AbstractAssemblyException;
-import devcpu.assembler.exceptions.IncludeFileNotFoundException;
-import devcpu.assembler.exceptions.RecursiveInclusionException;
 
 public class AssemblyDocument {
 	private IFile file;
@@ -125,13 +123,15 @@ public class AssemblyDocument {
 		return parent;
 	}
 
-	private AssemblyDocument loadInclude(Include include) throws AbstractAssemblyException, IOException, CoreException {
-		IFile includeFile = locate(include);
+	public AssemblyDocument loadChild(String path) { // throws AbstractAssemblyException, IOException, CoreException {
+		IFile includeFile = locate(path);
 		if (includeFile == null) {
-			throw new IncludeFileNotFoundException(include);
+//			throw new IncludeFileNotFoundException(include);
+			return null;
 		}
 		if (checkForAncestor(includeFile)) {
-			throw new RecursiveInclusionException(include, includeFile);
+//			throw new RecursiveInclusionException(include, includeFile);
+			return null;
 		}
 		return new AssemblyDocument(includeFile, assembly, this);
 	}
@@ -147,8 +147,8 @@ public class AssemblyDocument {
 		return false;
 	}
 
-	private IFile locate(Include include) {
-		Path path = new Path(include.getPath());
+	private IFile locate(String includePath) {
+		Path path = new Path(includePath);
 		//First, treat as path relative to current file ("../" is supported)
     IFile located = file.getParent().getFile(path);
     if (located.exists()) {
