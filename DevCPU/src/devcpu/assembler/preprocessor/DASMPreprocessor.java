@@ -135,6 +135,7 @@ public class DASMPreprocessor implements Preprocessor {
 								patterns.remove(params);
 							}
 						} else if ("INCLUDE".equals(name) || "IMPORT".equals(name)) {
+							params = replaceMacros(params, defines); //Do this?
 							params = params.replaceAll("\"", "").replaceAll("'", "").replaceAll("<", "").replaceAll(">", ""); //For now, none of those characters are allowed in paths, because I'm lazy
 							AssemblyDocument child = raw.getDocument().loadChild(params);
 							List<RawLine> newLines = assembly.getLineLoader().readLines(child);
@@ -155,9 +156,9 @@ public class DASMPreprocessor implements Preprocessor {
 		}
 		for (PreprocessedLine line : lines) {
 			replaceMacros(line, defines);
-			System.out.println(line.text);
+//			System.out.println(line.text);
 		}
-		return new DASMPreprocessorResult(rawLines, lines);
+		return new DASMPreprocessorResult(/*rawLines, */lines);
 	}
 
 	private void replaceMacros(PreprocessedLine line, LinkedHashMap<Pattern,String> defines) {
