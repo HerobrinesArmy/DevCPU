@@ -59,7 +59,7 @@ public class DASMPreprocessor implements Preprocessor {
 				String params = m.group(2);
 				if ("IFDEF".equals(name)) {
 					if (currentLevel == scopedLevel) {
-						scopeAlive = true;
+						//scopeAlive = true;
 						if (patterns.containsKey(params)) {
 							scopedLevel++;
 						}
@@ -67,7 +67,7 @@ public class DASMPreprocessor implements Preprocessor {
 					currentLevel++;
 				} else if ("IFNDEF".equals(name)) {
 					if (currentLevel == scopedLevel) {
-						scopeAlive = true;
+						//scopeAlive = true;
 						if (!patterns.containsKey(params)) {
 							scopedLevel++;
 						}
@@ -75,34 +75,35 @@ public class DASMPreprocessor implements Preprocessor {
 					currentLevel++;
 				} else if ("IF".equals(name)) {
 					if (currentLevel == scopedLevel) {
-						scopeAlive = true; //TODO Should be able to use sA in some conditions and only set sA true on ENDIF when cL==sL...I think... 
+						//scopeAlive = true; //TODO Should be able to use sA in some conditions and only set sA true on ENDIF when cL==sL...I think... 
 						if (false) { //TODO write IF params check
 							scopedLevel++;
 						}
 					}
 				} else if ("ELIF".equals(name) || "ELSEIF".equals(name)) {
-					if (scopeAlive && currentLevel == scopedLevel) {
+					if (currentLevel == scopedLevel) {
 						scopeAlive = false;
 						scopedLevel--;
 					} else if (scopeAlive && currentLevel == scopedLevel + 1) {
 						if (false) { //TODO write ELIF params check
-							scopeAlive = true;
+							//scopeAlive = true;
 							scopedLevel++;
 						}
 					}
 				} else if ("ELSE".equals(name)) {
 					//TODO check for invalid params?
-					if (scopeAlive && currentLevel == scopedLevel) {
+					if (currentLevel == scopedLevel) {
 						scopeAlive = false;
 						scopedLevel--;
 						//TODO Check for negative levels?
 					} else if (scopeAlive && currentLevel == scopedLevel + 1) {
-						scopeAlive = true;
+						//scopeAlive = true;
 						scopedLevel++;
 					}
 				} else if ("ENDIF".equals(name)) {
 					if (currentLevel == scopedLevel) {
 						scopedLevel--;
+						scopeAlive = true;
 					}
 					currentLevel--;
 				} else if (scopedLevel == currentLevel) {
