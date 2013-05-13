@@ -26,7 +26,8 @@ public class DASMPreprocessor implements Preprocessor {
 //		};
 //private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|(un|ifn?)?def|equ|include|import|el(se)?(if)?|(end)?if)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
 	private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|equ|def|include|import|undef|ifn?def|if|elif|elseif|else|endif)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
-
+//	private Pattern uselessLinePattern = Pattern.compile("^\\s*(;.*)?$");
+	
 //	private LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
 	
 	private Assembly assembly;
@@ -149,14 +150,17 @@ public class DASMPreprocessor implements Preprocessor {
 					}
 				} else {
 					if (currentLevel == scopedLevel) {
-						lines.add(line);
+						//We'll have the default preprocessor remove blank and comment lines to cut down on work for the tokenizer
+						if (!line.text.matches("^\\s*(;.*)?$")) {
+							lines.add(line);
+						}
 					}
 				}
 			}
 		}
 		for (PreprocessedLine line : lines) {
 			replaceMacros(line, defines);
-//			System.out.println(line.text);
+			//System.out.println(line.text);
 		}
 		return new DASMPreprocessorResult(/*rawLines, */lines);
 	}
