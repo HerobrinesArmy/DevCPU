@@ -32,10 +32,8 @@ public class AssemblyLine {
 	public static final int VALUE_LITERAL = 7;
 	
 	//TODO Consider making these and other classes' fields public so they can be accessed directly in the interest of assembly speed
-//	private String text;
+	private RawLine rawLine;
 	private LexerToken[] processedTokens;
-//	private AssemblyDocument document;
-//	private int lineNumber;
 	private Directive directive;
 	//Let's try out some public fields and see how we like them.
 	public int offset;
@@ -52,9 +50,9 @@ public class AssemblyLine {
 	public boolean bSet;
 	public boolean sized;
 	public boolean located;
-	//Set by Preprocess
+	//Set by analyze()
 	public int unvaluedLabelTokens;
-	public boolean isDat; //Other preprocess fields invalid if this is true
+	public boolean isDat; //Other analysis fields invalid if this is true
 	public boolean isSpecial;
 	public boolean isBasic;
 	public boolean aHasRegister;
@@ -82,7 +80,6 @@ public class AssemblyLine {
 	//Set on Calculation
 	public char literalA;
 	public boolean literalASet;
-	private RawLine rawLine;
 
 	public AssemblyLine(RawLine rawLine, LexerToken[] processedTokens) throws BadValueException, TooManyRegistersInExpressionException {
 		this.rawLine = rawLine;
@@ -102,18 +99,7 @@ public class AssemblyLine {
 		return processedTokens;
 	}
 
-	public void setProcessedTokens(LexerToken[] processedTokens) {
-		this.processedTokens = processedTokens;
-		if (directive != null) {
-			for (LexerToken token : processedTokens) {
-				if (token instanceof DirectiveParametersToken) {
-					directive.setParameters((DirectiveParametersToken)token);
-				}
-			}
-		}
-	}
-	
-	public void analyze() throws BadValueException, TooManyRegistersInExpressionException {
+	private void analyze() throws BadValueException, TooManyRegistersInExpressionException {
 		for (LexerToken token : processedTokens) {
 			if (token instanceof DirectiveToken) {
 				directive = new Directive(this, (DirectiveToken) token);
