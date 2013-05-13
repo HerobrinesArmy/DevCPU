@@ -823,15 +823,15 @@ public class Assembly {
 
 	private int treeCountChildren(AssemblyDocument doc) {
 		int n = 0;
-		for (AssemblyDocument child : doc.getChildren().values()) {
+		for (AssemblyDocument child : doc.getChildren()) {
 			n += 1 + treeCountChildren(child);
 		}
 		return n;
 	}
 
-	public int getLineCount() {
-		return lines.size();
-	}
+//	public int getLineCount() {
+//		return lines.size();
+//	}
 
 	public int getPasses() {
 		return passes;

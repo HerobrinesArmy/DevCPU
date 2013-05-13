@@ -1,7 +1,7 @@
 package devcpu.assembler;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -16,7 +16,7 @@ public class AssemblyDocument {
 	private Assembly assembly;
 	private AssemblyDocument parent;
 //	private ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
-	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
+	private ArrayList<AssemblyDocument> children = new ArrayList<AssemblyDocument>();
 
 	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) {
 		this.file = file;
@@ -110,7 +110,7 @@ public class AssemblyDocument {
 		return assembly;
 	}
 	
-	public LinkedHashMap<Directive, AssemblyDocument> getChildren() {
+	public ArrayList<AssemblyDocument> getChildren() {
 		return children;
 	}
 
@@ -132,7 +132,9 @@ public class AssemblyDocument {
 //			throw new RecursiveInclusionException(include, includeFile);
 			return null;
 		}
-		return new AssemblyDocument(includeFile, assembly, this);
+		AssemblyDocument doc = new AssemblyDocument(includeFile, assembly, this);
+		children.add(doc);
+		return doc;
 	}
 
 	private boolean checkForAncestor(IFile includeFile) {

@@ -83,7 +83,7 @@ public class NavigatorCommandHandler implements IHandler {
 											Assembly a = new Assembly(file);
 											a.assemble(disk);
 											long stop = System.nanoTime();
-											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) was loaded and assembled to " + disk.getID() + " in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of possible).\n");
+											os.write(file.getName() + " was loaded and assembled to " + disk.getID() + " in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals.\n");
 										} catch (Exception e) {
 											try {
 												es.write("Assembly failed: " + e.getMessage() + "\n");
@@ -134,7 +134,7 @@ public class NavigatorCommandHandler implements IHandler {
 											Assembly a = new Assembly(file);
 											a.assemble(dcpu);
 											long stop = System.nanoTime();
-											os.write(file.getName() + " (" + a.getLineCount() + " lines in " + a.getFileCount() + " files) was loaded and assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals (" + 100*a.getAssembledShortLiteralCount() / ((float)(a.getAssembledShortLiteralCount() + a.getMissedShortLiteralEstimate())) + "% of possible).\n");
+											os.write(file.getName() + " was loaded and assembled to " + dcpu.getID() + "'s RAM in " + (int)((stop-start)/1e6f) + " milliseconds using " + a.getPasses() + " sizing passes. Assembled size is " + a.getSize() + " words. " + a.getAssembledShortLiteralCount() + " values were optimized to short literals.\n");
 										} catch (Exception e) {
 											try {
 												e.printStackTrace();

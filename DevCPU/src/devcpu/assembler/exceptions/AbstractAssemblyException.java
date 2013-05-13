@@ -18,6 +18,6 @@ public abstract class AbstractAssemblyException extends Exception implements Ass
 	
 	@Override
 	public String getMessage() {
-		return "Assembly error: Something is wrong in one of the " + assembly.getLineCount() + " lines of your assembly. Too bad this particular error didn't include aaaaany information. Maybe you should go check to see if you have any labels spelled incorrectly or something. I don't know. What do I look like, a doctor?";
+		return "Assembly error: Something is wrong in one of the lines of your assembly. Too bad this particular error didn't include aaaaany information. Maybe you should go check to see if you have any labels spelled incorrectly or something. I don't know. What do I look like, a doctor?";
 	}
 }
