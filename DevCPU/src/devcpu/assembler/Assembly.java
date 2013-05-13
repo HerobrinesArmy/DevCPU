@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import devcpu.assembler.exceptions.AbstractAssemblyException;
 import devcpu.assembler.exceptions.BadValueException;
 import devcpu.assembler.exceptions.DirectiveExpressionEvaluationException;
-import devcpu.assembler.exceptions.DuplicateLabelDefinitionException;
 import devcpu.assembler.exceptions.OriginBacktrackException;
 import devcpu.assembler.exceptions.TokenizationException;
 import devcpu.assembler.exceptions.UndefinedLabelException;
@@ -28,7 +27,9 @@ import devcpu.assembler.exceptions.ValueResolutionException;
 import devcpu.assembler.expression.Address;
 import devcpu.assembler.expression.Group;
 import devcpu.assembler.preprocessor.DASMPreprocessor;
+import devcpu.assembler.preprocessor.PreprocessedLine;
 import devcpu.assembler.preprocessor.Preprocessor;
+import devcpu.assembler.preprocessor.PreprocessorResult;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.lexer.Lexer;
@@ -76,45 +77,91 @@ public class Assembly {
 	//TODO Add Error handling delegate of some sort; Also, these non-AAEs should be caught where they're generated and be handled or throw AAEs
 	public void assemble(DefaultControllableDCPU dcpu) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
-		preprocessor.preprocess(this);
-		if (true) return;//TODO REMOVE
-		System.out.println(timerReset() + "ms in Line Loading");
-		boolean preprocess = true;
+		PreprocessorResult result = preprocessor.preprocess(this);
+		System.out.println(timerReset() + "ms in Line Loading / Preprocessor");
+		createAssemblyLines(result);
+		System.out.println(timerReset() + "ms in Tokenizer / Analyzer");
+		gatherLabels();
+		System.out.println(timerReset() + "ms in Label Gathering");
 		int passes = 1;
-		while (preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		while (sizeAndLocate()){passes++;}
 		this.passes = passes;
-		System.out.println(timerReset() + "ms in Preprocessing");
+		System.out.println(timerReset() + "ms in Sizing and Positioning");
 		zeroBuffer(dcpu.ram);
 		System.out.println(timerReset() + "ms to zero RAM");
 		assembleToBuffer(dcpu.ram);
 		System.out.println(timerEnd() + "ms in Final Assembly");
 		dcpu.setAssembly(this);
 	}
-	
+
 	public void assemble(FloppyDisk disk) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException, IOException, CoreException {
 		timerStart();
-		rootDocument.readLines();
-		System.out.println(timerReset() + "ms in Line Loading");
-		boolean preprocess = true;
+		PreprocessorResult result = preprocessor.preprocess(this);
+		System.out.println(timerReset() + "ms in Line Loading / Preprocessor");
+		createAssemblyLines(result);
+		System.out.println(timerReset() + "ms in Tokenizer / Analyzer");
+		gatherLabels();
+		System.out.println(timerReset() + "ms in Label Gathering");
 		int passes = 1;
-		while (preprocessAndSize(preprocess)){preprocess = false; passes++;}
+		while (sizeAndLocate()){passes++;}
 		this.passes = passes;
-		System.out.println(timerReset() + "ms in Preprocessing");
+		System.out.println(timerReset() + "ms in Sizing and Positioning");
 		zeroBuffer(disk.data);
 		System.out.println(timerReset() + "ms to zero disk data");
 		assembleToBuffer(disk.data);
 		System.out.println(timerEnd() + "ms in Final Assembly");
 	}
 
-	private boolean preprocessAndSize(boolean preprocess) throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
-		//Note: Label collection can be done here now, but directives added later could necessitate
-		//moving this until after all preprocessing is done.
+	private void gatherLabels() throws TokenizationException {
+		String lastDefinedGlobalLabel = null;
+		for (AssemblyLine line : lines) {
+			for (LexerToken token : line.getProcessedTokens()) {
+				if (token instanceof LabelDefinitionToken) {
+					LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+					labelDefs.put(labelDef.getLabelName(), labelDef);
+					((LabelDefinitionToken) token).labelDef = labelDef;
+					if (!((LabelDefinitionToken) token).isLocal()) {
+						lastDefinedGlobalLabel = ((LabelDefinitionToken) token).getName();
+					}
+				} else if (token instanceof LabelToken) {
+					LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
+					((LabelToken) token).labelName = labelUse.getLabelName();
+					if (!labelUses.containsKey(labelUse.getLabelName())) {
+						labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
+					}
+					labelUses.get(labelUse.getLabelName()).add(labelUse);
+				} else if (token instanceof ErrorToken) {
+					throw new TokenizationException(line);
+				}
+			}
+		}
+		for (String label : labelDefs.keySet()) {
+			LabelDefinition def = labelDefs.get(label);
+			List<LabelUse> uses = labelUses.get(label);
+			if (uses != null) {
+				for (LabelUse use : uses) {
+					use.getToken().lineRef = def.getLine();
+				}
+			}
+		}
+	}
+
+	private void createAssemblyLines(PreprocessorResult result) {
+		try {
+			for (PreprocessedLine line : result.getPreprocessedLines()) {
+				lines.add(new AssemblyLine(line.getRawLine(), Lexer.get().generateTokens(line.text, true)));
+			}
+		} catch (AbstractAssemblyException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private boolean sizeAndLocate() throws AbstractAssemblyException, UnknownFunctionException, UnparsableExpressionException {
 		boolean accomplishedSomething = false;
 		boolean finished = true;
 		int oMin = 0;
 		int oMax = 0;
 		boolean exact = true;
-		String lastDefinedGlobalLabel = null;
 		for (AssemblyLine line : lines) {
 			if (exact) {
 				line.offset = oMin;
@@ -124,94 +171,31 @@ public class Assembly {
 				line.maxOffset = oMax;
 				line.offset = oMax;
 			}
-			if (preprocess) {
-				String pass = "";
-				boolean isDefine = false;
-				if (line.isDirective()) {
-					if (line.getDirective().isDefine()) {
-						isDefine = true;
-						pass = new Define(line.getDirective()).getKey();
-					}
-				}
-				boolean retokenize = false;
-				String text = line.getText();
-				line.preprocess();
+			if (line.unvaluedLabelTokens != 0) {
 				for (LexerToken token : line.getProcessedTokens()) {
-					if (token instanceof LabelDefinitionToken) {
-						LabelDefinition labelDef = new LabelDefinition(line, (LabelDefinitionToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
-						((LabelDefinitionToken)token).labelDef = labelDef;
-						if (!labelDef.isLocal()) {
-							lastDefinedGlobalLabel = labelDef.getLabelName();
+					if (token instanceof LabelToken) {
+						if (!((LabelToken) token).valueSet) {
+							if (!labelDefs.containsKey(((LabelToken) token).labelName)) {
+								throw new UndefinedLabelException(line, ((LabelToken) token).labelName, labelUses.get(((LabelToken) token).labelName));
+							}
+							if (labelDefs.get(((LabelToken) token).labelName).getLine().located) {
+								accomplishedSomething = true;
+								((LabelToken) token).value = labelDefs.get(((LabelToken) token).labelName).getLine().offset; //Setting it early
+								((LabelToken) token).valueSet = true;
+								line.unvaluedLabelTokens--;
+							}	
 						}
-						if (labelDefs.containsKey(labelDef.getLabelName())) {
-							throw new DuplicateLabelDefinitionException(this, labelDefs.get(labelDef.getLabelName()),labelDef);
-						}
-						labelDefs.put(labelDef.getLabelName(), labelDef);
+					} else if (token instanceof LabelDefinitionToken) {
 						if (exact) {
+							LabelDefinition labelDef = ((LabelDefinitionToken) token).labelDef;
 							if (labelUses.containsKey(labelDef.getLabelName())) {
 								for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
-									use.getToken().lineRef = labelDef.getLine();
 									use.getToken().value = line.offset;
 									use.getToken().valueSet = true;
 									use.getLine().unvaluedLabelTokens--;
 								}
 								labelUses.remove(labelDef.getLabelName());
-							}
-						} else {
-							if (labelUses.containsKey(labelDef.getLabelName())) {
-								for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
-									use.getToken().lineRef = labelDef.getLine();
-								}
-							}
-						}
-					} else if (token instanceof LabelToken) {
-						LabelUse labelUse = new LabelUse(line, (LabelToken) token, labelsCaseSensitive, lastDefinedGlobalLabel);
-						((LabelToken) token).labelName = labelUse.getLabelName();
-						if (labelDefs.containsKey(labelUse.getLabelName())) {
-							labelUse.getToken().lineRef = labelDefs.get(labelUse.getLabelName()).getLine();
-							if (labelDefs.get(labelUse.getLabelName()).getLine().located) {
-								((LabelToken) token).value = labelDefs.get(labelUse.getLabelName()).getLine().offset; //Setting it early
-								((LabelToken) token).valueSet = true;
-								line.unvaluedLabelTokens--;
-							}
-						} else {
-							if (!labelUses.containsKey(labelUse.getLabelName())) {
-								labelUses.put(labelUse.getLabelName(), new ArrayList<LabelUse>());
-							}
-							labelUses.get(labelUse.getLabelName()).add(labelUse);
-						}
-					} else if (token instanceof ErrorToken) {
-						throw new TokenizationException(line);
-					}
-					//TODO: Additional validity checks?
-				}
-			} else {
-				if (line.unvaluedLabelTokens != 0) {
-					for (LexerToken token : line.getProcessedTokens()) {
-						if (token instanceof LabelToken) {
-							if (!((LabelToken) token).valueSet) {
-								if (!labelDefs.containsKey(((LabelToken) token).labelName)) {
-									throw new UndefinedLabelException(line, ((LabelToken) token).labelName, labelUses.get(((LabelToken) token).labelName));
-								}
-								if (labelDefs.get(((LabelToken) token).labelName).getLine().located) {
-									accomplishedSomething = true;
-									((LabelToken) token).value = labelDefs.get(((LabelToken) token).labelName).getLine().offset; //Setting it early
-									((LabelToken) token).valueSet = true;
-									line.unvaluedLabelTokens--;
-								}	
-							}
-						} else if (token instanceof LabelDefinitionToken) {
-							if (exact) {
-								LabelDefinition labelDef = ((LabelDefinitionToken) token).labelDef;
-								if (labelUses.containsKey(labelDef.getLabelName())) {
-									for (LabelUse use : labelUses.get(labelDef.getLabelName())) {
-										use.getToken().value = line.offset;
-										use.getToken().valueSet = true;
-										use.getLine().unvaluedLabelTokens--;
-									}
-									labelUses.remove(labelDef.getLabelName());
-									accomplishedSomething = true;
-								}
+								accomplishedSomething = true;
 							}
 						}
 					}

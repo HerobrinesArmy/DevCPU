@@ -10,6 +10,7 @@ import devcpu.lexer.tokens.BValueEndToken;
 import devcpu.lexer.tokens.BasicOpCodeToken;
 import devcpu.lexer.tokens.DataToken;
 import devcpu.lexer.tokens.DirectiveParametersToken;
+import devcpu.lexer.tokens.DirectiveToken;
 import devcpu.lexer.tokens.GroupStartToken;
 import devcpu.lexer.tokens.LabelToken;
 import devcpu.lexer.tokens.LexerToken;
@@ -31,11 +32,10 @@ public class AssemblyLine {
 	public static final int VALUE_LITERAL = 7;
 	
 	//TODO Consider making these and other classes' fields public so they can be accessed directly in the interest of assembly speed
-	private String text;
-	private LexerToken[] sourceTokens;
+//	private String text;
 	private LexerToken[] processedTokens;
-	private AssemblyDocument document;
-	private int lineNumber;
+//	private AssemblyDocument document;
+//	private int lineNumber;
 	private Directive directive;
 	//Let's try out some public fields and see how we like them.
 	public int offset;
@@ -82,22 +82,20 @@ public class AssemblyLine {
 	//Set on Calculation
 	public char literalA;
 	public boolean literalASet;
-	private int documentOffset;
+	private RawLine rawLine;
 
-	public AssemblyLine(AssemblyDocument document, int lineNumber, String lineText, /*LexerToken[] tokens, */int documentOffset) {
-		this.document = document;
-		this.lineNumber = lineNumber;
-		this.text = lineText;
-//		this.processedTokens = this.sourceTokens = tokens;
-		this.documentOffset = documentOffset;
+	public AssemblyLine(RawLine rawLine, LexerToken[] processedTokens) throws BadValueException, TooManyRegistersInExpressionException {
+		this.rawLine = rawLine;
+		this.processedTokens = processedTokens;
+		analyze();
+	}
+	
+	public RawLine getRawLine() {
+		return rawLine;
 	}
 	
 	public String getText() {
-		return text;
-	}
-
-	public LexerToken[] getTokens() {
-		return sourceTokens;
+		return rawLine.getText();
 	}
 
 	public LexerToken[] getProcessedTokens() {
@@ -115,7 +113,14 @@ public class AssemblyLine {
 		}
 	}
 	
-	public void preprocess() throws BadValueException, TooManyRegistersInExpressionException {
+	public void analyze() throws BadValueException, TooManyRegistersInExpressionException {
+		for (LexerToken token : processedTokens) {
+			if (token instanceof DirectiveToken) {
+				directive = new Directive(this, (DirectiveToken) token);
+			} else if (token instanceof DirectiveParametersToken) {
+				directive.setParameters((DirectiveParametersToken)token);
+			}
+		}
 		if (!isDirective()) {
 			boolean inA = false;
 			int i = 0;
@@ -410,11 +415,11 @@ public class AssemblyLine {
 	}
 	
 	public AssemblyDocument getDocument() {
-		return document;
+		return rawLine.getDocument();
 	}
 
 	public int getLineNumber() {
-		return lineNumber;
+		return rawLine.getLineNumber();
 	}
 
 	public void setDirective(Directive directive) {
@@ -430,6 +435,6 @@ public class AssemblyLine {
 	}
 	
 	public int getDocumentOffset() {
-		return documentOffset;
+		return rawLine.getDocumentOffset();
 	}
 }

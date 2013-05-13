@@ -1,7 +1,6 @@
 package devcpu.assembler;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class AssemblyDocument {
 	private IFile file;
 	private Assembly assembly;
 	private AssemblyDocument parent;
-	private ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
+//	private ArrayList<AssemblyLine> lines = new ArrayList<AssemblyLine>();
 	private LinkedHashMap<Directive,AssemblyDocument> children = new LinkedHashMap<Directive, AssemblyDocument>();
 
 	public AssemblyDocument(IFile file, Assembly assembly, AssemblyDocument parent) {
@@ -103,9 +102,9 @@ public class AssemblyDocument {
 		return file;
 	}
 
-	public ArrayList<AssemblyLine> getLines() {
-		return lines;
-	}
+//	public ArrayList<AssemblyLine> getLines() {
+//		return lines;
+//	}
 
 	public Assembly getAssembly() {
 		return assembly;

@@ -58,8 +58,8 @@ public class KeyboardViewer {
 								Graphics2D g = (Graphics2D) canvas.getGraphics();
 								if (g != null) {
 									g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
+									g.dispose();
 								}
-								g.dispose();
 							}
 						}
 						Thread.sleep(16L);
