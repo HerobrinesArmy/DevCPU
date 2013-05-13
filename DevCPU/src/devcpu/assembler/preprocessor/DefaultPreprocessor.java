@@ -11,24 +11,9 @@ import devcpu.assembler.AssemblyDocument;
 import devcpu.assembler.RawLine;
 
 public class DefaultPreprocessor implements Preprocessor {
-//	private static String[] preprocessorDirectives = new String[]{
-//		//IMPLEMENTED
-//		"define", "equ", "def",
-//		"include", "import",
-//		"undef",
-//		"ifdef",
-//		"ifndef",
-//		/*"el", */"else",
-//		"endif",
-//NOT IMPLEMENTED
-//		"if",
-//		"elif", "elseif"
-//		};
 //private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|(un|ifn?)?def|equ|include|import|el(se)?(if)?|(end)?if)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
-	private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|equ|def|include|import|undef|ifn?def|if|elif|elseif|else|endif)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
+	private static final Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|equ|def|include|import|undef|ifn?def|if|elif|elseif|else|endif)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
 //	private Pattern uselessLinePattern = Pattern.compile("^\\s*(;.*)?$");
-	
-//	private LinkedHashMap<String,Define> defines = new LinkedHashMap<String, Define>();
 	
 	private Assembly assembly;
 
@@ -41,10 +26,11 @@ public class DefaultPreprocessor implements Preprocessor {
 		return assembly;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public PreprocessorResult preprocess(Assembly assembly) {
-		List<RawLine> rawLines = assembly.getLineLoader().readLines(assembly.getRootDocument());
-		List<RawLine> remainingLines = new ArrayList<RawLine>(rawLines);
+		List<RawLine> /*rawLines*/remainingLines = assembly.getLineLoader().readLines(assembly.getRootDocument());
+//		List<RawLine> remainingLines = new ArrayList<RawLine>(rawLines);
 		List<PreprocessedLine> lines = new ArrayList<PreprocessedLine>();
 		LinkedHashMap<Pattern,String> defines = new LinkedHashMap<Pattern, String>();
 		LinkedHashMap<String,Pattern> patterns = new LinkedHashMap<String, Pattern>();
