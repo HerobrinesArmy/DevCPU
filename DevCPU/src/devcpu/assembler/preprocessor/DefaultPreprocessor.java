@@ -9,10 +9,12 @@ import java.util.regex.Pattern;
 import devcpu.assembler.Assembly;
 import devcpu.assembler.AssemblyDocument;
 import devcpu.assembler.RawLine;
+import devcpu.lexer.Lexer;
 
 public class DefaultPreprocessor implements Preprocessor {
 //private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|(un|ifn?)?def|equ|include|import|el(se)?(if)?|(end)?if)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
 	private static final Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|equ|def|include|import|undef|ifn?def|if|elif|elseif|else|endif)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
+	private static final Pattern definePattern = Pattern.compile("\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
 //	private Pattern uselessLinePattern = Pattern.compile("^\\s*(;.*)?$");
 	
 	private Assembly assembly;
@@ -102,7 +104,7 @@ public class DefaultPreprocessor implements Preprocessor {
 							//TODO Currently, things like '#define def #define' and '#define in #include' will not work as a person may hope.
 							//Rather than doing macro replacement on params, consider doing it on every line, and using negative lookbehinds
 							//in the regexp to avoid replacing a previously defined macro in a re-define, ifdef, ifndef, or undef
-							Matcher matcher = Define.pattern.matcher(params);
+							Matcher matcher = definePattern.matcher(params);
 							if (matcher.find() && matcher.start() == 0) {
 								String key = matcher.group(1);
 								String value = matcher.group(2);
