@@ -9,10 +9,10 @@ import org.eclipse.core.runtime.CoreException;
 
 import devcpu.util.CountingLineReader;
 
-public class DASMLineLoader implements LineLoader {
+public class DefaultLineLoader implements LineLoader {
 	private Assembly assembly;
 
-	public DASMLineLoader(Assembly assembly) {
+	public DefaultLineLoader(Assembly assembly) {
 		this.assembly = assembly;
 	}
 

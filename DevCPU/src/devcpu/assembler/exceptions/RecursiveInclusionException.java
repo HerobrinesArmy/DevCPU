@@ -2,21 +2,12 @@ package devcpu.assembler.exceptions;
 
 import org.eclipse.core.resources.IFile;
 
-import devcpu.assembler.Include;
-
-public class RecursiveInclusionException extends AbstractDirectiveException {
+public class RecursiveInclusionException extends Exception {
 	private static final long serialVersionUID = 1L;
-	private Include include;
 	private IFile file;
 
-	public RecursiveInclusionException(Include include, IFile file) {
-		super(include.getDirective());
-		this.include = include;
+	public RecursiveInclusionException(IFile file) {
 		this.file = file;
-	}
-
-	public Include getInclude() {
-		return include;
 	}
 
 	public IFile getFile() {
@@ -25,6 +16,6 @@ public class RecursiveInclusionException extends AbstractDirectiveException {
 	
 	@Override
 	public String getMessage() {
-		return "Infinitely recursive inclusion error at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
+		return "Infinitely recursive inclusion error for " + file.getFullPath().toOSString();//at " + directive.getLine().getDocument().getFile().getName() + ", Line " + directive.getLine().getLineNumber() + ": " + directive.getLine().getText();
 	}
 }

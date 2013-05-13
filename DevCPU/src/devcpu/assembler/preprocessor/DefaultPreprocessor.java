@@ -10,7 +10,7 @@ import devcpu.assembler.Assembly;
 import devcpu.assembler.AssemblyDocument;
 import devcpu.assembler.RawLine;
 
-public class DASMPreprocessor implements Preprocessor {
+public class DefaultPreprocessor implements Preprocessor {
 //	private static String[] preprocessorDirectives = new String[]{
 //		//IMPLEMENTED
 //		"define", "equ", "def",
@@ -32,7 +32,7 @@ public class DASMPreprocessor implements Preprocessor {
 	
 	private Assembly assembly;
 
-	public DASMPreprocessor(Assembly assembly) {
+	public DefaultPreprocessor(Assembly assembly) {
 		this.assembly = assembly;
 	}
 	
@@ -162,7 +162,7 @@ public class DASMPreprocessor implements Preprocessor {
 			replaceMacros(line, defines);
 			//System.out.println(line.text);
 		}
-		return new DASMPreprocessorResult(/*rawLines, */lines);
+		return new DefaultPreprocessorResult(/*rawLines, */lines);
 	}
 
 	private void replaceMacros(PreprocessedLine line, LinkedHashMap<Pattern,String> defines) {

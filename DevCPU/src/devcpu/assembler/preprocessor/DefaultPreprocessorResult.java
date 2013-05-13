@@ -2,11 +2,11 @@ package devcpu.assembler.preprocessor;
 
 import java.util.List;
 
-public class DASMPreprocessorResult implements PreprocessorResult {
+public class DefaultPreprocessorResult implements PreprocessorResult {
 //	private List<RawLine> rawLines;
 	private List<PreprocessedLine> preprocessedLines;
 
-	public DASMPreprocessorResult(/*List<RawLine> rawLines,	*/List<PreprocessedLine> preprocessedLines) {
+	public DefaultPreprocessorResult(/*List<RawLine> rawLines,	*/List<PreprocessedLine> preprocessedLines) {
 //		this.rawLines = rawLines;
 		this.preprocessedLines = preprocessedLines;
 	}
