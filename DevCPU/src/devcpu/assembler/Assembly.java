@@ -838,6 +838,9 @@ public class Assembly {
 	}
 
 	public int getSize() {
+		if (lines.size() == 0) {
+			return 0;
+		}
 		AssemblyLine lastLine = lines.get(lines.size()-1);
 		return lastLine.offset + lastLine.size;
 	}

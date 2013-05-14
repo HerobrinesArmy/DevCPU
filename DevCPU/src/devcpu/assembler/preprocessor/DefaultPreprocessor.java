@@ -14,10 +14,8 @@ import devcpu.lexer.Lexer;
 public class DefaultPreprocessor implements Preprocessor {
 //private Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|(un|ifn?)?def|equ|include|import|el(se)?(if)?|(end)?if|macro)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
 	private static final Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](define|equ|def|include|import|undef|ifn?def|if|elif|elseif|else|endif|macro)\\b[\\s\\,]*([^;\\r\\n]*?)\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
-//	private static final Pattern preprocessorDirectivePattern = Pattern.compile("^\\s*[#\\.](?i:macro)\\b[\\s\\,]*(\b[a-zA-Z_][a-zA-Z_0-9]*\b)\s*(\(\s*(\b[a-zA-Z_][a-zA-Z_0-9]*\b(\s*\,\s*\b[a-zA-Z_][a-zA-Z_0-9]*\b)*)?\))?\s*\{?\\s*(;.*)?$",Pattern.CASE_INSENSITIVE);
-	private static final Pattern definePattern = Pattern.compile("\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
+	private static final Pattern definePattern = Pattern.compile("^\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*([^;\\r\\n]*)");
 	private static final Pattern macroPattern = Pattern.compile("^\\s*(" + Lexer.REGEX_IDENTIFIER + ")\\s*(\\(\\s*(" + Lexer.REGEX_IDENTIFIER + "(\\s*\\,\\s*" + Lexer.REGEX_IDENTIFIER + ")*)?\\))?\\s*\\{?$");
-//	private Pattern uselessLinePattern = Pattern.compile("^\\s*(;.*)?$");
 	
 	private Assembly assembly;
 
@@ -33,9 +31,9 @@ public class DefaultPreprocessor implements Preprocessor {
 	@SuppressWarnings("unused")
 	@Override
 	public PreprocessorResult preprocess(Assembly assembly) {
-		System.out.println(macroPattern.pattern());
 		List<RawLine> remainingLines = assembly.getLineLoader().readLines(assembly.getRootDocument());
 		List<PreprocessedLine> lines = new ArrayList<PreprocessedLine>();
+		ArrayList<PreprocessedLine> finalLines = new ArrayList<PreprocessedLine>();
 		LinkedHashMap<Pattern,String> defines = new LinkedHashMap<Pattern, String>();
 		LinkedHashMap<String,Pattern> patterns = new LinkedHashMap<String, Pattern>();
 		LinkedHashMap<Pattern,Macro> macros = new LinkedHashMap<Pattern, Macro>();
@@ -110,14 +108,12 @@ public class DefaultPreprocessor implements Preprocessor {
 							currentLevel--;
 						} else if (scopedLevel == currentLevel) {
 							if ("DEFINE".equals(name) || "EQU".equals(name) || "DEF".equals(name)) {
-								//TODO Check to see if we're handling value(param)-less defines. 
-								//The regex suggests that we are since the separator and the params group use *.
 								params = replaceDefines(params, defines);
 								//TODO Currently, things like '#define def #define' and '#define in #include' will not work as a person may hope.
 								//Rather than doing macro replacement on params, consider doing it on every line, and using negative lookbehinds
 								//in the regexp to avoid replacing a previously defined macro in a re-define, ifdef, ifndef, or undef
 								Matcher matcher = definePattern.matcher(params);
-								if (matcher.find() && matcher.start() == 0) {
+								if (matcher.find()) {
 									String key = matcher.group(1);
 									String value = matcher.group(2);
 									Pattern pattern = Pattern.compile("\\b"+/*Pattern.quote(*/key/*)*/+"\\b");
@@ -146,7 +142,7 @@ public class DefaultPreprocessor implements Preprocessor {
 								break;
 							} else if ("MACRO".equals(name)) {
 								Matcher matcher = macroPattern.matcher(params);
-								if (matcher.find()) { // && matcher.start() == 0) {
+								if (matcher.find()) {
 									String macroName = matcher.group(1);
 									String macroParams = matcher.group(3);
 									inMacro = new Macro(macroName, macroParams);
@@ -187,7 +183,6 @@ public class DefaultPreprocessor implements Preprocessor {
 				}
 			}
 		}
-		ArrayList<PreprocessedLine> finalLines = new ArrayList<PreprocessedLine>();
 		for (PreprocessedLine line : lines) {
 			for (Pattern pattern : macros.keySet()) {
 				Matcher matcher = pattern.matcher(line.text);
@@ -209,11 +204,12 @@ public class DefaultPreprocessor implements Preprocessor {
 				}
 			}
 			replaceDefines(line, defines);
+			finalLines.add(line);
 		}
 //		for (PreprocessedLine l : finalLines) {
 //			System.out.println(l.text);
 //		}
-		return new DefaultPreprocessorResult(/*rawLines, */lines);
+		return new DefaultPreprocessorResult(/*rawLines, */finalLines);
 	}
 
 	private void replaceDefines(PreprocessedLine line, LinkedHashMap<Pattern,String> defines) {
