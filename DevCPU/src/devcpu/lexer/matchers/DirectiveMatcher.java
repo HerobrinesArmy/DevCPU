@@ -27,12 +27,18 @@ public class DirectiveMatcher implements LexerTokenMatcher {
 		//Preprocessor
 		allowedDirectives.add("include");
 		allowedDirectives.add("import");
+		allowedDirectives.add("macro");
 		allowedDirectives.add("define");
 		allowedDirectives.add("def");
 		allowedDirectives.add("equ");
 		allowedDirectives.add("undef");
 		allowedDirectives.add("ifdef");
 		allowedDirectives.add("ifndef");
+//		allowedDirectives.add("if");
+//		allowedDirectives.add("elif");
+//		allowedDirectives.add("elseif");
+		allowedDirectives.add("else");
+		allowedDirectives.add("endif");
 		
 		//Assembler
 		allowedDirectives.add("origin");
