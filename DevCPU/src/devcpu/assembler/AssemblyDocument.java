@@ -27,75 +27,6 @@ public class AssemblyDocument {
 
 	public List<RawLine> readLines() throws IOException, CoreException, AbstractAssemblyException {
 		return assembly.getLineLoader().readLines(this);
-/*		//TODO Don't include in assembly time the time spent prompting user to save
-		UIJob promptJob = new UIJob("Promp to save changes") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				return IDE.saveAllEditors(new IResource[]{file}, true) ? Status.OK_STATUS : Status.CANCEL_STATUS;
-			}
-			@Override
-			public boolean belongsTo(Object family) {
-				return AssemblyDocument.this.equals(family);
-			}
-		};
-		promptJob.schedule();
-		try {
-			UIJob.getJobManager().join(this, null);
-		} catch (OperationCanceledException e) {
-			//TODO
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			//TODO
-			e.printStackTrace();
-		}
-		
-		CountingLineReader isr = new CountingLineReader(new InputStreamReader(file.getContents(true)));
-		String lineText = null;
-		int n = 0;
-		while((lineText=isr.readLine()) != null) {
-			AssemblyLine line = null;
-			String text = lineText;
-			++n;
-//			boolean tokenize = true;
-//			while (tokenize) {
-				line = new AssemblyLine(this, n, text, isr.getLastLineOffset());
-//				tokenize = false;
-//				Directive directive = null;
-//				for (LexerToken token : line.getTokens()) {
-//					if (token instanceof DirectiveToken) {
-//						directive = new Directive(line, (DirectiveToken) token);
-//					} else if (token instanceof DirectiveParametersToken) {
-//						directive.setParameters((DirectiveParametersToken)token);
-//						line.setDirective(directive);
-//						if (directive.isInclude()) {
-//							AssemblyDocument doc = loadInclude(new Include(directive));
-//							children.put(directive,doc);
-//							doc.readLines();
-//						} else if (directive.isDefine()) {
-//							for (String key : assembly.defines.keySet()) {
-//								//TODO Even this won't catch the bizarre case where the directive name itself is specified by an earlier define
-//								//TODO This has slowed down the assembly. Consider switching it back and detecting the case in preprocssAndSize, and doing an additional preprocess=true pass if it happens.
-//								//TODO Yeah, screw that. Just make a normal preprocessor and be done with it
-//								Pattern pattern = Pattern.compile("\\b"+Pattern.quote(key)+"\\b");
-//								if (pattern.matcher(text).find()) {
-//									tokenize = true;
-//									text = text.replaceAll(pattern.pattern(), assembly.defines.get(key).getValue());
-//								}
-//							}
-//							if (tokenize) {
-//								line.setProcessedTokens(Lexer.get().generateTokens(text, true));
-//							} else {
-//								Define define = new Define(directive);
-//								assembly.defines.put(define.getKey(), define);
-//							}
-//						}
-//					}
-//				}
-//			}
-			lines.add(line); 
-			assembly.lines.add(line);
-		}
-		isr.close();*/
 	}
 
 	public IFile getFile() {
@@ -125,11 +56,11 @@ public class AssemblyDocument {
 	public AssemblyDocument loadChild(String path) { // throws AbstractAssemblyException, IOException, CoreException {
 		IFile includeFile = locate(path);
 		if (includeFile == null) {
-//			throw new IncludeFileNotFoundException(include);
+//			throw new IncludeFileNotFoundException(path);
 			return null;
 		}
 		if (checkForAncestor(includeFile)) {
-//			throw new RecursiveInclusionException(include, includeFile);
+//			throw new RecursiveInclusionException(includeFile);
 			return null;
 		}
 		AssemblyDocument doc = new AssemblyDocument(includeFile, assembly, this);
