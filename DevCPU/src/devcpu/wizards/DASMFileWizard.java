@@ -66,7 +66,7 @@ public class DASMFileWizard extends Wizard implements INewWizard {
 		IResource resource = root.findMember(new Path(containerName));
 		final String contents = "; *************************\n; Project: " + resource.getProject().getName() + "\n; File: " + fileName + "\n; *************************\n";
 		if (!resource.exists() || !(resource instanceof IContainer)) {
-			throwCoreException("Container \"" + containerName + "\" does not exist.");
+			throw CoreException("Container \"" + containerName + "\" does not exist.");
 		}
 		IContainer container = (IContainer) resource;
 		final IFile file = container.getFile(new Path(fileName));
