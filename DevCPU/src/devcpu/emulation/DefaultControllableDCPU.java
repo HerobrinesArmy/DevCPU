@@ -47,44 +47,8 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		doInitDebugEnvironment();
 	}
 
-//	@SuppressWarnings("unused")
 	private void doInitDebugEnvironment() {
 			this.uid = Activator.getShip().getDCPUManager().assignUniqueID(this);
-//			IWorkbenchPage page =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//
-//		  if (page != null)
-//
-//		  {
-//
-//		     try
-//
-//		     {
-//
-//		    	 IViewPart view = page.showView("org.eclipse.debug.ui.MemoryView"); 
-//
-//		        IMemoryRenderingSite memoryView = (IMemoryRenderingSite) view; 
-//		        IMemoryBlockExtension mbe = new DCPUMemoryBlock(this); 
-//		        DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {mbe}); 
-//
-//		        IMemoryRenderingType renderingType = DebugUITools.getMemoryRenderingManager().getRenderingType("org.eclipse.debug.ui.rendering.hexint"); 
-//		        IMemoryRendering rendering = renderingType.createRendering(); 
-//
-//		        IMemoryRenderingContainer container = memoryView.getContainer(DebugUIPlugin.getUniqueIdentifier() + ".MemoryView.RenderingViewPane.1"); 
-//
-//		        rendering.init(container, mbe);
-//		        
-//		        container.addMemoryRendering(rendering);	
-//		       }
-//		       catch (Exception e) {e.printStackTrace();}
-//		  }
-
-//			MemoryView view = (MemoryView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.eclipse.debug.ui.MemoryView");;
-//			DebugPlugin.getDefault().getMemoryBlockManager().addMemoryBlocks(new IMemoryBlock[] {new DCPUMemoryBlock(new DCPUDebugTarget(launch), "0", new BigInteger("0"))});
-			
-//		System.out.println(view.getMemoryRenderingContainers().length);
-//		view.getMemoryRenderingContainers()[0].
-//		MemoryRenderingManager mgr = (MemoryRenderingManager) MemoryRenderingManager.getDefault();
-//		IMemoryRendering rendering = mgr.createRendering("org.eclipse.debug.ui.rendering.hexint");
 	}
 
 	@Override
@@ -227,7 +191,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		      		if (!suspend) {
 		      			suspended = false;
 		      			nextTime = System.nanoTime() + nsPerFrame;
-		      			//TODO analyze how this might affect hardware getting ticked at the correct time and consider alternet looping metric if there's a problem
+		      			//TODO analyze how this might affect hardware getting ticked at the correct time and consider alternate looping metric if there's a problem
 		      		}
 		      	}
 		      	if (keepAlive) {
@@ -307,7 +271,7 @@ public class DefaultControllableDCPU extends DCPU implements Identifiable { //, 
 		    	hw.powerOff();
 		    }
 			}
-		}).start();		
+		}).start();
 	}
 
 	public void stop() {

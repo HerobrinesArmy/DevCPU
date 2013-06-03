@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.compare,
  org.eclipse.ui.console,
- org.eclipse.egit.ui,
+ org.eclipse.egit.ui;resolution:=optional,
  org.eclipse.mylyn.github.ui;resolution:=optional,
  org.eclipse.ui.ide.application,
  org.eclipse.debug.ui

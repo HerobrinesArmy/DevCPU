@@ -80,7 +80,7 @@
       <view
             allowMultiple="false"
             class="devcpu.views.hex.HexView"
-            id="HexView"
+            id="devcpu.hexview"
             name="HexView">
       </view>
 <!--      <view

@@ -39,13 +39,14 @@ class HexTextBox extends BinaryTextBox {
 	}
 
 	public void appendRow(IDataProvider idp, int row, boolean isLastRow) {
-		int words = idp.getData(rowTemp,row);
+		int words = idp.getData(rowTemp, row);
+		idp.addStyles(styleRanges, row, sbTemp.length());
 		Color red = Display.getDefault().getSystemColor(SWT.COLOR_RED);
 		for (int i = 0; i < words; i++) {
 			Character w = rowTemp[i];
 			if (w == null) {
-				styleRanges.add(new StyleRange(sbTemp.length(),2,null,red));
-				sbTemp.append("??");
+				styleRanges.add(new StyleRange(sbTemp.length(),4,null,red));
+				sbTemp.append("????");
 			} else {
 				sbTemp.append(WORD_2_STR[w & 0xFFFF]);
 			}

@@ -22,6 +22,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
@@ -42,6 +45,8 @@ import devcpu.managers.DCPUManager;
 import devcpu.managers.FloppyManager;
 import devcpu.managers.HardwareManager;
 import devcpu.util.Util;
+import devcpu.views.hex.DCPUMemoryDataProvider;
+import devcpu.views.hex.HexView;
 
 public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
@@ -291,6 +296,19 @@ public class DeviceManagerView extends ViewPart {
       	  menuMgr.add(hardwareMenu);
         } else if (o instanceof DefaultControllableDCPU) {
         	final DefaultControllableDCPU dcpu = (DefaultControllableDCPU) o;
+ 	    		manager.add(new Action("View RAM") {
+  	    		public void run() {
+  	    			try {
+								IViewPart v = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(HexView.VIEW_ID, dcpu.getID(), IWorkbenchPage.VIEW_CREATE);
+								HexView hv = (HexView) v;
+								hv.setDataProvider(new DCPUMemoryDataProvider(dcpu));
+							} catch (PartInitException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+  	    			treeViewer.refresh();
+  	    		};
+  	    	});
 	    		if (dcpu.isRunning()) {
 	    			manager.add(new Action("Stop") {
 	    				@Override
@@ -317,7 +335,7 @@ public class DeviceManagerView extends ViewPart {
     	    			treeViewer.refresh();
     	    		};
     	    	});
-	    			manager.add(new Action("Clear RAM") {
+	 	    		manager.add(new Action("Clear RAM") {
 	  	    		public void run() {
 	  	    			for (int i = 0; i < 65536; i++) {
 	  	    				dcpu.ram[i] = 0;
@@ -443,8 +461,7 @@ public class DeviceManagerView extends ViewPart {
 						MappedView<DefaultControllableDCPU> view = ViewMapper.getFirstView(dcpu);
 						if (view == null) {
 							try {
-								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(
-										ViewMapper.createMappedView(dcpu, DCPUView.ID));
+								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(ViewMapper.createMappedView(dcpu, DCPUView.ID));
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}	
@@ -456,8 +473,7 @@ public class DeviceManagerView extends ViewPart {
 						MappedView<VirtualMonitor> view = ViewMapper.getFirstView(vm);
 						if (view == null) {
 							try {
-								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(
-										ViewMapper.createMappedView(vm, LEM1802View.ID));
+								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(ViewMapper.createMappedView(vm, LEM1802View.ID));
 							} catch (Exception e1) {
 								e1.printStackTrace();
 							}	

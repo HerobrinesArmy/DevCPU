@@ -35,6 +35,7 @@ public class HexViewer extends Composite {
 	private int selectStartWord; // selection start
 	private int selectEndWord; // selection end
 	private int wordsPerRow; // number of words in a row to show
+	private boolean keepAlive;
 	
 	public HexViewer(Composite parent, int style, IDataProvider idp, int wordsPerRow) {
 		super(parent,style);
@@ -61,15 +62,28 @@ public class HexViewer extends Composite {
 		selectStartWord = 0;
 		selectEndWord = 0;
 		this.addControlListener(new ControlListener() {
-			public void controlMoved(ControlEvent e) {				
+			public void controlMoved(ControlEvent e) {
 				doResizeCalc();
 			}
 			
 			public void controlResized(ControlEvent e) {
 				doResizeCalc();				
-			}					
+			}
 		});
-		doResizeCalc();		
+		doResizeCalc();
+		keepAlive = true;
+		final Display display = parent.getDisplay();
+		Runnable timer = new Runnable() {
+      public void run() {
+      	if (HexViewer.this.idp != null) {
+    			HexViewer.this.idp.frameUpdate(HexViewer.this);
+      	}
+      	if (keepAlive) {
+      		display.timerExec(16, this);
+      	}
+      }
+    };
+    display.timerExec(16, timer);
 	}
 
 	/// on resize, recalculate sizes, and draw what necessary.
@@ -269,5 +283,23 @@ public class HexViewer extends Composite {
 	
 	public Color getForeground() {
 		return this.forecolor;
+	}
+
+	public void refresh() {
+		//doResizeCalc();
+		showData();
+		//showSelection();
+	}
+	
+	public void fullRefresh() {
+		doResizeCalc();
+		showData();
+		showSelection();
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		keepAlive = false;
 	}
 }

@@ -1,27 +1,28 @@
 package devcpu.views.hex;
 
-import org.eclipse.swt.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
-import devcpu.Activator;
-
 public class HexView extends ViewPart {
-	
-	private IDataProvider idp;
+	public static final String VIEW_ID = "devcpu.hexview";
 	private HexViewer hv;
 		
 	public HexView() {
 		super();
-		idp = new DCPUMemoryDataProvider(Activator.getShip().getDCPUManager().getDCPUs().get(0));
+		//idp = new DCPUMemoryDataProvider(Activator.getShip().getDCPUManager().getDCPUs().get(0));
 	}
-			
-	/// creates all the widgets, and registers some events
+	
 	public void createPartControl(Composite parent) {
-		hv = new HexViewer(parent,SWT.NONE,idp,8);
+		hv = new HexViewer(parent,SWT.NONE,null,8);
+	}
+	
+	public void setDataProvider(IDataProvider dp)
+	{
+		hv.setDataProvider(dp);
 	}
 
 	public void setFocus() {
-		hv.setDataProvider(idp);
-	}	
+		hv.fullRefresh();
+	}
 }

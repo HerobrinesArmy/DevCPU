@@ -244,10 +244,10 @@ public class DCPU
   public void tick() {
     cycles++;
 
-    if (disassemble)
-    {
-    	System.out.println((pc < 0x1000 ? "0" : "") + (pc < 0x100 ? "0" : "") + Integer.toHexString(pc) + ": " + disassemble(ram, pc));
-    }
+//    if (disassemble)
+//    {
+//    	System.out.println((pc < 0x1000 ? "0" : "") + (pc < 0x100 ? "0" : "") + Integer.toHexString(pc) + ": " + disassemble(ram, pc));
+//    }
     
     if (isOnFire) {
 //      cycles += 10; //Disabled to match speed of crashing seen in livestreams
@@ -628,5 +628,60 @@ public class DCPU
 		synchronized (hardware) {
 			return new ArrayList<DCPUHardware>(hardware);
 		}
+	}
+	
+	public void run()
+	{
+//		keepAlive = true;
+//		(new Thread() {
+//			@Override
+//			public void run() {
+//				for (DCPUHardware hw : hardware) {
+//		    	hw.powerOn();
+//		    }
+//				opcounts = new int[64];
+//		    int hz = 1000 * khz;
+//		    int cyclesPerFrame = hz / 60 + 1;
+
+//		    long nsPerFrame = 16666666L;
+//		    long nextTime = System.nanoTime();
+//				long totalCycles = 0;
+		    while (true) {
+//		      while (System.nanoTime() < nextTime) {
+//		       try {
+//		          Thread.sleep(1L);
+//		        } catch (InterruptedException e) {
+//		          e.printStackTrace();
+//		        }
+//		      }
+		    	long start = System.nanoTime();
+		      while (cycles < 1000000000) {
+		        tick();
+		      }
+//		      tickHardware();
+		      long finish = System.nanoTime();
+		      System.out.println(finish-start);
+		      cycles -= 1000000000;//cyclesPerFrame;
+//		      totalCycles += 1000000;
+		     // nextTime += nsPerFrame;
+		    }
+//		    pc = 0;
+//		    sp = 0;
+//		    ex = 0;
+//		    ia = 0;
+//		    registers = new char[8];
+//		    cycles = 0;
+//		    stop = false;
+//		    isSkipping = false;
+//		    isOnFire = false;
+//		    queueingEnabled = false;
+//		    interrupts = new char[256];
+//		    ip = 0;
+//		    iwp = 0;
+//			}
+//		}).start();
+	}
+	public static void main(String[] args) {
+		new DCPU().run();
 	}
 }
