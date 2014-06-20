@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="devcpu.preprocessors" name="Preprocessors" schema="schema/devcpu.preprocessors.exsd"/>
+   <extension-point id="devcpu.hardware" name="Hardware" schema="schema/devcpu.hardware.exsd"/>
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
@@ -80,7 +82,7 @@
       <view
             allowMultiple="false"
             class="devcpu.views.hex.HexView"
-            id="devcpu.hexview"
+            id="HexView"
             name="HexView">
       </view>
 <!--      <view
@@ -506,6 +508,71 @@
       <super
             type="org.eclipse.debug.core.breakpointMarker">
       </super>
+   </extension>
+   <extension
+         point="devcpu.preprocessors">
+      <preprocessor
+            class="devcpu.assembler.preprocessor.DefaultPreprocessor"
+            name="Default Preprocessor"
+            preprocessorId="devcpu.defaultpreprocessor">
+      </preprocessor>
+   </extension>
+   <extension
+         point="devcpu.hardware">
+      <hardware
+            class="devcpu.emulation.VirtualMonitor"
+            hardwareId="devcpu.lem1802"
+            icon="icons/lem.png"
+            id="devcpu.lem1802"
+            name="LEM1802">
+         <hardwareView
+               class="devcpu.views.LEM1802View"
+               viewId="devcpu.views.LEM1802View">
+         </hardwareView>
+      </hardware>
+      <hardware
+            class="devcpu.emulation.VirtualKeyboard"
+            hardwareId="devcpu.keyboard"
+            icon="icons/keyboard.png"
+            id="devcpu.keyboard"
+            name="Generic Keyboard">
+         <hardwareView
+               class="devcpu.views.KeyboardView"
+               viewId="devcpu.views.KeyboardView">
+         </hardwareView>
+      </hardware>
+      <hardware
+            class="devcpu.emulation.VirtualClock"
+            hardwareId="devcpu.clock"
+            icon="icons/clock.png"
+            id="devcpu.clock"
+            name="Generic Clock">
+      </hardware>
+      <hardware
+            class="devcpu.emulation.VirtualVectorDisplay"
+            hardwareId="devcpu.sped3"
+            icon="icons/sped.png"
+            id="devcpu.sped3"
+            name="SPED-3">
+         <hardwareView
+               class="devcpu.views.SPED3View"
+               viewId="devcpu.views.SPED3View">
+         </hardwareView>
+      </hardware>
+      <hardware
+            class="devcpu.emulation.VirtualSleepChamber"
+            hardwareId="devcpu.spc2000"
+            icon="icons/spc.png"
+            id="devcpu.spc2000"
+            name="SPC2000">
+      </hardware>
+      <hardware
+            class="devcpu.emulation.VirtualFloppyDrive"
+            hardwareId="devcpu.m35fd"
+            icon="icons/fd.png"
+            id="devcpu.m35fd"
+            name="M35FD">
+      </hardware>
    </extension>
 <!--    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
