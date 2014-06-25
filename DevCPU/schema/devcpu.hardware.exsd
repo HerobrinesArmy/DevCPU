@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="hardware"/>
+            <element ref="device"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,10 +47,10 @@
       </complexType>
    </element>
 
-   <element name="hardware">
+   <element name="device">
       <complexType>
          <choice>
-            <element ref="hardwareView"/>
+            <element ref="hardwareView" minOccurs="0" maxOccurs="1"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
