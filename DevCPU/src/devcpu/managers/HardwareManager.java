@@ -2,6 +2,9 @@ package devcpu.managers;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+
 import devcpu.ViewMapper;
 import devcpu.emulation.AWTKeyMapping;
 import devcpu.emulation.DCPUHardware;
@@ -120,5 +123,29 @@ public class HardwareManager {
 			view.mapTo(null);
 		}
 		devices.remove(hardware);
+	}
+
+	public int nextId() {
+		return id++;
+	}
+
+	public DCPUHardware createHardware(IConfigurationElement element) {
+		try {
+			Object o = element.createExecutableExtension("class");
+			if (o instanceof DCPUHardware)
+			{
+				DCPUHardware hw = (DCPUHardware) o;
+				hw.setID(element.getAttribute("name") + " " + id++);
+				devices.add(hw);
+				return hw;
+			}
+			else
+			{
+				//TODO: Exception?
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

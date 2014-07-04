@@ -38,6 +38,10 @@ public class VirtualKeyboard extends DCPUHardware
 		this("Generic Keyboard", null, keyMapping);
 	}
 	
+	public VirtualKeyboard() {
+		this(new AWTKeyMapping(true)); //TODO support options
+	}
+	
 	public boolean isPowered() {
 		return powered;
 	}

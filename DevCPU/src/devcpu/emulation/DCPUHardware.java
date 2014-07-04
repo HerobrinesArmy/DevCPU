@@ -2,7 +2,7 @@ package devcpu.emulation;
 
 import java.util.Random;
 
-public abstract class DCPUHardware implements Identifiable
+public abstract class DCPUHardware implements IHardware
 {
   public static final int TYPE_LEM = 0x7349F615;
   public static final int TYPE_KEYBOARD = 0x30CF7406;

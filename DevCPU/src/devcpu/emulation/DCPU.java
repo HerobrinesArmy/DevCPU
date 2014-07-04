@@ -526,10 +526,13 @@ public class DCPU
   public void interrupt(char a)
   {
     interrupts[iwp = iwp + 1 & 0xFF] = a;
-    if (iwp == ip) isOnFire = true;
+    if (iwp == ip) {
+    	isOnFire = true;
+    }
   }
 
-  private String disassemble(char[] ram, char pcc)
+  @SuppressWarnings("unused")
+	private String disassemble(char[] ram, char pcc)
   {
     char opc = pc;
     try {

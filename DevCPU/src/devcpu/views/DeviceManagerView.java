@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -27,6 +31,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.eclipse.ui.internal.util.BundleUtility;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
@@ -35,11 +40,9 @@ import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
 import devcpu.emulation.Identifiable;
-import devcpu.emulation.VirtualClock;
 import devcpu.emulation.VirtualFloppyDrive;
 import devcpu.emulation.VirtualKeyboard;
 import devcpu.emulation.VirtualMonitor;
-import devcpu.emulation.VirtualSleepChamber;
 import devcpu.emulation.VirtualVectorDisplay;
 import devcpu.managers.DCPUManager;
 import devcpu.managers.FloppyManager;
@@ -48,6 +51,7 @@ import devcpu.util.Util;
 import devcpu.views.hex.DCPUMemoryDataProvider;
 import devcpu.views.hex.HexView;
 
+@SuppressWarnings("restriction")
 public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
 	private TreeViewer treeViewer;
@@ -224,72 +228,40 @@ public class DeviceManagerView extends ViewPart {
       	  hardwareMenu.addMenuListener(new IMenuListener() {
       	    @Override
       	    public void menuAboutToShow(IMenuManager manager) {
-      	    	manager.add(new Action("Generic Clock") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/clock.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualClock vc = hardwareManager.createVirtualClock();
-      	    			treeViewer.expandToLevel(vc, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
-      	    	manager.add(new Action("Generic Keyboard") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/keyboard.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualKeyboard vk = hardwareManager.createVirtualKeyboard();
-      	    			treeViewer.expandToLevel(vk, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
-      	    	manager.add(new Action("LEM1802") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/lem.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualMonitor vm = hardwareManager.createVirtualMonitor();
-      	    			treeViewer.expandToLevel(vm, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
-      	    	manager.add(new Action("M35FD") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/fd.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualFloppyDrive vfd = hardwareManager.createVirtualFloppyDrive();
-      	    			treeViewer.expandToLevel(vfd, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
-      	    	manager.add(new Action("SPC2000") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/spc.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualSleepChamber vsc = hardwareManager.createVirtualSleepChamber();
-      	    			treeViewer.expandToLevel(vsc, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
-      	    	manager.add(new Action("SPED-3") {
-      	    		@Override
-      	    		public ImageDescriptor getImageDescriptor() {
-      	    			return Util.getImageDescriptor("icons/sped.png");
-      	    		}
-      	    		public void run() {
-      	    			VirtualVectorDisplay vvd = hardwareManager.createVirtualVectorDisplay();
-      	    			treeViewer.expandToLevel(vvd, 0);
-      	    			treeViewer.refresh();
-      	    		};
-      	    	});
+      	    	IExtensionPoint hep = Platform.getExtensionRegistry().getExtensionPoint("devcpu.hardware");
+      	    	for (IExtension extension : hep.getExtensions())
+      	    	{
+	      	    	for (final IConfigurationElement element : extension.getConfigurationElements())
+	      	    	{
+	      	    		if ("device".equals(element.getName()))
+	      	    		{
+	      	    			final String deviceName = element.getAttribute("name");
+	      	    			manager.add(new Action(deviceName) {
+											@Override
+	      	    				public ImageDescriptor getImageDescriptor() {
+	      	    					String iconPath = element.getAttribute("icon");
+	      	    					if (iconPath != null && iconPath.length() > 0)
+	      	    					{
+	      	    						return ImageDescriptor.createFromURL(BundleUtility.find(Platform.getBundle(element.getDeclaringExtension().getNamespaceIdentifier()), iconPath));
+	      	    					}
+	      	    					return super.getImageDescriptor();
+	      	    				}
+	      	    				public void run() {
+	      	    					DCPUHardware hw = hardwareManager.createHardware(element);
+	      	    					if (hw != null)
+	      	    					{
+	      	    						treeViewer.expandToLevel(hw, 0);
+	      	    						treeViewer.refresh();
+	      	    					}
+	      	    					else
+	      	    					{
+	      	    						//TODO: exception?
+	      	    					}
+	      	    				}
+	      	    			});
+	      	    		}
+	      	    	}
+      	    	}
       	    }
       	  });
       	  hardwareMenu.setRemoveAllWhenShown(true);
