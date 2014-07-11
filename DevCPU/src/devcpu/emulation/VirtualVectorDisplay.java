@@ -42,8 +42,6 @@ public class VirtualVectorDisplay extends DCPUHardware
 	protected double angle;
 	private double targetDelta;
 	protected List<Vertex> vertices = new ArrayList<Vertex>();
-	private String id = "SPED-3";
-	private HardwareManager manager;
 	
   public VirtualVectorDisplay(String id, HardwareManager manager) {
     super(0x42babf3c, 0x0003, 0x1eb37e91);
@@ -133,18 +131,6 @@ public class VirtualVectorDisplay extends DCPUHardware
 		return angle;
 	}
 
-	public String getID() {
-		return id ;
-	}
-	
-	public void setID(String id) {
-		this.id = id;
-	}
-	
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		this.mapLength = 0;

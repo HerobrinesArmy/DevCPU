@@ -2,6 +2,8 @@ package devcpu.emulation;
 
 import java.util.Random;
 
+import devcpu.managers.HardwareManager;
+
 public abstract class DCPUHardware implements IHardware
 {
   public static final int TYPE_LEM = 0x7349F615;
@@ -14,6 +16,8 @@ public abstract class DCPUHardware implements IHardware
   private final int revision;
   private final int manufactorer;
   public DCPU dcpu;
+	protected HardwareManager manager;
+	protected String id;
 
   public DCPUHardware(int type, int revision, int manufactorer)
   {
@@ -68,5 +72,23 @@ public abstract class DCPUHardware implements IHardware
 	}
 
 	public void onDestroy() {
+	}
+	
+	public void setManager(HardwareManager manager) {
+		this.manager = manager;
+	}
+	
+	public HardwareManager getManager() {
+		return manager;
+	}
+	
+	@Override
+	public String getID() {
+		return id;
+	}
+
+	@Override
+	public void setID(String id) {
+		this.id = id;
 	}
 }

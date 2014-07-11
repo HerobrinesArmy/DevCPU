@@ -23,9 +23,6 @@ public class VirtualMonitor extends DCPUHardware
   private int borderColor = 0;
   private int startDelay = 0;
   
-  private String id = "LEM1802";
-	private HardwareManager manager;
-	
   private static final int[] loadImage = new int[12288];
   static {
   	try {
@@ -265,18 +262,6 @@ public class VirtualMonitor extends DCPUHardware
     return lightColor;
   }
   
-	public String getID() {
-		return id ;
-	}
-	
-	public void setID(String id) {
-		this.id = id;
-	}
-
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		lightColor = 0;

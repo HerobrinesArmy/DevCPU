@@ -5,18 +5,15 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 import devcpu.assembler.Assembly;
+import devcpu.emulation.DCPUHardware;
 import devcpu.emulation.DefaultControllableDCPU;
 import devcpu.emulation.FloppyDisk;
+import devcpu.emulation.Identifiable;
 import devcpu.emulation.Ship;
-import devcpu.emulation.VirtualClock;
-import devcpu.emulation.VirtualFloppyDrive;
-import devcpu.emulation.VirtualKeyboard;
-import devcpu.emulation.VirtualMonitor;
-import devcpu.emulation.VirtualSleepChamber;
-import devcpu.emulation.VirtualVectorDisplay;
 import devcpu.managers.DCPUManager;
 import devcpu.managers.FloppyManager;
 import devcpu.managers.HardwareManager;
+import devcpu.managers.HardwareRegistry;
 import devcpu.util.Util;
 
 public class DeviceManagerLabelProvider extends LabelProvider {
@@ -47,20 +44,8 @@ public class DeviceManagerLabelProvider extends LabelProvider {
 			} else {
 				return dcpu.getID();				
 			}
-		} else if (o instanceof VirtualClock) {
-			return ((VirtualClock)o).getID();
-		} else if (o instanceof VirtualFloppyDrive) {
-			return ((VirtualFloppyDrive)o).getID();
-		} else if (o instanceof VirtualKeyboard) {
-			return ((VirtualKeyboard)o).getID();
-		} else if (o instanceof VirtualSleepChamber) {
-			return ((VirtualSleepChamber)o).getID();
-		} else if (o instanceof VirtualVectorDisplay) {
-			return ((VirtualVectorDisplay)o).getID();
-		} else if (o instanceof VirtualMonitor) {
-			return ((VirtualMonitor)o).getID();
-		} else if (o instanceof FloppyDisk) {
-			return ((FloppyDisk)o).getID();
+		} else if (o instanceof Identifiable) {
+			return ((Identifiable)o).getID();
 		} else {
 			return "Unknown";
 		}
@@ -71,24 +56,9 @@ public class DeviceManagerLabelProvider extends LabelProvider {
 		if (o instanceof DefaultControllableDCPU)
 		{
 			return new Image(Display.getDefault(), Util.loadResource("icons/dcpu.png"));
-		} else if (o instanceof VirtualMonitor)
+		} else if (o instanceof DCPUHardware)
 		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/lem.png"));
-		} else if (o instanceof VirtualKeyboard)
-		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/keyboard.png"));
-		} else if (o instanceof VirtualVectorDisplay)
-		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/sped.png"));
-		} else if (o instanceof VirtualSleepChamber)
-		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/spc.png"));
-		} else if (o instanceof VirtualFloppyDrive)
-		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/fd.png"));
-		} else if (o instanceof VirtualClock)
-		{
-			return new Image(Display.getDefault(), Util.loadResource("icons/clock.png"));
+			return HardwareRegistry.getDeviceByClass(o.getClass()).getIconDescriptor().createImage();
 		} else if (o instanceof FloppyDisk)
 		{
 			if (((FloppyDisk) o).isWriteProtected()) {

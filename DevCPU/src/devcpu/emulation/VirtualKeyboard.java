@@ -23,9 +23,6 @@ public class VirtualKeyboard extends DCPUHardware
   private boolean doInterrupt;
   private boolean powered;
   
-  private String id = "Generic Keyboard";
-	private HardwareManager manager;
-
   public VirtualKeyboard(String id, HardwareManager manager, KeyMapping keyMapping)
   {
     super(0x30cf7406, 0x1337, 0x1EB37E91);
@@ -112,18 +109,6 @@ public class VirtualKeyboard extends DCPUHardware
     }
   }
   
-	public String getID() {
-		return id ;
-	}
-	
-	public void setID(String id) {
-		this.id = id;
-	}
-
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		this.powered = false;

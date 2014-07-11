@@ -51,8 +51,6 @@ public class VirtualFloppyDrive extends DCPUHardware
 	private int track;
 	private FloppyDisk floppy;
 	private FloppyOperation operation = new FloppyOperation(FloppyOperation.NONE, 0, 0, Integer.MAX_VALUE);
-	private String id;
-	private HardwareManager manager;
 	
   public VirtualFloppyDrive(String id, HardwareManager manager) {
     super(0x4fd524c5, 0x000b, 0x1eb37e91);
@@ -209,18 +207,6 @@ public class VirtualFloppyDrive extends DCPUHardware
 		return floppy;
 	}
 
-	public String getID() {
-		return id;
-	}
-
-	public void setID(String id) {
-		this.id = id;
-	}
-
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		this.state = floppy == null ? STATE_NO_MEDIA : floppy.isWriteProtected() ? STATE_READY_WP : STATE_READY;

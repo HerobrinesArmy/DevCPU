@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -31,7 +27,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eclipse.ui.internal.util.BundleUtility;
 import org.eclipse.ui.part.ViewPart;
 
 import devcpu.Activator;
@@ -45,13 +40,14 @@ import devcpu.emulation.VirtualKeyboard;
 import devcpu.emulation.VirtualMonitor;
 import devcpu.emulation.VirtualVectorDisplay;
 import devcpu.managers.DCPUManager;
+import devcpu.managers.DeviceRegistration;
 import devcpu.managers.FloppyManager;
 import devcpu.managers.HardwareManager;
+import devcpu.managers.HardwareRegistry;
 import devcpu.util.Util;
 import devcpu.views.hex.DCPUMemoryDataProvider;
 import devcpu.views.hex.HexView;
 
-@SuppressWarnings("restriction")
 public class DeviceManagerView extends ViewPart {
 	public static final String ID = "devcpu.views.DeviceManagerView";
 	private TreeViewer treeViewer;
@@ -228,40 +224,27 @@ public class DeviceManagerView extends ViewPart {
       	  hardwareMenu.addMenuListener(new IMenuListener() {
       	    @Override
       	    public void menuAboutToShow(IMenuManager manager) {
-      	    	IExtensionPoint hep = Platform.getExtensionRegistry().getExtensionPoint("devcpu.hardware");
-      	    	for (IExtension extension : hep.getExtensions())
+      	    	for (final DeviceRegistration device : HardwareRegistry.getDevices())
       	    	{
-	      	    	for (final IConfigurationElement element : extension.getConfigurationElements())
-	      	    	{
-	      	    		if ("device".equals(element.getName()))
-	      	    		{
-	      	    			final String deviceName = element.getAttribute("name");
-	      	    			manager.add(new Action(deviceName) {
-											@Override
-	      	    				public ImageDescriptor getImageDescriptor() {
-	      	    					String iconPath = element.getAttribute("icon");
-	      	    					if (iconPath != null && iconPath.length() > 0)
-	      	    					{
-	      	    						return ImageDescriptor.createFromURL(BundleUtility.find(Platform.getBundle(element.getDeclaringExtension().getNamespaceIdentifier()), iconPath));
-	      	    					}
-	      	    					return super.getImageDescriptor();
-	      	    				}
-	      	    				public void run() {
-	      	    					DCPUHardware hw = hardwareManager.createHardware(element);
-	      	    					if (hw != null)
-	      	    					{
-	      	    						treeViewer.expandToLevel(hw, 0);
-	      	    						treeViewer.refresh();
-	      	    					}
-	      	    					else
-	      	    					{
-	      	    						//TODO: exception?
-	      	    					}
-	      	    				}
-	      	    			});
-	      	    		}
-	      	    	}
-      	    	}
+    	    			manager.add(new Action(device.getName()) {
+									@Override
+    	    				public ImageDescriptor getImageDescriptor() {
+										return device.getIconDescriptor();
+    	    				}
+    	    				public void run() {
+    	    					DCPUHardware hw = hardwareManager.createHardware(device);
+    	    					if (hw != null)
+    	    					{
+    	    						treeViewer.expandToLevel(hw, 0);
+    	    						treeViewer.refresh();
+    	    					}
+    	    					else
+    	    					{
+    	    						//TODO: exception?
+    	    					}
+    	    				}
+    	    			});
+    	    		}
       	    }
       	  });
       	  hardwareMenu.setRemoveAllWhenShown(true);

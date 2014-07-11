@@ -9,9 +9,6 @@ public class VirtualClock extends DCPUHardware
   private char ticks;
   private char interruptMessage;
   
-	private String id;
-	private HardwareManager manager;
-
   public VirtualClock(String id, HardwareManager manager)
   {
     super(315667458, 32776, 515079825);
@@ -43,18 +40,6 @@ public class VirtualClock extends DCPUHardware
     }
   }
 
-	public String getID() {
-		return id;
-	}
-
-	public void setID(String id) {
-		this.id = id;
-	}
-
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		this.intCount = 0;

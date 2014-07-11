@@ -2,9 +2,6 @@ package devcpu.managers;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-
 import devcpu.ViewMapper;
 import devcpu.emulation.AWTKeyMapping;
 import devcpu.emulation.DCPUHardware;
@@ -129,21 +126,16 @@ public class HardwareManager {
 		return id++;
 	}
 
-	public DCPUHardware createHardware(IConfigurationElement element) {
+	public DCPUHardware createHardware(DeviceRegistration device) {
 		try {
-			Object o = element.createExecutableExtension("class");
-			if (o instanceof DCPUHardware)
-			{
-				DCPUHardware hw = (DCPUHardware) o;
-				hw.setID(element.getAttribute("name") + " " + id++);
+				DCPUHardware hw = device.createInstance();
+				hw.setID(device.getName() + " " + id++);
+				hw.setManager(this);
 				devices.add(hw);
 				return hw;
-			}
-			else
-			{
-				//TODO: Exception?
-			}
-		} catch (CoreException e) {
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
 		return null;

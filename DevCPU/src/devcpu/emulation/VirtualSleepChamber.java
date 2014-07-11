@@ -50,8 +50,6 @@ public class VirtualSleepChamber extends DCPUHardware
 	private long numberOfUnitsToSkip;
 	@SuppressWarnings("unused")
 	private int unitToSkip;
-	private HardwareManager manager;
-	private String id;
 	
   public VirtualSleepChamber(String id, HardwareManager manager) {
     super(0x40e41d9d, 0x005e, 0x1c6c8b36);
@@ -143,24 +141,11 @@ public class VirtualSleepChamber extends DCPUHardware
 	public void tick60hz() {
 		//TODO Something while triggered, I suppose
   }
-	
 
 	private void trigger() {	
 		//TODO Handle sleep chamber activation
 	}
 
-	public String getID() {
-		return id;
-	}
-
-	public void setID(String id) {
-		this.id = id;
-	}
-
-	public HardwareManager getManager() {
-		return manager;
-	}
-	
 	@Override
 	public void powerOff() {
 		this.numberOfUnitsToSkip = 0;

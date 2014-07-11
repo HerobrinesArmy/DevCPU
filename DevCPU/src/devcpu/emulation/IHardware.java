@@ -1,5 +1,7 @@
 package devcpu.emulation;
 
-public interface IHardware extends Identifiable {
+import devcpu.managers.HardwareManager;
 
+public interface IHardware extends Identifiable {
+	public void setManager(HardwareManager manager);
 }
