@@ -35,15 +35,16 @@ public class HardwareRegistry {
     		{
     			String id = element.getAttribute("id");
     			String name = element.getAttribute("name");
-    			Class<? extends DCPUHardware> clazz = null;
+    			Class<?> clazz = null;
+//    			Class<? extends DCPUHardware> clazz = null;
     			try {
-						clazz = (Class<? extends DCPUHardware>) Class.forName(element.getAttribute("class"));
+						clazz = Class.forName(element.getAttribute("class"));
 					} catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} catch (InvalidRegistryObjectException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+//					} catch (InvalidRegistryObjectException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
 					}
     			String iconPath = element.getAttribute("icon");
     			ImageDescriptor iconDescriptor = null;
@@ -53,7 +54,15 @@ public class HardwareRegistry {
 					}
 					DeviceRegistration dr = new DeviceRegistration(id, name, clazz, iconDescriptor, element);
 					devices.put(id, dr);
-					devicesByClass.put(clazz, dr);
+					try {
+						devicesByClass.put(dr.createInstance().getClass(), dr);
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					//TODO: check for and add views and anything else you add later
     		}
     	}

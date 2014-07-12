@@ -1,5 +1,6 @@
 package devcpu.managers;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 
@@ -8,16 +9,16 @@ import devcpu.emulation.DCPUHardware;
 public class DeviceRegistration {
 	private String id;
 	private String name;
-	private Class<? extends DCPUHardware> clazz;
+	private Class<?> clazz;
 	private ImageDescriptor iconDescriptor;
-//	private IConfigurationElement element;
+	private IConfigurationElement element;
 
-	public DeviceRegistration(String id, String name, Class<? extends DCPUHardware> clazz, ImageDescriptor iconDescriptor, IConfigurationElement element) {
+	public DeviceRegistration(String id, String name, Class<?> clazz, ImageDescriptor iconDescriptor, IConfigurationElement element) {
 		this.id = id;
 		this.name = name;
 		this.clazz = clazz;
 		this.iconDescriptor = iconDescriptor;
-//		this.element = element;
+		this.element = element;
 	}
 
 	public String getId() {
@@ -34,6 +35,12 @@ public class DeviceRegistration {
 	
 	public DCPUHardware createInstance() throws InstantiationException, IllegalAccessException
 	{
-		return clazz.newInstance();
+		try {
+			return (DCPUHardware) element.createExecutableExtension("class");
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
