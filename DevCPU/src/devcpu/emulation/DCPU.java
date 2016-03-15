@@ -384,45 +384,47 @@ public class DCPU
       case 2:{ //ADD
         cycles++;
         int val = b + a;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 3:{ //SUB
         cycles++;
         int val = b - a;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 4:{ //MUL
         cycles++;
         int val = b * a;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 5:{ //MLI
         cycles++;
         int val = (short)b * (short)a;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 6:{ //DIV
         cycles += 2;
         if (a == 0) {
-          b = ex = 0;
+          set(baddr, (char) 0);
+          ex = 0;
         } else {
-          b /= a;
+          set(baddr, b / a);
           ex = (char)((b << 16) / a);
         }
-        break;
+        return;
       }case 7:{ //DVI
         cycles += 2;
         if (a == 0) {
-          b = ex = 0;
+          set(baddr, (char) 0);
+          ex = 0;
         } else {
-          b = (char)((short)b / (short)a);
+          set(baddr, (char)((short)b / (short)a));
           ex = (char)(((short)b << 16) / (short)a);
         }
-        break;
+        return;
       }case 8: //MOD
         cycles += 2;
         if (a == 0)
@@ -449,17 +451,17 @@ public class DCPU
         b = (char)(b ^ a);
         break;
       case 13: //SHR
+        set(baddr, (char)(b >>> a));
         ex = (char)(b << 16 >> a);
-        b = (char)(b >>> a);
-        break;
+        return;
       case 14: //ASR
+        set(baddr, (char)((short)b >> a));
         ex = (char)((short)b << 16 >>> a);
-        b = (char)((short)b >> a);
-        break;
+        return;
       case 15: //SHL
+        set(baddr, (char)(b << a));
         ex = (char)(b << a >> 16);
-        b = (char)(b << a);
-        break;
+        return;
       case 16: //IFB
         cycles++;
         if ((b & a) == 0) skip();
@@ -495,15 +497,15 @@ public class DCPU
       case 26:{ //ADX
         cycles++;
         int val = b + a + ex;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 27:{ //SBX
         cycles++;
         int val = b - a + ex;
-        b = (char)val;
+        set(baddr, (char)val);
         ex = (char)(val >> 16);
-        break;
+        return;
       }case 30: //STI
         b = a;
         set(baddr, b);
