@@ -451,14 +451,25 @@ public class DCPU
         b = (char)(b ^ a);
         break;
       case 13: //SHR
+        if(a > 31) {
+          set(baddr, (char) 0);
+          ex = (char) 0;
+          return;
+        }
         set(baddr, (char)(b >>> a));
-        ex = (char)(b << 16 >> a);
+        ex = (char)(b << 16 >>> a);
         return;
       case 14: //ASR
+        if(a > 31) a = 31;
         set(baddr, (char)((short)b >> a));
-        ex = (char)((short)b << 16 >>> a);
+        ex = (char)(b << 16 >> a);
         return;
       case 15: //SHL
+        if(a > 31) {
+          set(baddr, (char) 0);
+          ex = (char) 0;
+          return;
+        }
         set(baddr, (char)(b << a));
         ex = (char)(b << a >> 16);
         return;
