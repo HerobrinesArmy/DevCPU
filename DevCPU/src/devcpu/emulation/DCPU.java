@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class DCPU
 {
+  private static final boolean SHIFT_DISTANCE_5_BITS = true;
+
   private static final boolean DISASSEMBLE = false;
   public char[] ram = new char[65536];
   public char pc;
@@ -410,21 +412,23 @@ public class DCPU
         if (a == 0) {
           set(baddr, (char) 0);
           ex = 0;
+          return;
         } else {
-          set(baddr, b / a);
-          ex = (char)((b << 16) / a);
+          set(baddr, (char) (b / a));
+          ex = (char) (((long) b << 16) / a);
+          return;
         }
-        return;
       }case 7:{ //DVI
         cycles += 2;
         if (a == 0) {
           set(baddr, (char) 0);
           ex = 0;
+          return;
         } else {
-          set(baddr, (char)((short)b / (short)a));
-          ex = (char)(((short)b << 16) / (short)a);
+          set(baddr, (char) ((short) b / (short) a));
+          ex = (char) ((b << 16) / ((short) a));
+          return;
         }
-        return;
       }case 8: //MOD
         cycles += 2;
         if (a == 0)
@@ -451,27 +455,29 @@ public class DCPU
         b = (char)(b ^ a);
         break;
       case 13: //SHR
-        if(a > 31) {
+        if(!SHIFT_DISTANCE_5_BITS && a > 31) {
           set(baddr, (char) 0);
           ex = (char) 0;
-          return;
+        } else {
+          set(baddr, (char) (b >>> a));
+          ex = (char) (b << 16 >>> a);
         }
-        set(baddr, (char)(b >>> a));
-        ex = (char)(b << 16 >>> a);
         return;
       case 14: //ASR
-        if(a > 31) a = 31;
+        if(!SHIFT_DISTANCE_5_BITS && a > 31) {
+          a = 31;
+        }
         set(baddr, (char)((short)b >> a));
         ex = (char)(b << 16 >> a);
         return;
       case 15: //SHL
-        if(a > 31) {
+        if(!SHIFT_DISTANCE_5_BITS && a > 31) {
           set(baddr, (char) 0);
           ex = (char) 0;
-          return;
+        } else {
+          set(baddr, (char) (b << a));
+          ex = (char) (b << a >> 16);
         }
-        set(baddr, (char)(b << a));
-        ex = (char)(b << a >> 16);
         return;
       case 16: //IFB
         cycles++;
